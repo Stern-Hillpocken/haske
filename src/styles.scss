@@ -1,1 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
+@font-face {
+    font-family: "font-base";
+    //src: url("assets/fonts/PortLligatSans-Regular.ttf");
+}
+
+body {
+    --color-dominent: #feda82;
+    --color-complement: #d67e6a;
+    --color-accent: #9b5bc9;
+}
