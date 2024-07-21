@@ -9,3 +9,15 @@ body {
     --color-complement: #d67e6a;
     --color-accent: #9b5bc9;
 }
+
+*[draggable=true] {
+    position: absolute;
+}
+*[draggable=true]:hover {
+    cursor: grab;
+}
+
+img {
+    image-rendering: pixelated;
+    width: 64px;
+}

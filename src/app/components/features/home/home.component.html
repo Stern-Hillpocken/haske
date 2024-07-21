@@ -1,0 +1,8 @@
+<div (dragenter)="onDivEnter()">
+<app-home-header></app-home-header>
+<app-home-pawn (pawnDragEndEmitter)="onPawnDragEndReceive($event)"></app-home-pawn>
+<app-home-menu (pawnEnterEmitter)="onPawnOverReceive($event)"></app-home-menu>
+<app-home-display [typeOfText]="typeOfTextToDiplay"></app-home-display>
+<br>
+<br>
+</div>
