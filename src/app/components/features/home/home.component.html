@@ -1,0 +1,6 @@
+<div>
+    <app-home-header></app-home-header>
+    <app-home-pawn [gameState]="gameState"></app-home-pawn>
+    <app-home-menu [gameState]="gameState" (pawnEnterEmitter)="onPawnEnterReceive($event)"></app-home-menu>
+    <app-home-display [typeOfText]="typeOfTextToDiplay"></app-home-display>
+</div>
