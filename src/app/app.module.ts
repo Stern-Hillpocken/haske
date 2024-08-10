@@ -11,7 +11,7 @@ import { HomeHeaderComponent } from './components/ui/home/home-header/home-heade
 import { HomeMenuComponent } from './components/ui/home/home-menu/home-menu.component';
 import { HomePawnComponent } from './components/ui/home/home-pawn/home-pawn.component';
 import { HomeDisplayComponent } from './components/ui/home/home-display/home-display.component';
-import { DragMemoryComponent } from './shared/drag-memory/drag-memory.component';
+import { DraggableImageComponent } from './shared/draggable-image/draggable-image.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +24,7 @@ import { DragMemoryComponent } from './shared/drag-memory/drag-memory.component'
     HomeMenuComponent,
     HomePawnComponent,
     HomeDisplayComponent,
-    DragMemoryComponent
+    DraggableImageComponent
   ],
   imports: [
     BrowserModule,

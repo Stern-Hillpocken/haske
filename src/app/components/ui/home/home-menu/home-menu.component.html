@@ -1,14 +1,8 @@
-<div>
-    <div class="menu-container">
-        <img src="assets/images/empty-space/pawn.png" alt="game" (dragenter)="onDragEnter($event)">
-        <p>Jouer</p>
-    </div>
-    <div class="menu-container">
-        <img src="assets/images/empty-space/pawn.png" alt="background" (dragenter)="onDragEnter($event)">
-        <p>Histoire</p>
-    </div>
-    <div class="menu-container">
-        <img src="assets/images/empty-space/pawn.png" alt="credits" (dragenter)="onDragEnter($event)">
-        <p>Crédits</p>
-    </div>
+<div *ngFor="let menu of titles; let i = index" class="window-box" draggable="true" (dragstart)="onWindowDragStart($event)" (dragend)="onWindowDragEnd($event)" style="z-index: 1;">
+    <h3 class="window-title" >{{ titles[i] }}</h3>
+    <div
+        class="window-content"
+        [attr.alt]="keywords[i]"
+        (dragenter)="onDragEnter($event)"
+    ><app-draggable-image *ngIf="gameState.menuChoice === keywords[i]" name="pawn"></app-draggable-image></div>
 </div>

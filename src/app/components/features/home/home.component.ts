@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { GameState } from 'src/app/models/game-state.model';
+import { GameStateService } from 'src/app/shared/game-sate.service';
 
 @Component({
   selector: 'app-home',
@@ -8,24 +9,18 @@ import { Router } from '@angular/router';
 })
 export class HomeComponent {
 
-  typeOfTextToDiplay: "background" | "credits" | "" = "";
-  lastOver: string = "";
+  gameState!: GameState;
+  typeOfTextToDiplay!: string;
 
-  constructor (private router: Router) {}
-
-  onPawnOverReceive(menuAlt: string): void {
-    this.lastOver = menuAlt;
+  constructor (private gss: GameStateService) {
+    this.gss._getGameState$().subscribe((gs: GameState) => {
+      this.gameState = gs;
+      this.typeOfTextToDiplay = gs.menuChoice;
+    })
   }
 
-  onPawnDragEndReceive(pawn: string): void {
-    console.log(pawn + " > " + this.lastOver)
-    if (this.lastOver === "game") this.router.navigateByUrl("/game");
-    else if (this.lastOver === "background" || this.lastOver === "credits" || this.lastOver === "") this.typeOfTextToDiplay = this.lastOver;
-    else this.typeOfTextToDiplay = "";
+  onPawnEnterReceive(menuAlt: string): void {
+    this.gss.onDragEnter(menuAlt);
   }
 
-  onDivEnter(): void {
-    //this.lastOver = ""
-    console.log("div enter")
-  }
 }

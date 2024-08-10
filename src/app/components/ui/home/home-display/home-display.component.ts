@@ -8,12 +8,13 @@ import { Component, Input } from '@angular/core';
 export class HomeDisplayComponent {
 
   @Input()
-  typeOfText!: "background" | "credits" | "";
+  typeOfText!: string;
 
   textToDisplay(): string {
     if (this.typeOfText === "background") return "Background to display";
     else if (this.typeOfText === "credits") return "Credit to display";
-    return "...";
+    else if (this.typeOfText === "help") return "Explication de la gemme";
+    return "Savais-tu que tu pouvais déplacer les menus ? Le déplacement d'élements est même le cœur du jeu. C’est ainsi que tu vas pouvoir réorganiser ton espace de jeu mais surtout déplacer les différents cultistes et objets que tu obtiendras. Si tu ne sais pas à quoi sert un élement, tu peux obtenir plus d’information dessus en le plaçant dans la boîte avec un \"?\" dessus.";
   }
 
 }

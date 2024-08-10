@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @font-face {
     font-family: "font-base";
-    //src: url("assets/fonts/PortLligatSans-Regular.ttf");
+    src: url("assets/fonts/Folks-Normal.ttf");
 }
 
 body {
@@ -11,13 +11,47 @@ body {
 }
 
 *[draggable=true] {
-    position: absolute;
+    //position: absolute;
 }
 *[draggable=true]:hover {
     cursor: grab;
 }
 
+h1, h2, h3 {
+    font-family: "font-base";
+    margin: 0;
+}
+h1 {
+    font-size: 10em;
+}
+h2 {
+    font-size: 4em;
+}
+
 img {
     image-rendering: pixelated;
-    width: 64px;
+    width: 32px;
+}
+
+.window-box {
+    border: 4px solid black;
+    border-radius: 0.5em;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+.window-title {
+    background-color: var(--color-accent);
+    padding: 0.2em;
+    padding-left: 1em;
+    padding-right: 1em;
+    font-size: 2em;
+    font-weight: bold;
+}
+.window-content {
+    background-color: white;
+    min-height: 3em;
+    display: flex;
+    align-items: center;
+    padding: 0.5em;
 }
