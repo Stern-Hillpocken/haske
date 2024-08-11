@@ -1,0 +1,15 @@
+.time-banner {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    text-align: center;
+    border: 2px solid black;
+
+    animation-name: slider;
+    animation-timing-function: cubic-bezier(0,1,1,0);
+}
+
+@keyframes slider {
+    from {left: 100%;}
+    to {left: -100%;}
+}
