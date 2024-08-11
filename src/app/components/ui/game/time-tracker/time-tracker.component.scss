@@ -1,0 +1,13 @@
+.time-bar {
+    position: relative;
+    width: 80%;
+    border: 2px solid black;
+    border-radius: 2em;
+    height: 1em;
+    background: linear-gradient(90deg, black 0%, rgba(0,212,255,1) 10%, var(--color-complement) 20%, var(--color-dominent) 45%, var(--color-dominent) 55%, var(--color-complement) 80%, var(--color-accent) 90%, black 100%);
+}
+
+img {
+    position: absolute;
+    top: -8px;
+}
