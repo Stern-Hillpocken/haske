@@ -15,12 +15,12 @@ export class HomeComponent {
   constructor (private gss: GameStateService) {
     this.gss._getGameState$().subscribe((gs: GameState) => {
       this.gameState = gs;
-      this.typeOfTextToDiplay = gs.menuChoice;
+      //this.typeOfTextToDiplay = gs.menuChoice;
     })
   }
 
   onPawnEnterReceive(menuAlt: string): void {
-    this.gss.onDragEnter(menuAlt);
+    //this.gss.onMenuDragEnter(menuAlt);
   }
 
 }

@@ -1,13 +1,12 @@
+import { GameDrag } from "./game-drag.model";
 import { GameTime } from "./game-time.model";
+import { GameWindow } from "./game-window.mode";
 
 export class GameState {
     constructor(
-        public menuChoice: string,
-        public windowStart: string,
-        public objectDragged: string,
-        public windowEnd: string,
-
+        public drag: GameDrag,
         public flame: number,
-        public time: GameTime
+        public time: GameTime,
+        public windows: GameWindow[]
     ) {}
 }

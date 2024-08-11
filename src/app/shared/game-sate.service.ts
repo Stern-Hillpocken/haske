@@ -3,13 +3,22 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { Router } from '@angular/router';
 import { GameTime } from '../models/game-time.model';
+import { GameWindow } from '../models/game-window.mode';
+import { GameDrag } from '../models/game-drag.model';
+import { DraggableNames } from '../types/draggable-names.type';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameStateService {
 
-  private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState("", "", "", "", 0, new GameTime(0, 1, 1)))
+  private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(-1, -1, "cultist"), 5, new GameTime(10, 1, 1), [
+    new GameWindow("storage", ["water", "water"], ["cultist", "water"]),
+    new GameWindow("storage", ["water"], ["cultist", "water"]),
+    new GameWindow("exploration", [], ["cultist"]),
+    new GameWindow("lighthouse", ["cultist"], ["cultist"])
+  ]
+  ));
 
   constructor(private router: Router) { }
 
@@ -17,18 +26,18 @@ export class GameStateService {
     return this._gameState$.asObservable();
   }
 
-  onDragStart(altNameImage: string, altNameDiv: string): void {
+  /*onMenuDragStart(altNameImage: string, altNameDiv: string): void {
     this._gameState$.value.objectDragged = altNameImage;
     this._gameState$.value.windowStart = altNameDiv;
     console.log(this._gameState$.value)
   }
 
-  onDragEnter(altNameDiv: string): void {
+  onMenuDragEnter(altNameDiv: string): void {
     this._gameState$.value.windowEnd = altNameDiv;
     console.log(this._gameState$.value)
   }
 
-  onDragEnd(): void {
+  onMenuDragEnd(): void {
     this._gameState$.value.menuChoice = this._gameState$.value.windowEnd;
     if (this._gameState$.value.windowEnd === "game") {
       this._gameState$.value.menuChoice = "";
@@ -40,6 +49,37 @@ export class GameStateService {
     const newState = this._gameState$.value
     this._gameState$.next(newState)
     console.log(this._gameState$.value)
+  }*/
+
+  onDragStart(altNameImage: DraggableNames, windowId: number): void {
+    this._gameState$.value.drag.draggableName = altNameImage;
+    this._gameState$.value.drag.windowStartId = windowId;
+  }
+
+  onDragEnter(windowId: number): void {
+    this._gameState$.value.drag.windowEndId = windowId;
+  }
+
+  onDragEnd(): void {
+    console.log(this._gameState$.value.drag)
+
+    let windowStart = this._gameState$.value.windows[this._gameState$.value.drag.windowStartId];
+    let windowEnd = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
+    let dragName = this._gameState$.value.drag.draggableName;
+    if (!windowEnd) return; // When draggable is drop outside
+
+    if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
+      windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
+      windowEnd.content.push(dragName);
+      windowEnd.content.sort();
+    } else {
+      console.log("Drop impossible")
+    }
+    
+    this._gameState$.value.drag.windowStartId = -1;
+    this._gameState$.value.drag.windowEndId = -1;
+    this._gameState$.value.drag.draggableName = "cultist";
+    this._gameState$.next(this._gameState$.value)
   }
 
   tickTime(): void {

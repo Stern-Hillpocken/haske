@@ -1,0 +1,9 @@
+<div class="window-box" draggable="true" (dragstart)="onWindowDragStart($event)" (dragend)="onWindowDragEnd($event)" style="z-index: 1;">
+    <h3 class="window-title" >{{ getTitle() }}</h3>
+    <div
+        class="window-content"
+        (dragenter)="onDragEnter()"
+    >
+        <app-draggable-image *ngFor="let c of windowInfo.content" [name]="c" [windowId]="id"></app-draggable-image>
+    </div>
+</div>

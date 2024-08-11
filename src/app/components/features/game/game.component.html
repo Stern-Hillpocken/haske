@@ -1,2 +1,3 @@
 <app-time-tracker [time]="gameState.time" (tickEmitter)="onTickReceive()"></app-time-tracker>
 <app-time-banner [tick]="gameState.time.tick" [speed]="gameState.time.speed"></app-time-banner>
+<app-game-window *ngFor="let w of gameState.windows; let id = index" [windowInfo]="w" [id]="id" (draggableEnterEmitter)="onDraggableEnterReceive($event)"></app-game-window>
