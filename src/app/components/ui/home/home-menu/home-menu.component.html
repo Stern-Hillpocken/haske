@@ -5,6 +5,11 @@
         [attr.alt]="keywords[i]"
         (dragenter)="onDragEnter($event)"
     >
-    <!-- <app-draggable-image *ngIf="gameState.menuChoice === keywords[i]" name="pawn"></app-draggable-image> -->
+    <img
+        *ngIf="pawnPosition === keywords[i]"
+        draggable="true"
+        (dragend)="onPawnDragEnd()"
+        [src]="'assets/images/draggable/pawn.png'"
+    >
     </div>
 </div>

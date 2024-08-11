@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { GameState } from 'src/app/models/game-state.model';
-import { GameStateService } from 'src/app/shared/game-sate.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -9,18 +8,19 @@ import { GameStateService } from 'src/app/shared/game-sate.service';
 })
 export class HomeComponent {
 
-  gameState!: GameState;
-  typeOfTextToDiplay!: string;
+  pawnLastHover: string = "";
+  pawnPosition: string = "";
 
-  constructor (private gss: GameStateService) {
-    this.gss._getGameState$().subscribe((gs: GameState) => {
-      this.gameState = gs;
-      //this.typeOfTextToDiplay = gs.menuChoice;
-    })
+  constructor (private router: Router) {}
+
+  onPawnEnterReceive(divAlt: string): void {
+    this.pawnLastHover = divAlt;
   }
 
-  onPawnEnterReceive(menuAlt: string): void {
-    //this.gss.onMenuDragEnter(menuAlt);
+  onPawnEndReceive(): void {
+    this.pawnPosition = this.pawnLastHover;
+    this.pawnLastHover = "";
+    if (this.pawnPosition === "game") this.router.navigateByUrl("/game");
   }
 
 }

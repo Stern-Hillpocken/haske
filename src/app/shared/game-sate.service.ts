@@ -20,36 +20,11 @@ export class GameStateService {
   ]
   ));
 
-  constructor(private router: Router) { }
+  constructor () { }
 
   _getGameState$(): Observable<GameState> {
     return this._gameState$.asObservable();
   }
-
-  /*onMenuDragStart(altNameImage: string, altNameDiv: string): void {
-    this._gameState$.value.objectDragged = altNameImage;
-    this._gameState$.value.windowStart = altNameDiv;
-    console.log(this._gameState$.value)
-  }
-
-  onMenuDragEnter(altNameDiv: string): void {
-    this._gameState$.value.windowEnd = altNameDiv;
-    console.log(this._gameState$.value)
-  }
-
-  onMenuDragEnd(): void {
-    this._gameState$.value.menuChoice = this._gameState$.value.windowEnd;
-    if (this._gameState$.value.windowEnd === "game") {
-      this._gameState$.value.menuChoice = "";
-      this.router.navigateByUrl("/game");
-    }
-    this._gameState$.value.windowStart = "";
-    this._gameState$.value.windowEnd = "";
-    this._gameState$.value.objectDragged = "";
-    const newState = this._gameState$.value
-    this._gameState$.next(newState)
-    console.log(this._gameState$.value)
-  }*/
 
   onDragStart(altNameImage: DraggableNames, windowId: number): void {
     this._gameState$.value.drag.draggableName = altNameImage;

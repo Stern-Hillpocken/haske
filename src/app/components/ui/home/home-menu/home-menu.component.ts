@@ -9,10 +9,13 @@ import { GameState } from 'src/app/models/game-state.model';
 export class HomeMenuComponent {
 
   @Input()
-  gameState!: GameState;
+  pawnPosition!: string;
 
   @Output()
   pawnEnterEmitter: EventEmitter<string> = new EventEmitter();
+
+  @Output()
+  pawnEndEmitter: EventEmitter<void> = new EventEmitter();
 
   titles = ["Jouer", "Histoire", "Crédits", "?"];
   keywords = ["game", "background", "credits", "help"];
@@ -23,6 +26,10 @@ export class HomeMenuComponent {
   onDragEnter(event: DragEvent): void {
     const div: HTMLDivElement  = (event.target as HTMLDivElement);
     this.pawnEnterEmitter.emit(div.attributes.getNamedItem("alt")?.value);
+  }
+
+  onPawnDragEnd(): void {
+    this.pawnEndEmitter.emit();
   }
 
   onWindowDragStart(event: any): void {
