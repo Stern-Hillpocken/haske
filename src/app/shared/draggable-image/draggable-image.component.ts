@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { GameStateService } from '../game-sate.service';
+import { DraggableNames } from 'src/app/types/draggable-names.type';
 
 @Component({
   selector: 'app-draggable-image',
@@ -9,14 +10,15 @@ import { GameStateService } from '../game-sate.service';
 export class DraggableImageComponent {
 
   @Input()
-  name!: string;
+  name!: DraggableNames;
+
+  @Input()
+  windowId: number = -1;
 
   constructor(private gss: GameStateService) {}
 
-  onDragStart(event: any): void {
-    const img: HTMLImageElement = (event.target as HTMLImageElement);
-    img.style.opacity = "0.2";
-    this.gss.onDragStart(img.alt, "menu");
+  onDragStart(): void {
+    this.gss.onDragStart(this.name, this.windowId);
   }
 
   onDragEnd(): void {

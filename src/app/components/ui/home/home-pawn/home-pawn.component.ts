@@ -1,5 +1,4 @@
-import { Component, Input } from '@angular/core';
-import { GameState } from 'src/app/models/game-state.model';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-home-pawn',
@@ -8,7 +7,11 @@ import { GameState } from 'src/app/models/game-state.model';
 })
 export class HomePawnComponent {
 
-  @Input()
-  gameState!: GameState;
+  @Output()
+  pawnEndEmitter: EventEmitter<void> = new EventEmitter();
+
+  onPawnDragEnd(): void {
+    this.pawnEndEmitter.emit();
+  }
 
 }

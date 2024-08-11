@@ -1,6 +1,6 @@
 <div>
     <app-home-header></app-home-header>
-    <app-home-pawn [gameState]="gameState"></app-home-pawn>
-    <app-home-menu [gameState]="gameState" (pawnEnterEmitter)="onPawnEnterReceive($event)"></app-home-menu>
-    <app-home-display [typeOfText]="typeOfTextToDiplay"></app-home-display>
+    <app-home-pawn (pawnEndEmitter)="onPawnEndReceive()" *ngIf="pawnPosition === ''"></app-home-pawn>
+    <app-home-menu [pawnPosition]="pawnPosition" (pawnEnterEmitter)="onPawnEnterReceive($event)" (pawnEndEmitter)="onPawnEndReceive()"></app-home-menu>
+    <app-home-display [pawnPosition]="pawnPosition"></app-home-display>
 </div>

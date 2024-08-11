@@ -21,4 +21,8 @@ export class GameComponent {
     this.gss.tickTime();
   }
 
+  onDraggableEnterReceive(windowId: number): void {
+    this.gss.onDragEnter(windowId);
+  }
+
 }

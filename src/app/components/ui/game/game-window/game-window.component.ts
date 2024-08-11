@@ -1,35 +1,35 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { GameState } from 'src/app/models/game-state.model';
+import { GameWindow } from 'src/app/models/game-window.mode';
 
 @Component({
-  selector: 'app-home-menu',
-  templateUrl: './home-menu.component.html',
-  styleUrls: ['./home-menu.component.scss']
+  selector: 'app-game-window',
+  templateUrl: './game-window.component.html',
+  styleUrls: ['./game-window.component.scss']
 })
-export class HomeMenuComponent {
+export class GameWindowComponent {
 
   @Input()
-  pawnPosition!: string;
+  windowInfo!: GameWindow;
+
+  @Input()
+  id!: number;
 
   @Output()
-  pawnEnterEmitter: EventEmitter<string> = new EventEmitter();
-
-  @Output()
-  pawnEndEmitter: EventEmitter<void> = new EventEmitter();
-
-  titles = ["Jouer", "Histoire", "Crédits", "?"];
-  keywords = ["game", "background", "credits", "help"];
+  draggableEnterEmitter: EventEmitter<number> = new EventEmitter();
 
   layerX: number = 0;
   layerY: number = 0;
 
-  onDragEnter(event: DragEvent): void {
-    const div: HTMLDivElement  = (event.target as HTMLDivElement);
-    this.pawnEnterEmitter.emit(div.attributes.getNamedItem("alt")?.value);
+  getTitle(): string {
+    switch (this.windowInfo.name) {
+      case "exploration": return "Exploration";
+      case "lighthouse": return "Phare";
+      case "storage": return "Entrepôt";
+    }
   }
 
-  onPawnDragEnd(): void {
-    this.pawnEndEmitter.emit();
+  onDragEnter(): void {
+    this.draggableEnterEmitter.emit(this.id);
   }
 
   onWindowDragStart(event: any): void {

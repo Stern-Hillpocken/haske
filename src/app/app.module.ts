@@ -14,6 +14,7 @@ import { HomeDisplayComponent } from './components/ui/home/home-display/home-dis
 import { DraggableImageComponent } from './shared/draggable-image/draggable-image.component';
 import { TimeTrackerComponent } from './components/ui/game/time-tracker/time-tracker.component';
 import { TimeBannerComponent } from './components/ui/game/time-banner/time-banner.component';
+import { GameWindowComponent } from './components/ui/game/game-window/game-window.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { TimeBannerComponent } from './components/ui/game/time-banner/time-banne
     HomeDisplayComponent,
     DraggableImageComponent,
     TimeTrackerComponent,
-    TimeBannerComponent
+    TimeBannerComponent,
+    GameWindowComponent
   ],
   imports: [
     BrowserModule,
