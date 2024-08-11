@@ -9,7 +9,7 @@ import { GameTime } from '../models/game-time.model';
 })
 export class GameStateService {
 
-  private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState("", "", "", "", 0, new GameTime(0, 0)))
+  private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState("", "", "", "", 0, new GameTime(0, 1, 1)))
 
   constructor(private router: Router) { }
 
