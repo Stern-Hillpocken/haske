@@ -12,6 +12,7 @@ import { HomeMenuComponent } from './components/ui/home/home-menu/home-menu.comp
 import { HomePawnComponent } from './components/ui/home/home-pawn/home-pawn.component';
 import { HomeDisplayComponent } from './components/ui/home/home-display/home-display.component';
 import { DraggableImageComponent } from './shared/draggable-image/draggable-image.component';
+import { TimeTrackerComponent } from './components/ui/game/time-tracker/time-tracker.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { DraggableImageComponent } from './shared/draggable-image/draggable-imag
     HomeMenuComponent,
     HomePawnComponent,
     HomeDisplayComponent,
-    DraggableImageComponent
+    DraggableImageComponent,
+    TimeTrackerComponent
   ],
   imports: [
     BrowserModule,

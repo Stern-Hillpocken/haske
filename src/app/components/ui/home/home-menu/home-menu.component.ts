@@ -32,7 +32,7 @@ export class HomeMenuComponent {
 
   onWindowDragEnd(event: DragEvent): void {
     const div: HTMLDivElement = event.target as HTMLDivElement;
-    div.style.left = event.clientX - this.layerX + "px";
+    div.style.left = event.clientX - this.layerX + div.offsetWidth/2 + "px";
     div.style.top = event.clientY - this.layerY + "px";
     let maxZ = 0;
     for(let i = 0; i < document.getElementsByClassName("window-box").length; i++) {
