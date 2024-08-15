@@ -49,7 +49,9 @@ export class GameStateService {
       return;
     }
 
-    if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
+    if (windowEnd instanceof GameWindowStorage && windowEnd.content.length === windowEnd.maxSpace) {
+      console.log("Plus de place")
+    } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
       windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
       windowEnd.content.push(dragName);
       windowEnd.content.sort();
