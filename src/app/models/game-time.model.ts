@@ -1,7 +1,7 @@
 export class GameTime {
     constructor(
-        public tick: number,
-        public day: number,
-        public speed: number
+        public tick: number = 10,
+        public day: number = 1,
+        public speed: number = 1
     ) {}
 }
