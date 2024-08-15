@@ -2,8 +2,8 @@ import { DraggableNames } from "../types/draggable-names.type";
 
 export class GameDrag {
     constructor (
-        public windowStartId: number,
-        public windowEndId: number,
-        public draggableName: DraggableNames
+        public windowStartId: number = -1,
+        public windowEndId: number = -1,
+        public draggableName: DraggableNames = "cultist"
     ) {}
 }
