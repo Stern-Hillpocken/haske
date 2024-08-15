@@ -7,6 +7,7 @@
     style="z-index: 1;"
 >
     <h3 class="window-title">
+        {{ windowInfo.name === "storage" ? '#'+id : '' }}
         {{ getTitle() }}
         {{ windowInfo.usageRemaining !== undefined ? ' x' + windowInfo.usageRemaining : '' }}
         {{ windowInfo.maxSpace !== undefined ? ' '+windowInfo.content.length+'/'+windowInfo.maxSpace : '' }}

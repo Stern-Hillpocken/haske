@@ -5,6 +5,7 @@ import { GameTime } from '../models/game-time.model';
 import { GameWindow, GameWindowExploration, GameWindowLighthouse, GameWindowQuarry, GameWindowScrub, GameWindowStorage } from '../models/game-window.mode';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
+import { ResourceNames } from '../types/resource-names.type';
 
 @Injectable({
   providedIn: 'root'
@@ -95,10 +96,18 @@ export class GameStateService {
             this._gameState$.value.windows.push(explored);
 
           } else if (window instanceof GameWindowQuarry || window instanceof GameWindowScrub) {
-            window.usageRemaining --;
-            switch (window.constructor) {
-              case GameWindowQuarry: window.content.push("stone"); break;
-              case GameWindowScrub: window.content.push("wood"); break;
+            let storageId: number = this.idOfFirstOpenedStorage();
+            if (storageId !== -1) {
+              window.usageRemaining --;
+              let resourceName: ResourceNames = "water";
+              switch (window.constructor) {
+                case GameWindowQuarry: resourceName = "stone"; break;
+                case GameWindowScrub: resourceName = "wood"; break;
+              }
+              this._gameState$.value.windows[storageId].content.push(resourceName);
+              this._gameState$.value.windows[storageId].content.sort();
+            } else {
+              window.currentTime = window.maxTime;
             }
           }
         }
@@ -122,6 +131,14 @@ export class GameStateService {
     }
     this._gameState$.value.windows[lighthouseIndex].content.push(... contentToStore);
     this._gameState$.next(this._gameState$.value);
+  }
+
+  idOfFirstOpenedStorage(): number {
+    for(let i = 0; i < this._gameState$.value.windows.length; i++) {
+      let window: GameWindow = this._gameState$.value.windows[i];
+      if (window instanceof GameWindowStorage && window.content.length < window.maxSpace) return i;
+    }
+    return -1;
   }
 
   flameLost(): void {
