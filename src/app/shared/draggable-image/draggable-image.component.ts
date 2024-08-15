@@ -13,7 +13,7 @@ export class DraggableImageComponent {
   name!: DraggableNames;
 
   @Input()
-  windowId: number = -1;
+  windowId!: number;
 
   constructor(private gss: GameStateService) {}
 

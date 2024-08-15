@@ -40,7 +40,13 @@ export class GameStateService {
     let windowStart = this._gameState$.value.windows[this._gameState$.value.drag.windowStartId];
     let windowEnd = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
     let dragName = this._gameState$.value.drag.draggableName;
-    if (!windowEnd) return; // When draggable is drop outside
+    // When draggable is drop outside
+    if (!windowEnd) {
+      console.log("Outside")
+      this._gameState$.value.drag = new GameDrag();
+      this._gameState$.next(this._gameState$.value);
+      return;
+    }
 
     if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
       windowStart.content.splice(windowStart.content.indexOf(dragName), 1);

@@ -5,3 +5,6 @@
 .bar {
     background-color: var(--color-complement);
 }
+.not-dropable {
+    filter: brightness(0.4);
+}
