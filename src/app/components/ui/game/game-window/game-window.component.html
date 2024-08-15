@@ -1,9 +1,10 @@
 <div class="window-box" draggable="true" (dragstart)="onWindowDragStart($event)" (dragend)="onWindowDragEnd($event)" style="z-index: 1;">
-    <h3 class="window-title" >{{ getTitle() }}</h3>
+    <h3 class="window-title" >{{ getTitle() }}{{ windowInfo.usageRemaining !== undefined ? ' x' + windowInfo.usageRemaining : '' }}</h3>
     <div
         class="window-content"
         (dragenter)="onDragEnter()"
     >
         <app-draggable-image *ngFor="let c of windowInfo.content" [name]="c" [windowId]="id"></app-draggable-image>
     </div>
+    <div *ngIf="windowInfo.currentTime !== undefined && windowInfo.maxTime" class="progress-bar"><div class="bar" [style]="{'width': windowInfo.currentTime*100/windowInfo.maxTime+'%'}"></div></div>
 </div>

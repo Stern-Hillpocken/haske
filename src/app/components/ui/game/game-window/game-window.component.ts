@@ -25,6 +25,9 @@ export class GameWindowComponent {
       case "exploration": return "Exploration";
       case "lighthouse": return "Phare";
       case "storage": return "Entrepôt";
+      case "quarry": return "Carrière";
+      case "scrub": return "Brousailles";
+      case "workbench": return "Atelier";
     }
   }
 

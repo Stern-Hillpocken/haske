@@ -1,1 +1,3 @@
-export type DraggableNames = "cultist" | "pawn" | "water";
+import { ResourceNames } from "./resource-names.type";
+
+export type DraggableNames = "cultist" | "pawn" | ResourceNames;
