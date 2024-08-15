@@ -7,7 +7,7 @@
     style="z-index: 1;"
 >
     <div class="window-title">
-        <p *ngIf="windowInfo.name === 'storage'">#{{ id }}</p>
+        <p *ngIf="windowInfo.name === 'storage'">#{{ storageId() }}</p>
         <div
             *ngIf="windowInfo.slot !== undefined"
             class="window-slot"

@@ -10,6 +10,9 @@ import { DraggableNames } from 'src/app/types/draggable-names.type';
 export class GameWindowComponent {
 
   @Input()
+  allWindows!: GameWindow[];
+
+  @Input()
   currentDragName!: DraggableNames;
 
   @Input()
@@ -30,9 +33,17 @@ export class GameWindowComponent {
       case "lighthouse": return "Phare";
       case "storage": return "Entrepôt";
       case "quarry": return "Carrière";
-      case "scrub": return "Brousailles";
+      case "scrub": return "Broussailles";
       case "workbench": return "Atelier";
     }
+  }
+
+  storageId(): number {
+    let currentStorageId: number = 1;
+    for (let i = 0; i < this.id; i++) {
+      if (this.allWindows[i].name === "storage") currentStorageId++;
+    }
+    return currentStorageId;
   }
 
   onDragEnter(): void {

@@ -178,6 +178,7 @@ export class GameStateService {
       let window: GameWindow = this._gameState$.value.windows[i];
       if (window instanceof GameWindowStorage && window.content.length < window.maxSpace && (window.slot.length === 0 || window.slot.includes(resourceName))) return i;
     }
+    console.log("Plus de place dans les storages")
     return -1;
   }
 
