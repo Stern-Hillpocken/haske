@@ -1,4 +1,5 @@
 import { DraggableNames } from "../types/draggable-names.type";
+import { ResourceNames } from "../types/resource-names.type";
 import { WindowNames } from "../types/window-names.type";
 
 function random(min: number, max: number) {
@@ -13,7 +14,8 @@ export class GameWindow {
         public currentTime?: number,
         public maxTime?: number,
         public usageRemaining?: number,
-        public maxSpace?: number
+        public maxSpace?: number,
+        public slot?: DraggableNames[]
     ) {}
 }
 
@@ -22,7 +24,8 @@ export class GameWindowStorage extends GameWindow {
         public override name: WindowNames = "storage",
         public override content: DraggableNames[] = [],
         public override acceptance: DraggableNames[] = ["stone", "water", "wood"],
-        public override maxSpace: number = 14
+        public override maxSpace: number = 14,
+        public override slot: ResourceNames[] = []
     ) {
         super(name, content, acceptance)
     }
