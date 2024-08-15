@@ -5,6 +5,9 @@ export class GameWindow {
     constructor (
         public name: WindowNames,
         public content: DraggableNames[],
-        public acceptance: "all" | DraggableNames[]
+        public acceptance: "all" | DraggableNames[],
+        public currentTime?: number,
+        public maxTime?: number,
+        public usageRemaining?: number
     ) {}
 }

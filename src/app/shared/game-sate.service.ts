@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
-import { Router } from '@angular/router';
 import { GameTime } from '../models/game-time.model';
 import { GameWindow } from '../models/game-window.mode';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
+import { WindowNames } from '../types/window-names.type';
 
 @Injectable({
   providedIn: 'root'
@@ -13,10 +13,10 @@ import { DraggableNames } from '../types/draggable-names.type';
 export class GameStateService {
 
   private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(-1, -1, "cultist"), 5, new GameTime(10, 1, 1), [
-    new GameWindow("storage", ["water", "water"], ["cultist", "water"]),
-    new GameWindow("storage", ["water"], ["cultist", "water"]),
-    new GameWindow("exploration", [], ["cultist"]),
-    new GameWindow("lighthouse", ["cultist"], ["cultist"])
+    new GameWindow("storage", ["water", "water"], ["water", "stone", "wood"]),
+    new GameWindow("storage", ["water"], ["water", "stone", "wood"]),
+    new GameWindow("exploration", [], ["cultist"], 0, 8),
+    new GameWindow("lighthouse", ["cultist", "cultist"], ["cultist"])
   ]
   ));
 
@@ -54,10 +54,15 @@ export class GameStateService {
     this._gameState$.value.drag.windowStartId = -1;
     this._gameState$.value.drag.windowEndId = -1;
     this._gameState$.value.drag.draggableName = "cultist";
-    this._gameState$.next(this._gameState$.value)
+    this._gameState$.next(this._gameState$.value);
   }
 
   tickTime(): void {
+    this.timeAdvance();
+    this.performTimedActions();
+  }
+
+  timeAdvance(): void {
     this._gameState$.value.time.tick ++;
     if (this._gameState$.value.time.tick === 5) {
       // Morning environment event
@@ -74,8 +79,49 @@ export class GameStateService {
     this._gameState$.next(this._gameState$.value);
   }
 
+  performTimedActions(): void {
+    for (let window of this._gameState$.value.windows) {
+      if (window.currentTime !== undefined && window.maxTime) {
+        window.currentTime += window.content.filter(() => "cultist").length;
+        if (window.currentTime >= window.maxTime) {
+          window.currentTime = 0;
+          // Perform
+          if (window.name === "exploration") {
+            let types: WindowNames[] = ["quarry", "scrub"];
+            let randomType: WindowNames = types[this.random(0, types.length-1)];
+            this._gameState$.value.windows.push(new GameWindow(randomType, [], ["cultist"], 0, 12, this.random(1, 4)));
+          } else if (window.name === "quarry" || window.name === "scrub") {
+            if (window.usageRemaining) window.usageRemaining --;
+            window.name === "quarry" ? window.content.push("stone") : window.content.push("wood");
+          }
+        }
+      }
+    }
+    this.removeNoUsageRemainingWindow();
+    this._gameState$.next(this._gameState$.value);
+  }
+
+  removeNoUsageRemainingWindow(): void {
+    let contentToStore: DraggableNames[] = [];
+    let lighthouseIndex: number = 0;
+    for(let i = 0; i < this._gameState$.value.windows.length; i++) {
+      if (this._gameState$.value.windows[i].name === "lighthouse") lighthouseIndex = i;
+      if (this._gameState$.value.windows[i].usageRemaining === 0) {
+        contentToStore.push(... this._gameState$.value.windows[i].content);
+        this._gameState$.value.windows.splice(i,1);
+        i --;
+      }
+    }
+    this._gameState$.value.windows[lighthouseIndex].content.push(... contentToStore);
+    this._gameState$.next(this._gameState$.value);
+  }
+
   flameLost(): void {
     this._gameState$.value.flame --;
     this._gameState$.next(this._gameState$.value);
+  }
+
+  random(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 }
