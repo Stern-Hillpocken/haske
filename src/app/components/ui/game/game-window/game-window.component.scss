@@ -1,3 +1,17 @@
+.window-title {
+    display: flex;
+    gap: 0.5em;
+    p {
+        margin: 0;
+        font-size: 0.5em;
+    }
+}
+
+.window-slot {
+    height: 32px;
+    border: 2px dashed black;
+}
+
 .progress-bar, .bar {
     height: 1em;
     background-color: gray;
@@ -5,6 +19,7 @@
 .bar {
     background-color: var(--color-complement);
 }
+
 .not-dropable {
     filter: brightness(0.4);
 }

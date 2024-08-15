@@ -39,6 +39,10 @@ export class GameWindowComponent {
     this.draggableEnterEmitter.emit(this.id);
   }
 
+  onDragEnterSlot(): void {
+    this.draggableEnterEmitter.emit(this.id+0.5);
+  }
+
   onWindowDragStart(event: any): void {
     this.layerX = event.layerX;
     this.layerY = event.layerY;

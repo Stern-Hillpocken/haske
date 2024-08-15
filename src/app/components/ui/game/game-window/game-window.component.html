@@ -6,12 +6,18 @@
     (dragend)="onWindowDragEnd($event)"
     style="z-index: 1;"
 >
-    <h3 class="window-title">
-        {{ windowInfo.name === "storage" ? '#'+id : '' }}
-        {{ getTitle() }}
-        {{ windowInfo.usageRemaining !== undefined ? ' x' + windowInfo.usageRemaining : '' }}
-        {{ windowInfo.maxSpace !== undefined ? ' '+windowInfo.content.length+'/'+windowInfo.maxSpace : '' }}
-    </h3>
+    <div class="window-title">
+        <p *ngIf="windowInfo.name === 'storage'">#{{ id }}</p>
+        <div
+            *ngIf="windowInfo.slot !== undefined"
+            class="window-slot"
+            [style]="{'width': (windowInfo.slot.length+1)*32+'px'}"
+            (dragenter)="onDragEnterSlot()"
+        ><app-draggable-image *ngFor="let s of windowInfo.slot" [name]="s" [windowId]="id+.5"></app-draggable-image></div>
+        <h3>{{ getTitle() }}</h3>
+        <p *ngIf="windowInfo.usageRemaining !== undefined">x{{ windowInfo.usageRemaining }}</p>
+        <p *ngIf="windowInfo.maxSpace !== undefined">{{ windowInfo.content.length+'/'+windowInfo.maxSpace }}</p>
+    </div>
     <div
         class="window-content"
         (dragenter)="onDragEnter()"

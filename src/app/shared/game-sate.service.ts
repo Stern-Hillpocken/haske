@@ -37,28 +37,66 @@ export class GameStateService {
 
   onDragEnd(): void {
     console.log(this._gameState$.value.drag)
-
-    let windowStart = this._gameState$.value.windows[this._gameState$.value.drag.windowStartId];
-    let windowEnd = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
-    let dragName = this._gameState$.value.drag.draggableName;
-    // When draggable is drop outside
-    if (!windowEnd) {
+    if (this._gameState$.value.drag.windowEndId === -1) {
       console.log("Outside")
       this._gameState$.value.drag = new GameDrag();
       this._gameState$.next(this._gameState$.value);
-      return;
-    }
+    } else if (this._gameState$.value.drag.windowEndId + 0.5 === Math.floor(this._gameState$.value.drag.windowEndId)+1) {
+      this.onDragEndOnSlot();
+    } else if (this._gameState$.value.drag.windowStartId + 0.5 === Math.floor(this._gameState$.value.drag.windowStartId)+1) {
+      this.onDragEndFromSlot();
+    } else {
+      let windowStart = this._gameState$.value.windows[this._gameState$.value.drag.windowStartId];
+      let windowEnd = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
+      let dragName = this._gameState$.value.drag.draggableName;
 
+      if (windowEnd instanceof GameWindowStorage && windowEnd.content.length === windowEnd.maxSpace) {
+        console.log("Plus de place")
+      } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
+        windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
+        windowEnd.content.push(dragName);
+        windowEnd.content.sort();
+      } else {
+        console.log("Drop impossible")
+      }
+      
+      this._gameState$.value.drag = new GameDrag();
+      this._gameState$.next(this._gameState$.value);
+    }
+  }
+
+  onDragEndOnSlot(): void {
+    let windowEnd: GameWindow = this._gameState$.value.windows[Math.floor(this._gameState$.value.drag.windowEndId)];
+    let windowStart: GameWindow = this._gameState$.value.windows[this._gameState$.value.drag.windowStartId];
+    let dragName: DraggableNames = this._gameState$.value.drag.draggableName;
+    //
+    if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName) && !windowEnd.slot?.includes(dragName)) {
+      windowEnd.slot?.push(dragName);
+      windowEnd.slot?.sort();
+      windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
+    } else {
+      console.log("Drop impossible dans le slot")
+    }
+    //
+    this._gameState$.value.drag = new GameDrag();
+    this._gameState$.next(this._gameState$.value);
+  }
+
+  onDragEndFromSlot(): void {
+    let windowEnd: GameWindow = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
+    let windowStart: GameWindow = this._gameState$.value.windows[Math.floor(this._gameState$.value.drag.windowStartId)];
+    let dragName: DraggableNames = this._gameState$.value.drag.draggableName;
+    //
     if (windowEnd instanceof GameWindowStorage && windowEnd.content.length === windowEnd.maxSpace) {
       console.log("Plus de place")
-    } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
-      windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
+    } else if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
+      windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
       windowEnd.content.push(dragName);
       windowEnd.content.sort();
     } else {
-      console.log("Drop impossible")
+      console.log("Drop impossible depuis le slot")
     }
-    
+    //
     this._gameState$.value.drag = new GameDrag();
     this._gameState$.next(this._gameState$.value);
   }
@@ -98,14 +136,14 @@ export class GameStateService {
             this._gameState$.value.windows.push(explored);
 
           } else if (window instanceof GameWindowQuarry || window instanceof GameWindowScrub) {
-            let storageId: number = this.idOfFirstOpenedStorage();
+            let resourceName: ResourceNames = "water";
+            switch (window.constructor) {
+              case GameWindowQuarry: resourceName = "stone"; break;
+              case GameWindowScrub: resourceName = "wood"; break;
+            }
+            let storageId: number = this.idOfFirstOpenedStorage(resourceName);
             if (storageId !== -1) {
               window.usageRemaining --;
-              let resourceName: ResourceNames = "water";
-              switch (window.constructor) {
-                case GameWindowQuarry: resourceName = "stone"; break;
-                case GameWindowScrub: resourceName = "wood"; break;
-              }
               this._gameState$.value.windows[storageId].content.push(resourceName);
               this._gameState$.value.windows[storageId].content.sort();
             } else {
@@ -135,10 +173,10 @@ export class GameStateService {
     this._gameState$.next(this._gameState$.value);
   }
 
-  idOfFirstOpenedStorage(): number {
+  idOfFirstOpenedStorage(resourceName: ResourceNames): number {
     for(let i = 0; i < this._gameState$.value.windows.length; i++) {
       let window: GameWindow = this._gameState$.value.windows[i];
-      if (window instanceof GameWindowStorage && window.content.length < window.maxSpace) return i;
+      if (window instanceof GameWindowStorage && window.content.length < window.maxSpace && (window.slot.length === 0 || window.slot.includes(resourceName))) return i;
     }
     return -1;
   }
