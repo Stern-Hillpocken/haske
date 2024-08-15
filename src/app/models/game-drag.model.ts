@@ -4,6 +4,6 @@ export class GameDrag {
     constructor (
         public windowStartId: number = -1,
         public windowEndId: number = -1,
-        public draggableName: DraggableNames = "cultist"
+        public draggableName: DraggableNames = "nothing"
     ) {}
 }

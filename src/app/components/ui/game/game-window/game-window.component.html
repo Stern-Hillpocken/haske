@@ -1,5 +1,12 @@
-<div class="window-box" draggable="true" (dragstart)="onWindowDragStart($event)" (dragend)="onWindowDragEnd($event)" style="z-index: 1;">
-    <h3 class="window-title" >
+<div
+    class="window-box"
+    [ngClass]="isDropableHere() ? '' : 'not-dropable'"
+    draggable="true"
+    (dragstart)="onWindowDragStart($event)"
+    (dragend)="onWindowDragEnd($event)"
+    style="z-index: 1;"
+>
+    <h3 class="window-title">
         {{ getTitle() }}
         {{ windowInfo.usageRemaining !== undefined ? ' x' + windowInfo.usageRemaining : '' }}
         {{ windowInfo.maxSpace !== undefined ? ' '+windowInfo.content.length+'/'+windowInfo.maxSpace : '' }}

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { GameWindow } from 'src/app/models/game-window.mode';
+import { DraggableNames } from 'src/app/types/draggable-names.type';
 
 @Component({
   selector: 'app-game-window',
@@ -7,6 +8,9 @@ import { GameWindow } from 'src/app/models/game-window.mode';
   styleUrls: ['./game-window.component.scss']
 })
 export class GameWindowComponent {
+
+  @Input()
+  currentDragName!: DraggableNames;
 
   @Input()
   windowInfo!: GameWindow;
@@ -50,6 +54,12 @@ export class GameWindowComponent {
       if(checkingZ > maxZ) maxZ = checkingZ;
     }
     div.style.zIndex = (maxZ + 1).toString();
+  }
+
+  isDropableHere(): boolean {
+    if (this.currentDragName === "nothing") return true;
+    if (this.windowInfo.acceptance.includes(this.currentDragName)) return true;
+    return false;
   }
 
 }
