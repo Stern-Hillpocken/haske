@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowExploration, GameWindowLighthouse, GameWindowQuarry, GameWindowScrub, GameWindowStorage } from '../models/game-window.mode';
+import { GameWindow, GameWindowExploration, GameWindowLighthouse, GameWindowQuarry, GameWindowScrub, GameWindowStorage, GameWindowTrash } from '../models/game-window.mode';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -15,6 +15,7 @@ export class GameStateService {
   private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 5, new GameTime(), [
     new GameWindowStorage(),
     new GameWindowStorage(),
+    new GameWindowTrash(),
     new GameWindowExploration(),
     new GameWindowLighthouse()
   ]
@@ -104,6 +105,7 @@ export class GameStateService {
   tickTime(): void {
     this.timeAdvance();
     this.performTimedActions();
+    this.emptyTrash();
   }
 
   timeAdvance(): void {
@@ -180,6 +182,16 @@ export class GameStateService {
     }
     console.log("Plus de place dans les storages")
     return -1;
+  }
+
+  emptyTrash(): void {
+    for (let window of this._gameState$.value.windows) {
+      if (window.name === 'trash') {
+        window.slot = [];
+        break;
+      }
+    }
+    this._gameState$.next(this._gameState$.value);
   }
 
   flameLost(): void {
