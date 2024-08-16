@@ -42,6 +42,8 @@ export class GameStateService {
       console.log("Outside")
       this._gameState$.value.drag = new GameDrag();
       this._gameState$.next(this._gameState$.value);
+    } else if(this._gameState$.value.drag.windowEndId + 0.5 === Math.floor(this._gameState$.value.drag.windowEndId)+1 && this._gameState$.value.drag.windowStartId + 0.5 === Math.floor(this._gameState$.value.drag.windowStartId)+1) {
+      this.onDragEndFromSlotOnSlot();
     } else if (this._gameState$.value.drag.windowEndId + 0.5 === Math.floor(this._gameState$.value.drag.windowEndId)+1) {
       this.onDragEndOnSlot();
     } else if (this._gameState$.value.drag.windowStartId + 0.5 === Math.floor(this._gameState$.value.drag.windowStartId)+1) {
@@ -64,6 +66,23 @@ export class GameStateService {
       this._gameState$.value.drag = new GameDrag();
       this._gameState$.next(this._gameState$.value);
     }
+  }
+
+  onDragEndFromSlotOnSlot(): void {
+    let windowEnd: GameWindow = this._gameState$.value.windows[Math.floor(this._gameState$.value.drag.windowEndId)];
+    let windowStart: GameWindow = this._gameState$.value.windows[Math.floor(this._gameState$.value.drag.windowStartId)];
+    let dragName: DraggableNames = this._gameState$.value.drag.draggableName;
+    //
+    if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName) && !windowEnd.slot?.includes(dragName)) {
+      windowEnd.slot?.push(dragName);
+      windowEnd.slot?.sort();
+      windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
+    } else {
+      console.log("Drop impossible de slot en slot")
+    }
+    //
+    this._gameState$.value.drag = new GameDrag();
+    this._gameState$.next(this._gameState$.value);
   }
 
   onDragEndOnSlot(): void {
