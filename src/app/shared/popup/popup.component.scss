@@ -1,0 +1,16 @@
+.popup {
+    position: absolute;
+    border: 2px solid black;
+    box-shadow: var(--box-shadow);
+    p {
+        padding: 0.5em;
+    }
+}
+
+.error {
+    background-color: red;
+}
+
+.info {
+    background-color: var(--color-complement);
+}

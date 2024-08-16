@@ -15,6 +15,7 @@ import { DraggableImageComponent } from './shared/draggable-image/draggable-imag
 import { TimeTrackerComponent } from './components/ui/game/time-tracker/time-tracker.component';
 import { TimeBannerComponent } from './components/ui/game/time-banner/time-banner.component';
 import { GameWindowComponent } from './components/ui/game/game-window/game-window.component';
+import { PopupComponent } from './shared/popup/popup.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { GameWindowComponent } from './components/ui/game/game-window/game-windo
     DraggableImageComponent,
     TimeTrackerComponent,
     TimeBannerComponent,
-    GameWindowComponent
+    GameWindowComponent,
+    PopupComponent
   ],
   imports: [
     BrowserModule,

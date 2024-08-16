@@ -6,6 +6,7 @@ import { GameWindow, GameWindowExploration, GameWindowLighthouse, GameWindowQuar
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
+import { PopupService } from './popup.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,7 @@ export class GameStateService {
   ]
   ));
 
-  constructor() { }
+  constructor(private popupService: PopupService) { }
 
   _getGameState$(): Observable<GameState> {
     return this._gameState$.asObservable();
@@ -39,7 +40,7 @@ export class GameStateService {
   onDragEnd(): void {
     console.log(this._gameState$.value.drag)
     if (this._gameState$.value.drag.windowEndId === -1) {
-      console.log("Outside")
+      this.popupService.pushValue("error", "Outside");
       this._gameState$.value.drag = new GameDrag();
       this._gameState$.next(this._gameState$.value);
     } else if(this._gameState$.value.drag.windowEndId + 0.5 === Math.floor(this._gameState$.value.drag.windowEndId)+1 && this._gameState$.value.drag.windowStartId + 0.5 === Math.floor(this._gameState$.value.drag.windowStartId)+1) {
@@ -54,13 +55,13 @@ export class GameStateService {
       let dragName = this._gameState$.value.drag.draggableName;
 
       if (windowEnd instanceof GameWindowStorage && windowEnd.content.length === windowEnd.maxSpace) {
-        console.log("Plus de place")
+        this.popupService.pushValue("error", "Plus de place");
       } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
         windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
         windowEnd.content.push(dragName);
         windowEnd.content.sort();
       } else {
-        console.log("Drop impossible")
+        this.popupService.pushValue("error", "Drop impossible");
       }
       
       this._gameState$.value.drag = new GameDrag();
@@ -78,7 +79,7 @@ export class GameStateService {
       windowEnd.slot?.sort();
       windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
     } else {
-      console.log("Drop impossible de slot en slot")
+      this.popupService.pushValue("error", "Drop impossible de slot en slot");
     }
     //
     this._gameState$.value.drag = new GameDrag();
@@ -95,7 +96,7 @@ export class GameStateService {
       windowEnd.slot?.sort();
       windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
     } else {
-      console.log("Drop impossible dans le slot")
+      this.popupService.pushValue("error", "Drop impossible dans le slot");
     }
     //
     this._gameState$.value.drag = new GameDrag();
@@ -108,13 +109,13 @@ export class GameStateService {
     let dragName: DraggableNames = this._gameState$.value.drag.draggableName;
     //
     if (windowEnd instanceof GameWindowStorage && windowEnd.content.length === windowEnd.maxSpace) {
-      console.log("Plus de place")
+      this.popupService.pushValue("error", "Plus de place");
     } else if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
       windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
       windowEnd.content.push(dragName);
       windowEnd.content.sort();
     } else {
-      console.log("Drop impossible depuis le slot")
+      this.popupService.pushValue("error", "Drop impossible depuis le slot");
     }
     //
     this._gameState$.value.drag = new GameDrag();
@@ -199,7 +200,7 @@ export class GameStateService {
       let window: GameWindow = this._gameState$.value.windows[i];
       if (window instanceof GameWindowStorage && window.content.length < window.maxSpace && (window.slot.length === 0 || window.slot.includes(resourceName))) return i;
     }
-    console.log("Plus de place dans les storages")
+    this.popupService.pushValue("error", "Plus de place dans les storages");
     return -1;
   }
 
