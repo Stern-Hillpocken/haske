@@ -9,6 +9,7 @@ body {
     --color-complement: #d67e6a;
     --color-accent: #9b5bc9;
     font-family: "font-base";
+    --box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.6);
 }
 
 *[draggable=true] {
@@ -34,13 +35,17 @@ img {
     width: 32px;
 }
 
+p {
+    margin: 0;
+}
+
 .window-box {
     border: 4px solid black;
     border-radius: 0.5em;
     position: absolute;
     left: 50%;
     transform: translate(-50%, 0);
-    box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.6);
+    box-shadow: var(--box-shadow);
 }
 .window-title {
     background-color: var(--color-accent);

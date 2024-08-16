@@ -1,0 +1,8 @@
+<div
+    *ngIf="popup.content"
+    class="popup"
+    [ngClass]="popup.status"
+    [style]="{'left': 'calc('+x+'px + 1em)', 'top': 'calc('+y+'px - 1em)', 'z-index': '999999999'}"
+>
+    <p>{{ popup.content }}</p>
+</div>
