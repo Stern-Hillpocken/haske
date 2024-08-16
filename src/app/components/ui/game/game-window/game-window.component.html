@@ -21,6 +21,7 @@
     <div
         class="window-content"
         (dragenter)="onDragEnter()"
+        *ngIf="windowInfo.name !== 'trash'"
     >
         <app-draggable-image *ngFor="let c of windowInfo.content" [name]="c" [windowId]="id"></app-draggable-image>
     </div>

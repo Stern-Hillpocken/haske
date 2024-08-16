@@ -35,6 +35,7 @@ export class GameWindowComponent {
       case "quarry": return "Carrière";
       case "scrub": return "Broussailles";
       case "workbench": return "Atelier";
+      case "trash": return "Rebut";
     }
   }
 
