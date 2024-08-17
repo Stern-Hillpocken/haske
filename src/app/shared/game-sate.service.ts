@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowExploration, GameWindowLighthouse, GameWindowQuarry, GameWindowScrub, GameWindowStorage, GameWindowTrash } from '../models/game-window.mode';
+import { GameWindow, GameWindowExploration, GameWindowHelp, GameWindowLighthouse, GameWindowQuarry, GameWindowScrub, GameWindowStorage, GameWindowTrash } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -18,7 +18,8 @@ export class GameStateService {
     new GameWindowStorage(),
     new GameWindowTrash(),
     new GameWindowExploration(),
-    new GameWindowLighthouse()
+    new GameWindowLighthouse(),
+    new GameWindowHelp()
   ]
   ));
 
@@ -200,7 +201,7 @@ export class GameStateService {
       let window: GameWindow = this._gameState$.value.windows[i];
       if (window instanceof GameWindowStorage && window.content.length < window.maxSpace && (window.slot.length === 0 || window.slot.includes(resourceName))) return i;
     }
-    this.popupService.pushValue("error", "Plus de place dans les storages");
+    this.popupService.pushValue("error", "Plus de place dans les entrepôts");
     return -1;
   }
 

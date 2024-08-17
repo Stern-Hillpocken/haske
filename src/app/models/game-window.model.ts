@@ -89,3 +89,14 @@ export class GameWindowTrash extends GameWindow {
         super(name, content, acceptance)
     }
 }
+
+export class GameWindowHelp extends GameWindow {
+    constructor(
+        public override name: WindowNames = "help",
+        public override content: DraggableNames[] = [],
+        public override acceptance: DraggableNames[] = ["cultist", "stone", "water", "wood"],
+        public override slot: ResourceNames[] = []
+    ) {
+        super(name, content, acceptance)
+    }
+}
