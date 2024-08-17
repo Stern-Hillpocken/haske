@@ -1,6 +1,6 @@
 import { GameDrag } from "./game-drag.model";
 import { GameTime } from "./game-time.model";
-import { GameWindow } from "./game-window.mode";
+import { GameWindow } from "./game-window.model";
 
 export class GameState {
     constructor(

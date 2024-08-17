@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { GameWindow } from 'src/app/models/game-window.mode';
+import { GameWindow } from 'src/app/models/game-window.model';
 import { DraggableNames } from 'src/app/types/draggable-names.type';
 
 @Component({
@@ -36,6 +36,7 @@ export class GameWindowComponent {
       case "scrub": return "Broussailles";
       case "workbench": return "Atelier";
       case "trash": return "Rebut";
+      case "help": return "?";
     }
   }
 
@@ -76,6 +77,16 @@ export class GameWindowComponent {
     if (this.currentDragName === "nothing") return true;
     if (this.windowInfo.acceptance.includes(this.currentDragName)) return true;
     return false;
+  }
+
+  helpDisplay(): string {
+    switch (this.windowInfo.slot?.[0]) {
+      case "cultist": return "Une main d’oeuvre pour faire ce que vous désirez.";
+      case "stone": return "De la pierre pour construire.";
+      case "water": return "De l’eau pour survivre et allumer le phare.";
+      case "wood": return "Du bois pour construire.";
+    }
+    return "";
   }
 
 }
