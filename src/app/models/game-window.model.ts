@@ -100,3 +100,16 @@ export class GameWindowHelp extends GameWindow {
         super(name, content, acceptance)
     }
 }
+
+export class GameWindowWorkbench extends GameWindow {
+    constructor(
+        public override name: WindowNames = "workbench",
+        public override content: DraggableNames[] = [],
+        public override acceptance: DraggableNames[] = ["cultist", "stone", "water", "wood"],
+        public override currentTime: number = 0,
+        public override maxTime: number = 12,
+        public override maxSpace: number = 8
+    ) {
+        super(name, content, acceptance)
+    }
+}

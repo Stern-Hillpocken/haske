@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowExploration, GameWindowHelp, GameWindowLighthouse, GameWindowQuarry, GameWindowScrub, GameWindowStorage, GameWindowTrash } from '../models/game-window.model';
+import { GameWindow, GameWindowExploration, GameWindowHelp, GameWindowLighthouse, GameWindowQuarry, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -14,6 +14,7 @@ import { PopupService } from './popup.service';
 export class GameStateService {
 
   private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 5, new GameTime(), [
+    new GameWindowWorkbench(),
     new GameWindowStorage(),
     new GameWindowStorage(),
     new GameWindowTrash(),
@@ -149,7 +150,7 @@ export class GameStateService {
   performTimedActions(): void {
     for (let window of this._gameState$.value.windows) {
       if (window.currentTime !== undefined && window.maxTime) {
-        window.currentTime += window.content.filter(() => "cultist").length;
+        window.currentTime += window.content.filter((name) => name === "cultist").length;
         if (window.currentTime >= window.maxTime) {
           window.currentTime = 0;
           // Perform

@@ -7,6 +7,7 @@
     style="z-index: 1;"
 >
     <div class="window-title">
+        <img *ngIf="windowInfo.name === 'workbench'" [src]="workbenchPreparedRecipe()">
         <p *ngIf="windowInfo.name === 'storage'">#{{ storageId() }}</p>
         <div
             *ngIf="windowInfo.slot !== undefined"

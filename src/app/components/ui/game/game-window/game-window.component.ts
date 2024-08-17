@@ -89,4 +89,15 @@ export class GameWindowComponent {
     return "";
   }
 
+  workbenchPreparedRecipe(): string {
+    if (this.windowInfo.name === "workbench" && this.exactRecipe() !== "nothing") return "assets/images/draggable/" + this.exactRecipe() + ".png";
+    return "assets/images/window/" + this.windowInfo.name + ".png";
+  }
+
+  exactRecipe(): DraggableNames {
+    if(this.windowInfo.content.filter((name) => name === "wood").length === 1 &&
+      this.windowInfo.content.filter((name) => name === "stone").length === 1) return "pickaxe";
+    return "nothing";
+  }
+
 }
