@@ -7,6 +7,7 @@ import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
 import { PopupService } from './popup.service';
+import { RecipesService } from './recipes.service';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,7 @@ export class GameStateService {
   ]
   ));
 
-  constructor(private popupService: PopupService) { }
+  constructor(private popupService: PopupService, private recipesServices: RecipesService) { }
 
   _getGameState$(): Observable<GameState> {
     return this._gameState$.asObservable();
@@ -58,6 +59,10 @@ export class GameStateService {
 
       if (windowEnd instanceof GameWindowStorage && windowEnd.content.length === windowEnd.maxSpace) {
         this.popupService.pushValue("error", "Plus de place");
+      } else if (windowStart instanceof GameWindowWorkbench && this.recipesServices.canPerformThisRecipe(windowStart.content) !== "nothing" && windowStart.currentTime !== 0) {
+        this.popupService.pushValue("error", "La recette doit être menée à son terme");
+      } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.canPerformThisRecipe(windowEnd.content) === "nothing" && dragName === "cultist") {
+        this.popupService.pushValue("error", "La recette doit être correcte avant d’y assigner des ouvriers");
       } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
         windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
         windowEnd.content.push(dragName);
