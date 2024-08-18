@@ -101,4 +101,8 @@ export class GameWindowComponent {
     return this.recipesService.canPerformThisRecipe(this.windowInfo.content);
   }
 
+  contentLengthWithoutWorker(): number {
+    return this.windowInfo.content.filter((name) => name !== "cultist").length
+  }
+
 }

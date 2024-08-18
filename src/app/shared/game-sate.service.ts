@@ -57,7 +57,7 @@ export class GameStateService {
       let windowEnd = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
       let dragName = this._gameState$.value.drag.draggableName;
 
-      if (windowEnd instanceof GameWindowStorage && windowEnd.content.length === windowEnd.maxSpace) {
+      if (windowEnd instanceof GameWindowStorage && windowEnd.content.filter((name) => name !== "cultist").length === windowEnd.maxSpace) {
         this.popupService.pushValue("error", "Plus de place");
       } else if (windowStart instanceof GameWindowWorkbench && this.recipesServices.canPerformThisRecipe(windowStart.content) !== "nothing" && windowStart.currentTime !== 0) {
         this.popupService.pushValue("error", "La recette doit être menée à son terme");
@@ -155,7 +155,11 @@ export class GameStateService {
   performTimedActions(): void {
     for (let window of this._gameState$.value.windows) {
       if (window.currentTime !== undefined && window.maxTime) {
-        window.currentTime += window.content.filter((name) => name === "cultist").length;
+        // Add time
+        if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.canPerformThisRecipe(window.content) !== "nothing")) {
+          window.currentTime += window.content.filter((name) => name === "cultist").length;
+        }
+        // Max time
         if (window.currentTime >= window.maxTime) {
           window.currentTime = 0;
           // Perform
@@ -178,6 +182,10 @@ export class GameStateService {
             } else {
               window.currentTime = window.maxTime;
             }
+          } else if (window instanceof GameWindowWorkbench) {
+            let recipeName: DraggableNames = this.recipesServices.canPerformThisRecipe(window.content);
+            window.content = window.content.filter((name) => name === "cultist");
+            window.content.push(recipeName);
           }
         }
       }
