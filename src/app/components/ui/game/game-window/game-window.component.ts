@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { GameWindow } from 'src/app/models/game-window.model';
+import { RecipesService } from 'src/app/shared/recipes.service';
 import { DraggableNames } from 'src/app/types/draggable-names.type';
 
 @Component({
@@ -26,6 +27,8 @@ export class GameWindowComponent {
 
   layerX: number = 0;
   layerY: number = 0;
+
+  constructor(private recipesService: RecipesService) {}
 
   getTitle(): string {
     switch (this.windowInfo.name) {
@@ -87,6 +90,19 @@ export class GameWindowComponent {
       case "wood": return "Du bois pour construire.";
     }
     return "";
+  }
+
+  workbenchPreparedRecipe(): string {
+    if (this.windowInfo.name === "workbench" && this.exactRecipe() !== "nothing") return "assets/images/draggable/" + this.exactRecipe() + ".png";
+    return "assets/images/window/" + this.windowInfo.name + ".png";
+  }
+
+  exactRecipe(): DraggableNames {
+    return this.recipesService.canPerformThisRecipe(this.windowInfo.content);
+  }
+
+  contentLengthWithoutWorker(): number {
+    return this.windowInfo.content.filter((name) => name !== "cultist").length
   }
 
 }

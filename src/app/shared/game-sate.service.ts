@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowExploration, GameWindowHelp, GameWindowLighthouse, GameWindowQuarry, GameWindowScrub, GameWindowStorage, GameWindowTrash } from '../models/game-window.model';
+import { GameWindow, GameWindowExploration, GameWindowHelp, GameWindowLighthouse, GameWindowQuarry, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
 import { PopupService } from './popup.service';
+import { RecipesService } from './recipes.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,7 @@ import { PopupService } from './popup.service';
 export class GameStateService {
 
   private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 5, new GameTime(), [
+    new GameWindowWorkbench(),
     new GameWindowStorage(),
     new GameWindowStorage(),
     new GameWindowTrash(),
@@ -23,7 +25,7 @@ export class GameStateService {
   ]
   ));
 
-  constructor(private popupService: PopupService) { }
+  constructor(private popupService: PopupService, private recipesServices: RecipesService) { }
 
   _getGameState$(): Observable<GameState> {
     return this._gameState$.asObservable();
@@ -55,8 +57,12 @@ export class GameStateService {
       let windowEnd = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
       let dragName = this._gameState$.value.drag.draggableName;
 
-      if (windowEnd instanceof GameWindowStorage && windowEnd.content.length === windowEnd.maxSpace) {
+      if (windowEnd instanceof GameWindowStorage && windowEnd.content.filter((name) => name !== "cultist").length === windowEnd.maxSpace) {
         this.popupService.pushValue("error", "Plus de place");
+      } else if (windowStart instanceof GameWindowWorkbench && this.recipesServices.canPerformThisRecipe(windowStart.content) !== "nothing" && windowStart.currentTime !== 0) {
+        this.popupService.pushValue("error", "La recette doit être menée à son terme");
+      } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.canPerformThisRecipe(windowEnd.content) === "nothing" && dragName === "cultist") {
+        this.popupService.pushValue("error", "La recette doit être correcte avant d’y assigner des ouvriers");
       } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
         windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
         windowEnd.content.push(dragName);
@@ -149,7 +155,11 @@ export class GameStateService {
   performTimedActions(): void {
     for (let window of this._gameState$.value.windows) {
       if (window.currentTime !== undefined && window.maxTime) {
-        window.currentTime += window.content.filter(() => "cultist").length;
+        // Add time
+        if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.canPerformThisRecipe(window.content) !== "nothing")) {
+          window.currentTime += window.content.filter((name) => name === "cultist").length;
+        }
+        // Max time
         if (window.currentTime >= window.maxTime) {
           window.currentTime = 0;
           // Perform
@@ -172,6 +182,10 @@ export class GameStateService {
             } else {
               window.currentTime = window.maxTime;
             }
+          } else if (window instanceof GameWindowWorkbench) {
+            let recipeName: DraggableNames = this.recipesServices.canPerformThisRecipe(window.content);
+            window.content = window.content.filter((name) => name === "cultist");
+            window.content.push(recipeName);
           }
         }
       }
