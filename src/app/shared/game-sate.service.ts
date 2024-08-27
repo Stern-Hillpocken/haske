@@ -28,6 +28,7 @@ export class GameStateService {
   ));
 
   windowsWhichCanPause: WindowNames[] = ["exploration", "scrub", "quarry"];
+  workerNames: DraggableNames[] = ["worker", "miner"];
 
   constructor(private popupService: PopupService, private recipesServices: RecipesService) { }
 
@@ -165,11 +166,11 @@ export class GameStateService {
       if (window.currentTime !== undefined && window.maxTime) {
         // Add time
         if (window instanceof GameWindowDressing) {
-          if (window.content.filter((name) => !["worker", "miner"].includes(name)).length > 0) {
+          if (window.content.filter((name) => !this.workerNames.includes(name)).length > 0 && window.content.filter((name) => this.workerNames.includes(name)).length > 0) {
             window.currentTime ++;
           }
         } else if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(window.content) !== "nothing")) {
-          window.currentTime += window.content.filter((name) => ["worker", "miner"].includes(name)).length;
+          window.currentTime += window.content.filter((name) => this.workerNames.includes(name)).length;
         }
         // Max time
         if (window.currentTime >= window.maxTime) {
@@ -199,8 +200,9 @@ export class GameStateService {
             window.content = window.content.filter((name) => name === "worker");
             window.content.push(recipeName);
           } else if (window instanceof GameWindowDressing) {
-            let item: DraggableNames = window.content.filter((name) => !["worker", "miner"].includes(name))[0];
-            window.content = window.content.filter((name) => ["worker", "miner"].includes(name));
+            let item: DraggableNames = window.content.filter((name) => !this.workerNames.includes(name))[0];
+            window.content = window.content.filter((name) => this.workerNames.includes(name));
+            window.content.shift();
             if (item === "pickaxe") window.content.push("miner");
           }
         }

@@ -40,7 +40,7 @@ export class GameWindowComponent {
       case "workbench": return "Atelier";
       case "trash": return "Rebut";
       case "help": return "?";
-      case "dressing": return "Dressing";
+      case "dressing": return "Vestiaire";
     }
   }
 
