@@ -99,7 +99,7 @@ export class GameWindowComponent {
   }
 
   exactRecipe(): DraggableNames {
-    return this.recipesService.canPerformThisRecipe(this.windowInfo.content);
+    return this.recipesService.recipeDoable(this.windowInfo.content);
   }
 
   contentLengthWithoutWorker(): number {

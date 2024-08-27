@@ -35,7 +35,7 @@ export class GameWindowExploration extends GameWindow {
     constructor(
         public override name: WindowNames = "exploration",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["worker"],
+        public override acceptance: DraggableNames[] = ["worker", "miner"],
         public override currentTime: number = 0,
         public override maxTime: number = 12
     ) {
@@ -119,6 +119,8 @@ export class GameWindowDressing extends GameWindow {
         public override name: WindowNames = "dressing",
         public override content: DraggableNames[] = [],
         public override acceptance: DraggableNames[] = ["worker", "pickaxe"],
+        public override currentTime: number = 0,
+        public override maxTime: number = 6,
         public override maxSpace: number = 1
     ) {
         super(name, content, acceptance)

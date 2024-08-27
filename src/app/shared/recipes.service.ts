@@ -17,7 +17,7 @@ export class RecipesService {
     return this.allReceipes;
   }
 
-  canPerformThisRecipe(content: DraggableNames[]): DraggableNames {
+  recipeDoable(content: DraggableNames[]): DraggableNames {
     for (let r = 0; r < this.allReceipes.length; r++) {
       let valid: number = 0;
       for (let i = 0; i < this.allReceipes[r].resources.length; i++) {
