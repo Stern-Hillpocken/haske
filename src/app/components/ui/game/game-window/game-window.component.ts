@@ -40,6 +40,7 @@ export class GameWindowComponent {
       case "workbench": return "Atelier";
       case "trash": return "Rebut";
       case "help": return "?";
+      case "dressing": return "Vestiaire";
     }
   }
 
@@ -84,7 +85,7 @@ export class GameWindowComponent {
 
   helpDisplay(): string {
     switch (this.windowInfo.slot?.[0]) {
-      case "cultist": return "Une main d’oeuvre pour faire ce que vous désirez.";
+      case "worker": return "Une main d’oeuvre pour faire ce que vous désirez.";
       case "stone": return "De la pierre pour construire.";
       case "water": return "De l’eau pour survivre et allumer le phare.";
       case "wood": return "Du bois pour construire.";
@@ -98,11 +99,11 @@ export class GameWindowComponent {
   }
 
   exactRecipe(): DraggableNames {
-    return this.recipesService.canPerformThisRecipe(this.windowInfo.content);
+    return this.recipesService.recipeDoable(this.windowInfo.content);
   }
 
   contentLengthWithoutWorker(): number {
-    return this.windowInfo.content.filter((name) => name !== "cultist").length
+    return this.windowInfo.content.filter((name) => name !== "worker").length
   }
 
 }

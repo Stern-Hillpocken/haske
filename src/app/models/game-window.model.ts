@@ -35,7 +35,7 @@ export class GameWindowExploration extends GameWindow {
     constructor(
         public override name: WindowNames = "exploration",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["cultist"],
+        public override acceptance: DraggableNames[] = ["worker", "miner"],
         public override currentTime: number = 0,
         public override maxTime: number = 12
     ) {
@@ -46,8 +46,8 @@ export class GameWindowExploration extends GameWindow {
 export class GameWindowLighthouse extends GameWindow {
     constructor(
         public override name: WindowNames = "lighthouse",
-        public override content: DraggableNames[] = ["cultist", "cultist"],
-        public override acceptance: DraggableNames[] = ["cultist"]
+        public override content: DraggableNames[] = ["worker", "worker"],
+        public override acceptance: DraggableNames[] = ["worker", "miner"]
     ) {
         super(name, content, acceptance)
     }
@@ -57,7 +57,7 @@ export class GameWindowQuarry extends GameWindow {
     constructor(
         public override name: WindowNames = "quarry",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["cultist"],
+        public override acceptance: DraggableNames[] = ["worker"],
         public override currentTime: number = 0,
         public override maxTime: number = 8,
         public override usageRemaining: number =  random(2,5)
@@ -70,7 +70,7 @@ export class GameWindowScrub extends GameWindow {
     constructor(
         public override name: WindowNames = "scrub",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["cultist"],
+        public override acceptance: DraggableNames[] = ["worker"],
         public override currentTime: number = 0,
         public override maxTime: number = 8,
         public override usageRemaining: number =  random(2,5)
@@ -94,7 +94,7 @@ export class GameWindowHelp extends GameWindow {
     constructor(
         public override name: WindowNames = "help",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["cultist", "stone", "water", "wood"],
+        public override acceptance: DraggableNames[] = ["worker", "stone", "water", "wood"],
         public override slot: ResourceNames[] = []
     ) {
         super(name, content, acceptance)
@@ -105,10 +105,23 @@ export class GameWindowWorkbench extends GameWindow {
     constructor(
         public override name: WindowNames = "workbench",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["cultist", "stone", "water", "wood"],
+        public override acceptance: DraggableNames[] = ["worker", "stone", "water", "wood"],
         public override currentTime: number = 0,
         public override maxTime: number = 12,
         public override maxSpace: number = 8
+    ) {
+        super(name, content, acceptance)
+    }
+}
+
+export class GameWindowDressing extends GameWindow {
+    constructor(
+        public override name: WindowNames = "dressing",
+        public override content: DraggableNames[] = [],
+        public override acceptance: DraggableNames[] = ["worker", "pickaxe", "miner"],
+        public override currentTime: number = 0,
+        public override maxTime: number = 6,
+        public override maxSpace: number = 1
     ) {
         super(name, content, acceptance)
     }

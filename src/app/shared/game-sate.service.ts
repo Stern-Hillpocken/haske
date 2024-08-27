@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowExploration, GameWindowHelp, GameWindowLighthouse, GameWindowQuarry, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
+import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowHelp, GameWindowLighthouse, GameWindowQuarry, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
 import { PopupService } from './popup.service';
 import { RecipesService } from './recipes.service';
+import { WindowNames } from '../types/window-names.type';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,7 @@ export class GameStateService {
 
   private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 5, new GameTime(), [
     new GameWindowWorkbench(),
+    new GameWindowDressing(),
     new GameWindowStorage(),
     new GameWindowStorage(),
     new GameWindowTrash(),
@@ -24,6 +26,9 @@ export class GameStateService {
     new GameWindowHelp()
   ]
   ));
+
+  windowsWhichCanPause: WindowNames[] = ["exploration", "scrub", "quarry"];
+  workerNames: DraggableNames[] = ["worker", "miner"];
 
   constructor(private popupService: PopupService, private recipesServices: RecipesService) { }
 
@@ -57,11 +62,11 @@ export class GameStateService {
       let windowEnd = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
       let dragName = this._gameState$.value.drag.draggableName;
 
-      if (windowEnd instanceof GameWindowStorage && windowEnd.content.filter((name) => name !== "cultist").length === windowEnd.maxSpace) {
+      if (windowEnd instanceof GameWindowStorage && windowEnd.content.filter((name) => name !== "worker").length === windowEnd.maxSpace) {
         this.popupService.pushValue("error", "Plus de place");
-      } else if (windowStart instanceof GameWindowWorkbench && this.recipesServices.canPerformThisRecipe(windowStart.content) !== "nothing" && windowStart.currentTime !== 0) {
+      } else if (windowStart instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowStart.content) !== "nothing" && windowStart.currentTime !== 0) {
         this.popupService.pushValue("error", "La recette doit être menée à son terme");
-      } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.canPerformThisRecipe(windowEnd.content) === "nothing" && dragName === "cultist") {
+      } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content) === "nothing" && dragName === "worker") {
         this.popupService.pushValue("error", "La recette doit être correcte avant d’y assigner des ouvriers");
       } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
         windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
@@ -98,10 +103,12 @@ export class GameStateService {
     let windowStart: GameWindow = this._gameState$.value.windows[this._gameState$.value.drag.windowStartId];
     let dragName: DraggableNames = this._gameState$.value.drag.draggableName;
     //
-    if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName) && !windowEnd.slot?.includes(dragName)) {
+    if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName) && !windowEnd.slot?.includes(dragName) && (windowStart.currentTime === undefined || windowStart.currentTime === 0)) {
       windowEnd.slot?.push(dragName);
       windowEnd.slot?.sort();
       windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
+    } else if (!this.windowsWhichCanPause.includes(windowStart.name) && windowStart.currentTime && windowStart.currentTime > 0) {
+      this.popupService.pushValue("error", "Pas possible de sortir alors que l’action est en cours");
     } else {
       this.popupService.pushValue("error", "Drop impossible dans le slot");
     }
@@ -117,6 +124,8 @@ export class GameStateService {
     //
     if (windowEnd instanceof GameWindowStorage && windowEnd.content.length === windowEnd.maxSpace) {
       this.popupService.pushValue("error", "Plus de place");
+    } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content) === "nothing") {
+      this.popupService.pushValue("error", "Atelier non prêt");
     } else if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
       windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
       windowEnd.content.push(dragName);
@@ -156,8 +165,12 @@ export class GameStateService {
     for (let window of this._gameState$.value.windows) {
       if (window.currentTime !== undefined && window.maxTime) {
         // Add time
-        if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.canPerformThisRecipe(window.content) !== "nothing")) {
-          window.currentTime += window.content.filter((name) => name === "cultist").length;
+        if (window instanceof GameWindowDressing) {
+          if (window.content.filter((name) => !this.workerNames.includes(name)).length > 0 && window.content.filter((name) => this.workerNames.includes(name)).length > 0) {
+            window.currentTime ++;
+          }
+        } else if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(window.content) !== "nothing")) {
+          window.currentTime += window.content.filter((name) => this.workerNames.includes(name)).length;
         }
         // Max time
         if (window.currentTime >= window.maxTime) {
@@ -183,9 +196,14 @@ export class GameStateService {
               window.currentTime = window.maxTime;
             }
           } else if (window instanceof GameWindowWorkbench) {
-            let recipeName: DraggableNames = this.recipesServices.canPerformThisRecipe(window.content);
-            window.content = window.content.filter((name) => name === "cultist");
+            let recipeName: DraggableNames = this.recipesServices.recipeDoable(window.content);
+            window.content = window.content.filter((name) => name === "worker");
             window.content.push(recipeName);
+          } else if (window instanceof GameWindowDressing) {
+            let item: DraggableNames = window.content.filter((name) => !this.workerNames.includes(name))[0];
+            window.content = window.content.filter((name) => this.workerNames.includes(name));
+            window.content.shift();
+            if (item === "pickaxe") window.content.push("miner");
           }
         }
       }

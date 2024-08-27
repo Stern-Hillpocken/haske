@@ -1,1 +1,1 @@
-export type WindowNames = "lighthouse" | "exploration" | "storage" | "quarry" | "scrub" | "workbench" | "trash" | "help";
+export type WindowNames = "lighthouse" | "exploration" | "storage" | "quarry" | "scrub" | "workbench" | "trash" | "help" | "dressing";
