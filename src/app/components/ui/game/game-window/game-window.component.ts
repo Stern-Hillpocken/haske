@@ -84,13 +84,28 @@ export class GameWindowComponent {
   }
 
   helpDisplay(): string {
-    switch (this.windowInfo.slot?.[0]) {
+    if (!this.windowInfo.slot) return "";
+    switch (this.windowInfo.slot[0]) {
+      case "nothing": return "";
+      case "pawn": return "";
+      // Workers
       case "worker": return "Une main d’oeuvre pour faire ce que vous désirez.";
+      case "miner": return "Un aikaci spécialisé pour aller dans la mine.";
+      // Resources
       case "stone": return "De la pierre pour construire.";
       case "water": return "De l’eau pour survivre et allumer le phare.";
       case "wood": return "Du bois pour construire.";
+      // Notes
+      case "note-help-and-trash": return "Ici c’est l’endroit pour avoir des informations sur les différents élèments. Pour l’instant un élement de type \"note\" est dans l’emplacement mais tu peux l’enlever pour libérer la place pour un autre. Tu peux par exemple détruire cette note en la plaçant dans le Rebut.";
+      case "note-time-strip": return "En haut se trouve la frise du temps avec différents évènements qui y sont associés, et le temps qui passe.";
+      case "note-storage-filter": return "Tu peux associer un ou plusieurs élèments à un Entrepôt pour que seulement ces élèments puissent être stockés à l’intérieur.";
+      case "note-event-end-day": return "À la fin de la journée il faut nourrir tes aikacis, sans quoi ils et elles mourront. Et la flamme du phare diminuera d’un cran.";
+      case "note-event-event": return "Tous les matins tu auras un nouvel évènement à t’occuper.";
+      case "note-event-fight": return "Durant le nuit les halittus attaqueront de différents côtés, en fonction de la puissance de la puissance de ton phare. Prépare de défenses et dispose des guerriers.";
+      case "note-event-newcomers": return "En fonction de la puissance de feu de ton phare, des gens viendront te rejoindre. Mais cela impact aussi le nombre de personnes à nourrir.";
+      // Items
+      case "pickaxe": return "Un outil qui peut être équipé à un aikaci dans un Vestiaire, permettant d’exploiter les mines.";
     }
-    return "";
   }
 
   workbenchPreparedRecipe(): string {

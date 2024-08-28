@@ -48,7 +48,11 @@ export class GameStateService {
   onDragEnd(): void {
     console.log(this._gameState$.value.drag)
     if (this._gameState$.value.drag.windowEndId === -1) {
-      this.popupService.pushValue("error", "Outside");
+      this.popupService.pushValue("error", "En dehors");
+      this._gameState$.value.drag = new GameDrag();
+      this._gameState$.next(this._gameState$.value);
+    } else if (this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowHelp) {
+      this.popupService.pushValue("error", "Impossible de stocker dans l’aide");
       this._gameState$.value.drag = new GameDrag();
       this._gameState$.next(this._gameState$.value);
     } else if(this._gameState$.value.drag.windowEndId + 0.5 === Math.floor(this._gameState$.value.drag.windowEndId)+1 && this._gameState$.value.drag.windowStartId + 0.5 === Math.floor(this._gameState$.value.drag.windowStartId)+1) {
@@ -148,12 +152,19 @@ export class GameStateService {
     this._gameState$.value.time.tick ++;
     if (this._gameState$.value.time.tick === 5) {
       // Morning environment event
+      if (this._gameState$.value.time.day === 3) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-event");
+
     } else if (this._gameState$.value.time.tick === 75) {
       // Newcomers
+      if (this._gameState$.value.time.day === 2) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-newcomers");
+
     } else if (this._gameState$.value.time.tick === 85) {
       // Attack of the monsters
+      if (this._gameState$.value.time.day === 4) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-fight");
+
     } else if (this._gameState$.value.time.tick > 100) {
       // Flame lost and new day
+      if (this._gameState$.value.time.day === 1) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-end-day");
       this.flameLost();
       this._gameState$.value.time.tick = 0;
       this._gameState$.value.time.day ++;
@@ -187,7 +198,7 @@ export class GameStateService {
               case GameWindowQuarry: resourceName = "stone"; break;
               case GameWindowScrub: resourceName = "wood"; break;
             }
-            let storageId: number = this.idOfFirstOpenedStorage(resourceName);
+            let storageId: number = this.indexOfFirstOpenedStorage(resourceName);
             if (storageId !== -1) {
               window.usageRemaining --;
               this._gameState$.value.windows[storageId].content.push(resourceName);
@@ -228,12 +239,19 @@ export class GameStateService {
     this._gameState$.next(this._gameState$.value);
   }
 
-  idOfFirstOpenedStorage(resourceName: ResourceNames): number {
+  indexOfFirstOpenedStorage(resourceName: ResourceNames): number {
     for(let i = 0; i < this._gameState$.value.windows.length; i++) {
       let window: GameWindow = this._gameState$.value.windows[i];
       if (window instanceof GameWindowStorage && window.content.length < window.maxSpace && (window.slot.length === 0 || window.slot.includes(resourceName))) return i;
     }
     this.popupService.pushValue("error", "Plus de place dans les entrepôts");
+    return -1;
+  }
+
+  indexOfWindow(name: WindowNames): number {
+    for (let i = 0; i < this._gameState$.value.windows.length; i++) {
+      if (this._gameState$.value.windows[i].name === name) return i;
+    }
     return -1;
   }
 
