@@ -25,4 +25,9 @@ export class DraggableImageComponent {
     this.gss.onDragEnd();
   }
 
+  correctName(): string {
+    if (this.name.startsWith("note-")) return "note";
+    return this.name;
+  }
+
 }
