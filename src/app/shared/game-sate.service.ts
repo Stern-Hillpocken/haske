@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowHelp, GameWindowLighthouse, GameWindowQuarry, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
+import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowHelp, GameWindowLighthouse, GameWindowQuarry, GameWindowRecipesBook, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -20,6 +20,7 @@ export class GameStateService {
     new GameWindowDressing(),
     new GameWindowStorage(),
     new GameWindowStorage(),
+    new GameWindowRecipesBook(),
     new GameWindowTrash(),
     new GameWindowExploration(),
     new GameWindowLighthouse(),
@@ -51,8 +52,8 @@ export class GameStateService {
       this.popupService.pushValue("error", "En dehors");
       this._gameState$.value.drag = new GameDrag();
       this._gameState$.next(this._gameState$.value);
-    } else if (this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowHelp) {
-      this.popupService.pushValue("error", "Impossible de stocker dans l’aide");
+    } else if (this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowHelp || this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowRecipesBook) {
+      this.popupService.pushValue("error", "Impossible de stocker dans du texte");
       this._gameState$.value.drag = new GameDrag();
       this._gameState$.next(this._gameState$.value);
     } else if(this._gameState$.value.drag.windowEndId + 0.5 === Math.floor(this._gameState$.value.drag.windowEndId)+1 && this._gameState$.value.drag.windowStartId + 0.5 === Math.floor(this._gameState$.value.drag.windowStartId)+1) {
@@ -128,7 +129,7 @@ export class GameStateService {
     //
     if (windowEnd instanceof GameWindowStorage && windowEnd.content.length === windowEnd.maxSpace) {
       this.popupService.pushValue("error", "Plus de place");
-    } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content) === "nothing") {
+    } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content) === "nothing" && windowEnd.content.length > 0) {
       this.popupService.pushValue("error", "Atelier non prêt");
     } else if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
       windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);

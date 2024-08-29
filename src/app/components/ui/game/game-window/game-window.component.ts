@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { GameWindow } from 'src/app/models/game-window.model';
+import { GameWindow, GameWindowRecipesBook } from 'src/app/models/game-window.model';
 import { RecipesService } from 'src/app/shared/recipes.service';
 import { DraggableNames } from 'src/app/types/draggable-names.type';
 
@@ -41,6 +41,7 @@ export class GameWindowComponent {
       case "trash": return "Rebut";
       case "help": return "?";
       case "dressing": return "Vestiaire";
+      case "recipes-book": return "Recettes";
     }
   }
 
@@ -106,6 +107,11 @@ export class GameWindowComponent {
       // Items
       case "pickaxe": return "Un outil qui peut être équipé à un aikaci dans un Vestiaire, permettant d’exploiter les mines.";
     }
+  }
+
+  recipesBookDisplay(): string {
+    if (!(this.windowInfo instanceof GameWindowRecipesBook)) return "error";
+    return this.recipesService.recipesWith(this.windowInfo.slot[0]);
   }
 
   workbenchPreparedRecipe(): string {
