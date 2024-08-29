@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowHelp, GameWindowLighthouse, GameWindowQuarry, GameWindowRecipesBook, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
+import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowQuarry, GameWindowRecipesBook, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -189,15 +189,22 @@ export class GameStateService {
           window.currentTime = 0;
           // Perform
           if (window instanceof GameWindowExploration) {
-            let explorables: GameWindow[] = [new GameWindowQuarry(), new GameWindowScrub()];
-            let explored: GameWindow = explorables[this.random(0, explorables.length-1)];
-            this._gameState$.value.windows.push(explored);
+            let pN: number = 10;
+            let pQ: number = 35;
+            let pS: number = 35;
+            let pM: number = 20;
+            let rand: number = this.random(0, 100);
+            if (rand < pN) this.popupService.pushValue("info", "L’exploration n’a rien donnée")
+            else if (rand < pN+pQ) this._gameState$.value.windows.push(new GameWindowQuarry());
+            else if (rand < pN+pQ+pS) this._gameState$.value.windows.push(new GameWindowScrub());
+            else if (rand < pN+pQ+pS+pM) this._gameState$.value.windows.push(new GameWindowMine());
 
-          } else if (window instanceof GameWindowQuarry || window instanceof GameWindowScrub) {
+          } else if (window instanceof GameWindowQuarry || window instanceof GameWindowScrub || window instanceof GameWindowMine) {
             let resourceName: ResourceNames = "water";
             switch (window.constructor) {
               case GameWindowQuarry: resourceName = "stone"; break;
               case GameWindowScrub: resourceName = "wood"; break;
+              case GameWindowMine: resourceName = "iron-ore"; break;
             }
             let storageId: number = this.indexOfFirstOpenedStorage(resourceName);
             if (storageId !== -1) {
