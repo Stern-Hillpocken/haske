@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowQuarry, GameWindowRecipesBook, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
+import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowQuarry, GameWindowRecipesBook, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -16,6 +16,7 @@ import { WindowNames } from '../types/window-names.type';
 export class GameStateService {
 
   private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 5, new GameTime(), [
+    new GameWindowGoal(),
     new GameWindowWorkbench(),
     new GameWindowDressing(),
     new GameWindowStorage(),
