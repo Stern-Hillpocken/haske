@@ -102,6 +102,17 @@ export class GameWindowHelp extends GameWindow {
     }
 }
 
+export class GameWindowRecipesBook extends GameWindow {
+    constructor(
+        public override name: WindowNames = "recipes-book",
+        public override content: DraggableNames[] = [],
+        public override acceptance: ResourceNames[] = ["stone", "water", "wood"],
+        public override slot: ResourceNames[] = []
+    ) {
+        super(name, content, acceptance)
+    }
+}
+
 export class GameWindowWorkbench extends GameWindow {
     constructor(
         public override name: WindowNames = "workbench",

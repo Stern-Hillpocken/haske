@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Recipe } from '../models/recipe.model';
 import { DraggableNames } from '../types/draggable-names.type';
+import { ResourceNames } from '../types/resource-names.type';
 
 @Injectable({
   providedIn: 'root'
@@ -27,4 +28,21 @@ export class RecipesService {
     }
     return "nothing";
   }
+
+  recipesWith(resource: ResourceNames): string {
+    let recipes: string = "";
+    for (let recipe of this.allReceipes) {
+      let sentence: string = "";
+      let isIn: boolean = false;
+      for (let i = 0; i < recipe.resources.length; i++) {
+        sentence += "<img src='assets/images/draggable/" + recipe.resources[i] + ".png'>";
+        if (i < recipe.resources.length-1) sentence += " + ";
+        if (i === recipe.resources.length-1) sentence += " = <img src='assets/images/draggable/" + recipe.name + ".png'><br>";
+        if (recipe.resources[i] === resource) isIn = true;
+      }
+      if (isIn) recipes += sentence;
+    }
+    return recipes === "" ? "Pas de recette avec cet élèment..." : recipes;
+  }
+
 }

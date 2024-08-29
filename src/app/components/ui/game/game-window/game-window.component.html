@@ -12,7 +12,7 @@
         <div
             *ngIf="windowInfo.slot !== undefined"
             class="window-slot"
-            [ngStyle]="windowInfo.name === 'help' ? {'width': (1)*32+'px'} : {'width': (windowInfo.slot.length+1)*32+'px'}"
+            [ngStyle]="windowInfo.name === 'help' || windowInfo.name === 'recipes-book' ? {'width': (1)*32+'px'} : {'width': (windowInfo.slot.length+1)*32+'px'}"
             (dragenter)="onDragEnterSlot()"
         ><app-draggable-image *ngFor="let s of windowInfo.slot" [name]="s" [windowId]="id+.5"></app-draggable-image></div>
         <h3>{{ getTitle() }}</h3>
@@ -23,10 +23,11 @@
     <div
         class="window-content"
         (dragenter)="onDragEnter()"
-        *ngIf="(windowInfo.name !== 'trash' && windowInfo.name !== 'help') || (windowInfo.name === 'help' && windowInfo.slot && windowInfo.slot.length > 0)"
+        *ngIf="(windowInfo.name !== 'trash' && windowInfo.name !== 'help' && windowInfo.name !== 'recipes-book') || (windowInfo.name === 'help' && windowInfo.slot && windowInfo.slot.length > 0) || (windowInfo.name === 'recipes-book' && windowInfo.slot && windowInfo.slot.length > 0)"
     >
         <app-draggable-image *ngFor="let c of windowInfo.content" [name]="c" [windowId]="id"></app-draggable-image>
         <p *ngIf="windowInfo.name === 'help'">{{ helpDisplay() }}</p>
+        <p *ngIf="windowInfo.name === 'recipes-book'" [innerHTML]="recipesBookDisplay()" style="font-size: 3em;"></p>
     </div>
 
     <div *ngIf="windowInfo.currentTime !== undefined && windowInfo.maxTime" class="progress-bar"><div class="bar" [style]="{'width': windowInfo.currentTime*100/windowInfo.maxTime+'%'}"></div></div>
