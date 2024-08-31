@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowQuarry, GameWindowRecipesBook, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
+import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -17,6 +17,7 @@ import { GoalService } from './goal.service';
 export class GameStateService {
 
   private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 5, new GameTime(), [
+    new GameWindowPantry(),
     new GameWindowGoal(),
     new GameWindowWorkbench(),
     new GameWindowDressing(),
@@ -54,7 +55,7 @@ export class GameStateService {
       this.popupService.pushValue("error", "En dehors");
       this._gameState$.value.drag = new GameDrag();
       this._gameState$.next(this._gameState$.value);
-    } else if (this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowHelp || this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowRecipesBook) {
+    } else if (this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowHelp || this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowRecipesBook || this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowGoal) {
       this.popupService.pushValue("error", "Impossible de stocker dans du texte");
       this._gameState$.value.drag = new GameDrag();
       this._gameState$.next(this._gameState$.value);
