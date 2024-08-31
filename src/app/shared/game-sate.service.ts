@@ -9,6 +9,7 @@ import { ResourceNames } from '../types/resource-names.type';
 import { PopupService } from './popup.service';
 import { RecipesService } from './recipes.service';
 import { WindowNames } from '../types/window-names.type';
+import { GoalService } from './goal.service';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +33,7 @@ export class GameStateService {
   windowsWhichCanPause: WindowNames[] = ["exploration", "scrub", "quarry"];
   workerNames: DraggableNames[] = ["worker", "miner"];
 
-  constructor(private popupService: PopupService, private recipesServices: RecipesService) { }
+  constructor(private popupService: PopupService, private recipesServices: RecipesService, private goalService: GoalService) { }
 
   _getGameState$(): Observable<GameState> {
     return this._gameState$.asObservable();
@@ -199,13 +200,28 @@ export class GameStateService {
             else if (rand < pN+pQ) this._gameState$.value.windows.push(new GameWindowQuarry());
             else if (rand < pN+pQ+pS) this._gameState$.value.windows.push(new GameWindowScrub());
             else if (rand < pN+pQ+pS+pM) this._gameState$.value.windows.push(new GameWindowMine());
+            this.goalService.launchTrigger("exporation");
 
           } else if (window instanceof GameWindowQuarry || window instanceof GameWindowScrub || window instanceof GameWindowMine) {
             let resourceName: ResourceNames = "water";
             switch (window.constructor) {
-              case GameWindowQuarry: resourceName = "stone"; break;
-              case GameWindowScrub: resourceName = "wood"; break;
-              case GameWindowMine: resourceName = "iron-ore"; break;
+              case GameWindowQuarry:
+                resourceName = "stone";
+                this.goalService.launchTrigger("gather-stone");
+                break;
+              case GameWindowScrub:
+                if (this.random(0, 100) < 80) {
+                  resourceName = "wood";
+                  this.goalService.launchTrigger("gather-wood");
+                } else {
+                  resourceName = "fiber";
+                  this.goalService.launchTrigger("gather-fiber");
+                }
+                break;
+              case GameWindowMine:
+                resourceName = "iron-ore";
+                this.goalService.launchTrigger("gather-iron-ore");
+                break;
             }
             let storageId: number = this.indexOfFirstOpenedStorage(resourceName);
             if (storageId !== -1) {

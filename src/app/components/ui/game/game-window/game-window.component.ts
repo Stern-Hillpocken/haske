@@ -11,6 +11,9 @@ import { DraggableNames } from 'src/app/types/draggable-names.type';
 export class GameWindowComponent {
 
   @Input()
+  currentGoal!: string;
+
+  @Input()
   allWindows!: GameWindow[];
 
   @Input()
@@ -98,6 +101,7 @@ export class GameWindowComponent {
       case "stone": return "De la pierre pour construire.";
       case "water": return "De l’eau pour survivre et allumer le phare.";
       case "wood": return "Du bois pour construire.";
+      case "fiber": return "Une fibre extraite des végétaux, utile pour faire du tissu.";
       case "iron-ore": return "Un minerai de fer qu’il va falloir faire fondre pour être utilisé.";
       // Monster parts
       case "monster-eye": return "Un œil qui peut être utilisé pour ne plus voir les objectifs.";
@@ -112,14 +116,6 @@ export class GameWindowComponent {
       // Items
       case "pickaxe": return "Un outil qui peut être équipé à un aikaci dans un Vestiaire, permettant d’exploiter les mines.";
     }
-  }
-
-  goalDisplay(): string {
-    // 1 - Explore && Gather resources: wood, stone, fiber
-    // 2 - Pickaxe && Dressing && Miner
-    // 3 - Equip a aikaci to have soldier
-    // 4 - Perform your first sacrifice
-    return "Goal it is";
   }
 
   recipesBookDisplay(): string {
