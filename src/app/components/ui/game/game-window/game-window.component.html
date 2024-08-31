@@ -18,12 +18,14 @@
         <h3>{{ getTitle() }}</h3>
         <p *ngIf="windowInfo.usageRemaining !== undefined">x{{ windowInfo.usageRemaining }}</p>
         <p *ngIf="windowInfo.maxSpace !== undefined">{{ contentLengthWithoutWorker()+'/'+windowInfo.maxSpace }}</p>
+        <p *ngIf="windowInfo.name === 'lighthouse'">{{ flame }}<img src="assets/images/window/flame.png">/100</p>
+        <p *ngIf="windowInfo.name === 'pantry'">{{ windowInfo.content.length }}<img src="assets/images/window/food.png"></p>
     </div>
 
     <div
         class="window-content"
         (dragenter)="onDragEnter()"
-        *ngIf="(windowInfo.name !== 'trash' && windowInfo.name !== 'help' && windowInfo.name !== 'recipes-book' && windowInfo.name !== 'goal') || (windowInfo.name === 'help' && windowInfo.slot && windowInfo.slot.length > 0) || (windowInfo.name === 'recipes-book' && windowInfo.slot && windowInfo.slot.length > 0) || (windowInfo.name === 'goal' && windowInfo.slot && windowInfo.slot !== ['monster-eye'])"
+        *ngIf="(windowInfo.name !== 'trash' && windowInfo.name !== 'help' && windowInfo.name !== 'recipes-book' && windowInfo.name !== 'goal') || (windowInfo.name === 'help' && windowInfo.slot && windowInfo.slot.length > 0) || (windowInfo.name === 'recipes-book' && windowInfo.slot && windowInfo.slot.length > 0) || (windowInfo.name === 'goal' && windowInfo.slot && !windowInfo.slot.includes('monster-eye'))"
     >
         <app-draggable-image *ngFor="let c of windowInfo.content" [name]="c" [windowId]="id"></app-draggable-image>
         <p *ngIf="windowInfo.name === 'help'">{{ helpDisplay() }}</p>

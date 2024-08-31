@@ -32,7 +32,7 @@ import { PopupComponent } from './shared/popup/popup.component';
     TimeTrackerComponent,
     TimeBannerComponent,
     GameWindowComponent,
-    PopupComponent
+    PopupComponent,
   ],
   imports: [
     BrowserModule,

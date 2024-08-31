@@ -25,9 +25,19 @@ export class GameWindowStorage extends GameWindow {
     constructor(
         public override name: WindowNames = "storage",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["stone", "water", "wood", "fiber", "iron-ore", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip"],
+        public override acceptance: DraggableNames[] = ["stone", "water", "wood", "fiber", "iron-ore", "bread", "monster-eye", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip"],
         public override maxSpace: number = 14,
         public override slot: ResourceNames[] = []
+    ) {
+        super(name, content, acceptance)
+    }
+}
+
+export class GameWindowPantry extends GameWindow {
+    constructor(
+        public override name: WindowNames = "pantry",
+        public override content: DraggableNames[] = ["bread", "bread", "bread", "monster-eye"],
+        public override acceptance: DraggableNames[] = ["bread", "monster-eye"]
     ) {
         super(name, content, acceptance)
     }
