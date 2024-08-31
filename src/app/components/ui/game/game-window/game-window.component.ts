@@ -106,6 +106,7 @@ export class GameWindowComponent {
       case "water": return "De l’eau pour survivre et allumer le phare.";
       case "wood": return "Du bois pour construire.";
       case "fiber": return "Une fibre extraite des végétaux, utile pour faire du tissu.";
+      case "fabric": return "Du tissu, très rustique.";
       case "iron-ore": return "Un minerai de fer qu’il va falloir faire fondre pour être utilisé.";
       // Monster parts
       case "monster-eye": return "Un œil qui peut être utilisé pour ne plus voir les objectifs.";

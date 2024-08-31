@@ -17,17 +17,13 @@ import { GoalService } from './goal.service';
 export class GameStateService {
 
   private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 5, new GameTime(), [
-    new GameWindowPantry(),
+    //new GameWindowPantry(),
     new GameWindowGoal(),
-    new GameWindowWorkbench(),
-    new GameWindowDressing(),
+    //new GameWindowDressing(),
     new GameWindowStorage(),
-    new GameWindowStorage(),
-    new GameWindowRecipesBook(),
-    new GameWindowTrash(),
+    //new GameWindowStorage(),
     new GameWindowExploration(),
-    new GameWindowLighthouse(),
-    new GameWindowHelp()
+    new GameWindowLighthouse()
   ]
   ));
 
@@ -157,6 +153,21 @@ export class GameStateService {
     if (this._gameState$.value.time.tick === 5) {
       // Morning environment event
       if (this._gameState$.value.time.day === 3) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-event");
+
+    } else if (this._gameState$.value.time.day === 1 && this._gameState$.value.time.tick === 40) {
+      this._gameState$.value.windows.push(
+        new GameWindowHelp(),
+        new GameWindowWorkbench(),
+        new GameWindowRecipesBook()
+      );
+      this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-time-strip");
+
+    } else if (this._gameState$.value.time.day === 1 && this._gameState$.value.time.tick === 60) {
+      this._gameState$.value.windows.push(
+        new GameWindowTrash(),
+        new GameWindowRecipesBook(),
+        new GameWindowDressing() // TODO remove
+      );
 
     } else if (this._gameState$.value.time.tick === 75) {
       // Newcomers

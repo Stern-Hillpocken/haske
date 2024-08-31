@@ -9,7 +9,8 @@ import { ResourceNames } from '../types/resource-names.type';
 export class RecipesService {
 
   allReceipes: Recipe[] = [
-    new Recipe("pickaxe", ["stone", "wood"], [1, 1], 12)
+    new Recipe("pickaxe", ["stone", "wood"], [1, 1], 12),
+    new Recipe("fabric", ["fiber"], [3], 8)
   ];
 
   constructor() { }
