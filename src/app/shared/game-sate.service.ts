@@ -235,11 +235,16 @@ export class GameStateService {
             let recipeName: DraggableNames = this.recipesServices.recipeDoable(window.content);
             window.content = window.content.filter((name) => name === "worker");
             window.content.push(recipeName);
+            if (recipeName === "pickaxe") this.goalService.launchTrigger("make-pickaxe");
+
           } else if (window instanceof GameWindowDressing) {
             let item: DraggableNames = window.content.filter((name) => !this.workerNames.includes(name))[0];
             window.content = window.content.filter((name) => this.workerNames.includes(name));
             window.content.shift();
-            if (item === "pickaxe") window.content.push("miner");
+            if (item === "pickaxe") {
+              window.content.push("miner");
+              this.goalService.launchTrigger("equip-miner");
+            }
           }
         }
       }
