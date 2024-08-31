@@ -11,6 +11,9 @@ import { DraggableNames } from 'src/app/types/draggable-names.type';
 export class GameWindowComponent {
 
   @Input()
+  currentGoal!: string;
+
+  @Input()
   allWindows!: GameWindow[];
 
   @Input()
@@ -43,6 +46,7 @@ export class GameWindowComponent {
       case "dressing": return "Vestiaire";
       case "recipes-book": return "Recettes";
       case "mine": return "Mine";
+      case "goal": return "Objectif";
     }
   }
 
@@ -97,7 +101,10 @@ export class GameWindowComponent {
       case "stone": return "De la pierre pour construire.";
       case "water": return "De l’eau pour survivre et allumer le phare.";
       case "wood": return "Du bois pour construire.";
+      case "fiber": return "Une fibre extraite des végétaux, utile pour faire du tissu.";
       case "iron-ore": return "Un minerai de fer qu’il va falloir faire fondre pour être utilisé.";
+      // Monster parts
+      case "monster-eye": return "Un œil qui peut être utilisé pour ne plus voir les objectifs.";
       // Notes
       case "note-help-and-trash": return "Ici c’est l’endroit pour avoir des informations sur les différents élèments. Pour l’instant un élement de type \"note\" est dans l’emplacement mais tu peux l’enlever pour libérer la place pour un autre. Tu peux par exemple détruire cette note en la plaçant dans le Rebut.";
       case "note-time-strip": return "En haut se trouve la frise du temps avec différents évènements qui y sont associés, et le temps qui passe.";

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { GameState } from 'src/app/models/game-state.model';
 import { GameStateService } from 'src/app/shared/game-sate.service';
+import { GoalService } from 'src/app/shared/goal.service';
 
 @Component({
   selector: 'app-game',
@@ -11,10 +12,15 @@ export class GameComponent {
 
   gameState!: GameState;
 
-  constructor (private gss: GameStateService) {
+  currentGoal!: string;
+
+  constructor (private gss: GameStateService, private goalService: GoalService) {
     this.gss._getGameState$().subscribe((gs: GameState) => {
       this.gameState = gs;
-    })
+    });
+    this.goalService._getGoal$().subscribe((goal: string) => {
+      this.currentGoal = goal;
+    });
   }
 
   onTickReceive(): void {
