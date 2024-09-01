@@ -1,6 +1,9 @@
 .window-title {
     display: flex;
     gap: 0.5em;
+    h3 {
+        font-size: 1em;
+    }
     p {
         font-size: 0.5em;
     }
@@ -11,11 +14,12 @@
     border: 2px dashed black;
 }
 
-.progress-bar, .bar {
+.progress-bar {
     height: 1em;
     background-color: gray;
 }
 .bar {
+    height: 1em;
     background-color: var(--color-complement);
 }
 

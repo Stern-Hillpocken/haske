@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { GameWindow, GameWindowRecipesBook } from 'src/app/models/game-window.model';
+import { GameWindow, GameWindowHelp, GameWindowRecipesBook } from 'src/app/models/game-window.model';
 import { RecipesService } from 'src/app/shared/recipes.service';
 import { DraggableNames } from 'src/app/types/draggable-names.type';
 
@@ -141,6 +141,26 @@ export class GameWindowComponent {
 
   contentLengthWithoutWorker(): number {
     return this.windowInfo.content.filter((name) => name !== "worker").length
+  }
+
+  backgroundColorOfTitle(): string {
+    let style: "basic" | "food" | "resource" | "workstation" = "basic";
+    switch (this.windowInfo.name) {
+      case "dressing": style = "workstation"; break;
+      case "exploration": style = "resource"; break;
+      case "goal": style = "basic"; break;
+      case "help": style = "basic"; break;
+      case "lighthouse": style = "basic"; break;
+      case "mine": style = "resource"; break;
+      case "pantry": style = "food"; break;
+      case "quarry": style = "resource"; break;
+      case "recipes-book": style = "basic"; break;
+      case "scrub": style = "resource"; break;
+      case "storage": style = "resource"; break;
+      case "trash": style = "basic"; break;
+      case "workbench": style = "workstation"; break;
+    }
+    return "var(--color-banner-" + style + ")";
   }
 
 }
