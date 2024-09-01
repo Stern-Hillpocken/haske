@@ -92,6 +92,11 @@ export class GameStateService {
     let windowStart: GameWindow = this._gameState$.value.windows[Math.floor(this._gameState$.value.drag.windowStartId)];
     let dragName: DraggableNames = this._gameState$.value.drag.draggableName;
     //
+    if ((windowEnd instanceof GameWindowHelp || windowEnd instanceof GameWindowRecipesBook) && windowEnd.slot.length === 1) {
+      this.popupService.pushValue("error", "Il y a déjà un élément ici");
+      return;
+    }
+    //
     if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName) && !windowEnd.slot?.includes(dragName)) {
       windowEnd.slot?.push(dragName);
       windowEnd.slot?.sort();
@@ -108,6 +113,11 @@ export class GameStateService {
     let windowEnd: GameWindow = this._gameState$.value.windows[Math.floor(this._gameState$.value.drag.windowEndId)];
     let windowStart: GameWindow = this._gameState$.value.windows[this._gameState$.value.drag.windowStartId];
     let dragName: DraggableNames = this._gameState$.value.drag.draggableName;
+    //
+    if ((windowEnd instanceof GameWindowHelp || windowEnd instanceof GameWindowRecipesBook) && windowEnd.slot.length === 1) {
+      this.popupService.pushValue("error", "Il y a déjà un élément ici");
+      return;
+    }
     //
     if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName) && !windowEnd.slot?.includes(dragName) && (windowStart.currentTime === undefined || windowStart.currentTime === 0)) {
       windowEnd.slot?.push(dragName);
