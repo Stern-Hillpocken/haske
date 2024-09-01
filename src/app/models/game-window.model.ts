@@ -98,7 +98,7 @@ export class GameWindowMine extends GameWindow {
         public override acceptance: DraggableNames[] = ["miner"],
         public override currentTime: number = 0,
         public override maxTime: number = 12,
-        public override usageRemaining: number =  random(2,4)
+        public override usageRemaining: number =  random(1,3)
     ) {
         super(name, content, acceptance)
     }

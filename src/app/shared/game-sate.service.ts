@@ -157,8 +157,7 @@ export class GameStateService {
     } else if (this._gameState$.value.time.day === 1 && this._gameState$.value.time.tick === 40) {
       this._gameState$.value.windows.push(
         new GameWindowHelp(),
-        new GameWindowWorkbench(),
-        new GameWindowRecipesBook()
+        new GameWindowWorkbench()
       );
       this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-time-strip");
 
@@ -208,10 +207,24 @@ export class GameStateService {
             let pS: number = 35;
             let pM: number = 20;
             let rand: number = this.random(0, 100);
-            if (rand < pN) this.popupService.pushValue("info", "L’exploration n’a rien donnée")
-            else if (rand < pN+pQ) this._gameState$.value.windows.push(new GameWindowQuarry());
-            else if (rand < pN+pQ+pS) this._gameState$.value.windows.push(new GameWindowScrub());
-            else if (rand < pN+pQ+pS+pM) this._gameState$.value.windows.push(new GameWindowMine());
+            if (rand < pN) {
+              this.popupService.pushValue("info", "L’exploration n’a rien donnée");
+            } else if (rand < pN+pQ) {
+              let index: number = this.indexOfWindow("quarry");
+              if (index !== -1 && this._gameState$.value.windows[index]) {
+                (this._gameState$.value.windows[index].usageRemaining as number) += this.random(2,5);
+              } else this._gameState$.value.windows.push(new GameWindowQuarry());
+            } else if (rand < pN+pQ+pS) {
+              let index: number = this.indexOfWindow("scrub");
+              if (index !== -1 && this._gameState$.value.windows[index]) {
+                (this._gameState$.value.windows[index].usageRemaining as number) += this.random(2,5);
+              } else this._gameState$.value.windows.push(new GameWindowScrub());
+            } else if (rand < pN+pQ+pS+pM) {
+              let index: number = this.indexOfWindow("mine");
+              if (index !== -1 && this._gameState$.value.windows[index]) {
+                  (this._gameState$.value.windows[index].usageRemaining as number) += this.random(1,3);
+              } else this._gameState$.value.windows.push(new GameWindowMine());
+            }
             this.goalService.launchTrigger("exporation");
 
           } else if (window instanceof GameWindowQuarry || window instanceof GameWindowScrub || window instanceof GameWindowMine) {
