@@ -51,6 +51,7 @@ export class GameWindowComponent {
       case "mine": return "Mine";
       case "goal": return "Objectif";
       case "pantry": return "Garde-manger";
+      case "ruin": return "Ruine";
     }
   }
 
@@ -159,6 +160,7 @@ export class GameWindowComponent {
       case "storage": style = "resource"; break;
       case "trash": style = "basic"; break;
       case "workbench": style = "workstation"; break;
+      case "ruin": style = "resource"; break;
     }
     return "var(--color-banner-" + style + ")";
   }

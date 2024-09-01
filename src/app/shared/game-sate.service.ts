@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
+import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -10,6 +10,8 @@ import { PopupService } from './popup.service';
 import { RecipesService } from './recipes.service';
 import { WindowNames } from '../types/window-names.type';
 import { GoalService } from './goal.service';
+import { FoodNames } from '../types/food-names.type';
+import { MonsterPartNames } from '../types/monster-part-names.type';
 
 @Injectable({
   providedIn: 'root'
@@ -203,9 +205,10 @@ export class GameStateService {
           // Perform
           if (window instanceof GameWindowExploration) {
             let pN: number = 10;
-            let pQ: number = 35;
-            let pS: number = 35;
+            let pQ: number = 30;
+            let pS: number = 30;
             let pM: number = 20;
+            let pR: number = 10;
             let rand: number = this.random(0, 100);
             if (rand < pN) {
               this.popupService.pushValue("info", "L’exploration n’a rien donnée");
@@ -223,12 +226,17 @@ export class GameStateService {
               let index: number = this.indexOfWindow("mine");
               if (index !== -1 && this._gameState$.value.windows[index]) {
                   (this._gameState$.value.windows[index].usageRemaining as number) += this.random(1,3);
-              } else this._gameState$.value.windows.push(new GameWindowMine());
+              }  else this._gameState$.value.windows.push(new GameWindowMine());
+            } else if (rand < pN+pQ+pS+pM+pR) {
+              let index: number = this.indexOfWindow("ruin");
+              if (index !== -1 && this._gameState$.value.windows[index]) {
+                  (this._gameState$.value.windows[index].usageRemaining as number) += this.random(1,3);
+              }  else this._gameState$.value.windows.push(new GameWindowRuin());
             }
             this.goalService.launchTrigger("exporation");
 
-          } else if (window instanceof GameWindowQuarry || window instanceof GameWindowScrub || window instanceof GameWindowMine) {
-            let resourceName: ResourceNames = "water";
+          } else if (window instanceof GameWindowQuarry || window instanceof GameWindowScrub || window instanceof GameWindowMine || window instanceof GameWindowRuin) {
+            let resourceName: DraggableNames = "nothing";
             switch (window.constructor) {
               case GameWindowQuarry:
                 resourceName = "stone";
@@ -247,8 +255,17 @@ export class GameStateService {
                 resourceName = "iron-ore";
                 this.goalService.launchTrigger("gather-iron-ore");
                 break;
+              case GameWindowRuin:
+                let pRuinN: number = 50;
+                let pRuinB: number = 30;
+                let pRuinE: number = 20;
+                let randRuinObj: number = this.random(0, 100);
+                if (randRuinObj < pRuinN) {}
+                else if (randRuinObj < pRuinN+pRuinB) resourceName = "bread";
+                else if (randRuinObj < pRuinN+pRuinB+pRuinE) resourceName = "monster-eye";
+                break;
             }
-            let storageId: number = this.indexOfFirstOpenedStorage(resourceName);
+            let storageId: number = resourceName === "nothing" ? -1 : this.indexOfFirstOpenedStorage(resourceName);
             if (storageId !== -1) {
               window.usageRemaining --;
               this._gameState$.value.windows[storageId].content.push(resourceName);
@@ -284,7 +301,7 @@ export class GameStateService {
     for(let i = 0; i < this._gameState$.value.windows.length; i++) {
       let window: GameWindow = this._gameState$.value.windows[i];
       if (window instanceof GameWindowLighthouse) lighthouseIndex = i;
-      if ((window instanceof GameWindowQuarry || window instanceof GameWindowScrub) && window.usageRemaining === 0) {
+      if ((window instanceof GameWindowQuarry || window instanceof GameWindowScrub || window instanceof GameWindowRuin) && window.usageRemaining === 0) {
         contentToStore.push(... this._gameState$.value.windows[i].content);
         this._gameState$.value.windows.splice(i,1);
         i --;
@@ -294,7 +311,7 @@ export class GameStateService {
     this._gameState$.next(this._gameState$.value);
   }
 
-  indexOfFirstOpenedStorage(resourceName: ResourceNames): number {
+  indexOfFirstOpenedStorage(resourceName: ResourceNames | FoodNames | MonsterPartNames): number {
     for(let i = 0; i < this._gameState$.value.windows.length; i++) {
       let window: GameWindow = this._gameState$.value.windows[i];
       if (window instanceof GameWindowStorage && window.content.length < window.maxSpace && (window.slot.length === 0 || window.slot.includes(resourceName))) return i;
