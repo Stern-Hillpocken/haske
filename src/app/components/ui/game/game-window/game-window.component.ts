@@ -145,22 +145,22 @@ export class GameWindowComponent {
   }
 
   backgroundColorOfTitle(): string {
-    let style: "basic" | "food" | "resource" | "workstation" = "basic";
+    let style: "basic" | "exploration" | "food" | "storage" | "workstation" = "basic";
     switch (this.windowInfo.name) {
       case "dressing": style = "workstation"; break;
-      case "exploration": style = "resource"; break;
+      case "exploration": style = "exploration"; break;
       case "goal": style = "basic"; break;
       case "help": style = "basic"; break;
       case "lighthouse": style = "basic"; break;
-      case "mine": style = "resource"; break;
+      case "mine": style = "exploration"; break;
       case "pantry": style = "food"; break;
-      case "quarry": style = "resource"; break;
+      case "quarry": style = "exploration"; break;
       case "recipes-book": style = "basic"; break;
-      case "scrub": style = "resource"; break;
-      case "storage": style = "resource"; break;
+      case "scrub": style = "exploration"; break;
+      case "storage": style = "storage"; break;
       case "trash": style = "basic"; break;
       case "workbench": style = "workstation"; break;
-      case "ruin": style = "resource"; break;
+      case "ruin": style = "exploration"; break;
     }
     return "var(--color-banner-" + style + ")";
   }
