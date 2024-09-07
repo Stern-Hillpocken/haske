@@ -4,6 +4,8 @@
     width: 100%;
     text-align: center;
     border: 2px solid black;
+    z-index: 999999;
+    background-color: rgba(0, 0, 0, 0.2);
 
     animation-name: slider;
     animation-timing-function: cubic-bezier(0,1,1,0);
