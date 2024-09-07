@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
+import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -19,11 +19,8 @@ import { MonsterPartNames } from '../types/monster-part-names.type';
 export class GameStateService {
 
   private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 5, new GameTime(), [
-    //new GameWindowPantry(),
     new GameWindowGoal(),
-    //new GameWindowDressing(),
     new GameWindowStorage(),
-    //new GameWindowStorage(),
     new GameWindowExploration(),
     new GameWindowLighthouse()
   ]
@@ -176,8 +173,7 @@ export class GameStateService {
     } else if (this._gameState$.value.time.day === 1 && this._gameState$.value.time.tick === 60) {
       this._gameState$.value.windows.push(
         new GameWindowTrash(),
-        new GameWindowRecipesBook(),
-        new GameWindowDressing() // TODO remove
+        new GameWindowRecipesBook()
       );
 
     } else if (this._gameState$.value.time.tick === 75) {
@@ -285,10 +281,18 @@ export class GameStateService {
               window.currentTime = window.maxTime;
             }
           } else if (window instanceof GameWindowWorkbench) {
-            let recipeName: DraggableNames = this.recipesServices.recipeDoable(window.content);
+            let recipeName: DraggableNames | WindowNames = this.recipesServices.recipeDoable(window.content);
             this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push(...window.content.filter((name) => name === "worker"));
-            window.content = [recipeName];
-            if (recipeName === "pickaxe") this.goalService.launchTrigger("make-pickaxe");
+            window.content = [];
+            if (recipeName === "pickaxe" || recipeName === "plank" || recipeName === "stick" || recipeName === "fabric") {
+              window.content = [recipeName];
+              if (recipeName === "pickaxe") this.goalService.launchTrigger("make-pickaxe");
+            } else {
+              if (recipeName === "storage") this._gameState$.value.windows.push(new GameWindowStorage ());
+              else if (recipeName === "dressing") this._gameState$.value.windows.push(new GameWindowDressing());
+              else if (recipeName === "furnace") this._gameState$.value.windows.push(new GameWindowFurnace());
+              else if (recipeName === "sawmill") this._gameState$.value.windows.push(new GameWindowSawmill());
+            }
 
           } else if (window instanceof GameWindowDressing) {
             let item: DraggableNames = window.content.filter((name) => !this.workerNames.includes(name))[0];
