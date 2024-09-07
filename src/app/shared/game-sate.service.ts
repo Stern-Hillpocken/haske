@@ -171,7 +171,7 @@ export class GameStateService {
         new GameWindowHelp(),
         new GameWindowWorkbench()
       );
-      this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-time-strip");
+      this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-exploration-x-time");
 
     } else if (this._gameState$.value.time.day === 1 && this._gameState$.value.time.tick === 60) {
       this._gameState$.value.windows.push(
@@ -179,13 +179,13 @@ export class GameStateService {
         new GameWindowRecipesBook(),
         new GameWindowDressing() // TODO remove
       );
-      this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-exploration-x-time");
 
     } else if (this._gameState$.value.time.tick === 75) {
       // Newcomers
       if (this._gameState$.value.time.day === 2) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-newcomers");
 
     } else if (this._gameState$.value.time.tick === 85) {
+      if (this._gameState$.value.time.day === 1) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-time-strip");
       // Attack of the monsters
       if (this._gameState$.value.time.day === 4) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-fight");
 
@@ -312,7 +312,7 @@ export class GameStateService {
     for(let i = 0; i < this._gameState$.value.windows.length; i++) {
       let window: GameWindow = this._gameState$.value.windows[i];
       if (window instanceof GameWindowLighthouse) lighthouseIndex = i;
-      if ((window instanceof GameWindowQuarry || window instanceof GameWindowScrub || window instanceof GameWindowRuin) && window.usageRemaining === 0) {
+      if ((window instanceof GameWindowQuarry || window instanceof GameWindowScrub || window instanceof GameWindowMine || window instanceof GameWindowRuin) && window.usageRemaining === 0) {
         contentToStore.push(... this._gameState$.value.windows[i].content);
         this._gameState$.value.windows.splice(i,1);
         i --;

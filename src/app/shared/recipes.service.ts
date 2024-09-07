@@ -25,7 +25,9 @@ export class RecipesService {
       for (let i = 0; i < this.allReceipes[r].resources.length; i++) {
         if (content.filter((name) => name === this.allReceipes[r].resources[i]).length === this.allReceipes[r].quantity[i]) valid ++;
       }
-      if (valid === this.allReceipes[r].resources.length) return this.allReceipes[r].name;
+      let sumOfQuantity: number = this.allReceipes[r].quantity.reduce((partialSum, a) => partialSum + a, 0);
+      let contentWithoutWorker: number = content.filter((e) => !e.includes("worker")).length;
+      if (valid === this.allReceipes[r].resources.length && contentWithoutWorker === sumOfQuantity) return this.allReceipes[r].name;
     }
     return "nothing";
   }

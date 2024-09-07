@@ -132,7 +132,7 @@ export class GameWindowHelp extends GameWindow {
     constructor(
         public override name: WindowNames = "help",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["worker", "stone", "water", "wood", "fiber", "fabric", "iron-ore", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip"],
+        public override acceptance: DraggableNames[] = ["worker", "miner", "stone", "water", "wood", "fiber", "fabric", "iron-ore", "bread", "pickaxe", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip"],
         public override slot: DraggableNames[] = ["note-help-and-trash"]
     ) {
         super(name, content, acceptance)
