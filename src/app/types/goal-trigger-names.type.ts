@@ -1,2 +1,2 @@
 export type GoalTriggerNames = "exporation" | "gather-stone" | "gather-wood" | "gather-fiber"
-| "make-pickaxe" | "build-dressing" | "equip-miner" | "gather-iron-ore";
+| "make-pickaxe" | "build-storage" | "build-dressing" | "build-furnace" | "build-sawmill" | "equip-miner" | "gather-iron-ore" | "make-fabric" | "make-plank" | "melt-iron";
