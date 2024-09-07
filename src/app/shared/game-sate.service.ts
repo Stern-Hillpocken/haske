@@ -179,6 +179,7 @@ export class GameStateService {
         new GameWindowRecipesBook(),
         new GameWindowDressing() // TODO remove
       );
+      this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-exploration-x-time");
 
     } else if (this._gameState$.value.time.tick === 75) {
       // Newcomers
