@@ -12,7 +12,11 @@ export class GoalService {
   isCurrentSubStepsValidated: boolean[] = [];
   allSubSteps: string[][] = [
     ["Découverte du monde et de ses ressources", "Envoyer un aikaci en exploration", "Récupérer de la pierre dans une Carrière", "Récupérer du bois dans les Broussailles", "Trouver de la fibre dans les Broussailles"],
-    ["Retour au début de l’âge de fer", "Fabriquer une pioche dans l’Atelier", "Construire un Vestiaire", "Équiper un aikaci avec la pioche dans le Vestiaire", "Miner du minerai de fer dans une Mine"]
+    ["Un endroit pour se vêtir", "Tisser un tissu à partir de fibres dans l’Atelier", "Dégrossir du bois en planche dans l’Atelier", "Construire un Vestiaire"],
+    ["Retour au début de l’âge de fer", "Fabriquer une pioche dans l’Atelier", "Équiper un aikaci avec la pioche dans le Vestiaire", "Miner du minerai de fer dans une Mine"],
+    ["Une meilleure découpe du bois", "Construire un Four", "Y faire fondre un minerai de fer", "Construire une Scierie", "Construire un Stockage"],
+    
+    ["Allumer le Phare !", "Avoir 100 de luminosité dans le Phare"]
   ]
 
   constructor() {
@@ -40,15 +44,26 @@ export class GoalService {
       if (trigger === "gather-wood") this.isCurrentSubStepsValidated[3] = true;
       if (trigger === "gather-fiber") this.isCurrentSubStepsValidated[4] = true;
     } else if (this.currentStep === 1) {
-      // 1 - Pickaxe && Dressing && Miner
-      if (trigger === "make-pickaxe") this.isCurrentSubStepsValidated[1] = true;
-      if (trigger === "build-dressing") this.isCurrentSubStepsValidated[2] = true;
-      if (trigger === "equip-miner") this.isCurrentSubStepsValidated[3] = true;
-      if (trigger === "gather-iron-ore") this.isCurrentSubStepsValidated[4] = true;
+      if (trigger === "make-fabric") this.isCurrentSubStepsValidated[1] = true;
+      if (trigger === "make-plank") this.isCurrentSubStepsValidated[2] = true;
+      if (trigger === "build-dressing") this.isCurrentSubStepsValidated[3] = true;
     } else if (this.currentStep === 2) {
-      // 2 - Equip a aikaci to have soldier
+      // 2 - Pickaxe && Dressing && Miner
+      if (trigger === "make-pickaxe") this.isCurrentSubStepsValidated[1] = true;
+      if (trigger === "equip-miner") this.isCurrentSubStepsValidated[2] = true;
+      if (trigger === "gather-iron-ore") this.isCurrentSubStepsValidated[3] = true;
     } else if (this.currentStep === 3) {
-      // 3 - Perform your first sacrifice
+      // 3 - Furnace && Sawmill && Storage
+      if (trigger === "build-furnace") this.isCurrentSubStepsValidated[1] = true;
+      if (trigger === "melt-iron") this.isCurrentSubStepsValidated[2] = true;
+      if (trigger === "build-sawmill") this.isCurrentSubStepsValidated[3] = true;
+      if (trigger === "build-storage") this.isCurrentSubStepsValidated[4] = true;
+    } else if (this.currentStep === 4) {
+      // 4 - Equip a aikaci to have soldier
+    } else if (this.currentStep === 5) {
+      // 5 - Perform your first sacrifice
+    } else {
+      // Light the lighthouse with 100 fire
     }
     if (this.isCurrentSubStepsValidated.filter(val => val === true).length === this.isCurrentSubStepsValidated.length) this.addStep();
     this._goal$.next(this.formattingDisplay());

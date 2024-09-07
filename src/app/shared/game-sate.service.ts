@@ -12,6 +12,7 @@ import { WindowNames } from '../types/window-names.type';
 import { GoalService } from './goal.service';
 import { FoodNames } from '../types/food-names.type';
 import { MonsterPartNames } from '../types/monster-part-names.type';
+import { GoalTriggerNames } from '../types/goal-trigger-names.type';
 
 @Injectable({
   providedIn: 'root'
@@ -212,8 +213,8 @@ export class GameStateService {
           // Perform
           if (window instanceof GameWindowExploration) {
             let pN: number = 10;
-            let pQ: number = 30;
-            let pS: number = 30;
+            let pQ: number = 20;
+            let pS: number = 40;
             let pM: number = 20;
             let pR: number = 10;
             let rand: number = this.random(0, 100);
@@ -286,12 +287,13 @@ export class GameStateService {
             window.content = [];
             if (recipeName === "pickaxe" || recipeName === "plank" || recipeName === "stick" || recipeName === "fabric") {
               window.content = [recipeName];
-              if (recipeName === "pickaxe") this.goalService.launchTrigger("make-pickaxe");
+              this.goalService.launchTrigger("make-"+recipeName as GoalTriggerNames);
             } else {
               if (recipeName === "storage") this._gameState$.value.windows.push(new GameWindowStorage ());
               else if (recipeName === "dressing") this._gameState$.value.windows.push(new GameWindowDressing());
               else if (recipeName === "furnace") this._gameState$.value.windows.push(new GameWindowFurnace());
               else if (recipeName === "sawmill") this._gameState$.value.windows.push(new GameWindowSawmill());
+              this.goalService.launchTrigger("build-"+recipeName as GoalTriggerNames);
             }
 
           } else if (window instanceof GameWindowDressing) {
