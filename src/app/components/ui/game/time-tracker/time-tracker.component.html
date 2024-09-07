@@ -1,4 +1,4 @@
-<div class="time-bar">
+<div class="time-bar" *ngIf="time.day >= 2 || time.tick >= 85">
     <img src="assets/images/time/event.png" style="left: 5%" *ngIf="time.day >= 3">
     <img src="assets/images/time/newcomers.png" style="left: 75%" *ngIf="time.day >= 2">
     <img src="assets/images/time/attack.png" style="left: 85%" *ngIf="time.day >= 4">

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { GameWindow, GameWindowRecipesBook } from 'src/app/models/game-window.model';
+import { GameWindow, GameWindowHelp, GameWindowRecipesBook } from 'src/app/models/game-window.model';
 import { RecipesService } from 'src/app/shared/recipes.service';
 import { DraggableNames } from 'src/app/types/draggable-names.type';
 
@@ -51,6 +51,7 @@ export class GameWindowComponent {
       case "mine": return "Mine";
       case "goal": return "Objectif";
       case "pantry": return "Garde-manger";
+      case "ruin": return "Ruine";
     }
   }
 
@@ -113,13 +114,14 @@ export class GameWindowComponent {
       // Food
       case "bread": return "Du pain pour faire manger un aikaci.";
       // Notes
-      case "note-help-and-trash": return "Ici c’est l’endroit pour avoir des informations sur les différents élèments. Pour l’instant un élement de type \"note\" est dans l’emplacement mais tu peux l’enlever pour libérer la place pour un autre. Tu peux par exemple détruire cette note en la plaçant dans le Rebut.";
+      case "note-help-and-trash": return "Ici c’est l’endroit pour avoir des informations sur les différents élèments. Pour l’instant un élement de type \"note\" (représenté par l’enveloppe) est dans l’emplacement mais tu peux l’enlever pour libérer la place pour un autre élèment. Tu peux par exemple détruire cette note en la plaçant dans le Rebut. Chaque note est différente, examine les toutes !";
       case "note-time-strip": return "En haut se trouve la frise du temps avec différents évènements qui y sont associés, et le temps qui passe.";
-      case "note-storage-filter": return "Tu peux associer un ou plusieurs élèments à un Entrepôt pour que seulement ces élèments puissent être stockés à l’intérieur.";
-      case "note-event-end-day": return "À la fin de la journée il faut nourrir tes aikacis, sans quoi ils et elles mourront. Et la flamme du phare diminuera d’un cran.";
+      case "note-storage-filter": return "Tu peux associer un ou plusieurs élèments dans le haut d’un Entrepôt pour que seulement ces élèments puissent être stockés à l’intérieur.";
+      case "note-event-end-day": return "À la fin de la journée il faut nourrir tes aikacis, sans quoi ils et elles mourront. En plus de la nourriture, la flamme du phare diminue d’un cran à chaque fois.";
       case "note-event-event": return "Tous les matins tu auras un nouvel évènement à t’occuper.";
-      case "note-event-fight": return "Durant le nuit les halittus attaqueront de différents côtés, en fonction de la puissance de la puissance de ton phare. Prépare de défenses et dispose des guerriers.";
+      case "note-event-fight": return "Durant la nuit les halittus attaqueront de différents côtés, en fonction de la puissance de la puissance de ton phare. Prépare de défenses et dispose des guerriers.";
       case "note-event-newcomers": return "En fonction de la puissance de feu de ton phare, des gens viendront te rejoindre. Mais cela impact aussi le nombre de personnes à nourrir.";
+      case "note-exploration-x-time": return "Chaque lieu exploré peut l’être un certain nombre de fois, rappelé à droite par le x1, x2, x3, etc...";
       // Items
       case "pickaxe": return "Un outil qui peut être équipé à un aikaci dans un Vestiaire, permettant d’exploiter les mines.";
     }
@@ -141,6 +143,27 @@ export class GameWindowComponent {
 
   contentLengthWithoutWorker(): number {
     return this.windowInfo.content.filter((name) => name !== "worker").length
+  }
+
+  backgroundColorOfTitle(): string {
+    let style: "basic" | "exploration" | "food" | "storage" | "workstation" = "basic";
+    switch (this.windowInfo.name) {
+      case "dressing": style = "workstation"; break;
+      case "exploration": style = "exploration"; break;
+      case "goal": style = "basic"; break;
+      case "help": style = "basic"; break;
+      case "lighthouse": style = "basic"; break;
+      case "mine": style = "exploration"; break;
+      case "pantry": style = "food"; break;
+      case "quarry": style = "exploration"; break;
+      case "recipes-book": style = "basic"; break;
+      case "scrub": style = "exploration"; break;
+      case "storage": style = "storage"; break;
+      case "trash": style = "basic"; break;
+      case "workbench": style = "workstation"; break;
+      case "ruin": style = "exploration"; break;
+    }
+    return "var(--color-banner-" + style + ")";
   }
 
 }

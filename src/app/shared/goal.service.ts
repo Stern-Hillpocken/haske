@@ -11,7 +11,7 @@ export class GoalService {
   currentStep: number = -1;
   isCurrentSubStepsValidated: boolean[] = [];
   allSubSteps: string[][] = [
-    ["Découverte du monde et de ses ressources", "Envoyer un aikaci en exploration", "Récupérer de la pierre dans une Carrière", "Récupérer du bois dans les Brouissailes", "Trouver de la fibre dans les Broussailles"],
+    ["Découverte du monde et de ses ressources", "Envoyer un aikaci en exploration", "Récupérer de la pierre dans une Carrière", "Récupérer du bois dans les Broussailles", "Trouver de la fibre dans les Broussailles"],
     ["Retour au début de l’âge de fer", "Fabriquer une pioche dans l’Atelier", "Construire un Vestiaire", "Équiper un aikaci avec la pioche dans le Vestiaire", "Miner du minerai de fer dans une Mine"]
   ]
 

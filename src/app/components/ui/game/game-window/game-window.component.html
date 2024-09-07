@@ -6,7 +6,10 @@
     (dragend)="onWindowDragEnd($event)"
     style="z-index: 1;"
 >
-    <div class="window-title">
+    <div
+        class="window-title"
+        [ngStyle]="{'background-color': backgroundColorOfTitle()}"
+    >
         <img *ngIf="windowInfo.name === 'workbench'" [src]="workbenchPreparedRecipe()">
         <p *ngIf="windowInfo.name === 'storage'">#{{ storageId() }}</p>
         <div
@@ -33,5 +36,5 @@
         <p *ngIf="windowInfo.name === 'goal'" [innerHTML]="currentGoal"></p>
     </div>
 
-    <div *ngIf="windowInfo.currentTime !== undefined && windowInfo.maxTime" class="progress-bar"><div class="bar" [style]="{'width': windowInfo.currentTime*100/windowInfo.maxTime+'%'}"></div></div>
+    <div *ngIf="windowInfo.currentTime !== undefined && windowInfo.maxTime && (windowInfo.content.includes('worker') || windowInfo.content.includes('miner'))" class="progress-bar"><div class="bar" [style]="{'width': windowInfo.currentTime*100/windowInfo.maxTime+'%'}"></div></div>
 </div>
