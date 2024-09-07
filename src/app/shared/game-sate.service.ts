@@ -286,8 +286,8 @@ export class GameStateService {
             }
           } else if (window instanceof GameWindowWorkbench) {
             let recipeName: DraggableNames = this.recipesServices.recipeDoable(window.content);
-            window.content = window.content.filter((name) => name === "worker");
-            window.content.push(recipeName);
+            this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push(...window.content.filter((name) => name === "worker"));
+            window.content = [recipeName];
             if (recipeName === "pickaxe") this.goalService.launchTrigger("make-pickaxe");
 
           } else if (window instanceof GameWindowDressing) {
