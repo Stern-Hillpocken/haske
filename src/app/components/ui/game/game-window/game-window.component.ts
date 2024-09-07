@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { GameWindow, GameWindowHelp, GameWindowRecipesBook } from 'src/app/models/game-window.model';
 import { RecipesService } from 'src/app/shared/recipes.service';
 import { DraggableNames } from 'src/app/types/draggable-names.type';
+import { WindowNames } from 'src/app/types/window-names.type';
 
 @Component({
   selector: 'app-game-window',
@@ -52,6 +53,8 @@ export class GameWindowComponent {
       case "goal": return "Objectif";
       case "pantry": return "Garde-manger";
       case "ruin": return "Ruine";
+      case "furnace": return "Four";
+      case "sawmill": return "Scierie";
     }
   }
 
@@ -106,9 +109,12 @@ export class GameWindowComponent {
       case "stone": return "De la pierre pour construire.";
       case "water": return "De l’eau pour survivre et allumer le phare.";
       case "wood": return "Du bois pour construire.";
+      case "plank": return "Une planche de bois utile pour faire des tiges."
+      case "stick": return "Tige de bois.";
       case "fiber": return "Une fibre extraite des végétaux, utile pour faire du tissu.";
       case "fabric": return "Du tissu, très rustique.";
-      case "iron-ore": return "Un minerai de fer qu’il va falloir faire fondre pour être utilisé.";
+      case "iron-ore": return "Un minerai de fer qu’il va falloir faire fondre dans le Four pour être utilisé.";
+      case "iron": return "Un lingot de fer.";
       // Monster parts
       case "monster-eye": return "Un œil qui peut être utilisé pour ne plus voir les objectifs.";
       // Food
@@ -137,7 +143,7 @@ export class GameWindowComponent {
     return "assets/images/window/" + this.windowInfo.name + ".png";
   }
 
-  exactRecipe(): DraggableNames {
+  exactRecipe(): DraggableNames | WindowNames {
     return this.recipesService.recipeDoable(this.windowInfo.content);
   }
 
@@ -162,6 +168,8 @@ export class GameWindowComponent {
       case "trash": style = "basic"; break;
       case "workbench": style = "workstation"; break;
       case "ruin": style = "exploration"; break;
+      case "furnace": style = "workstation"; break;
+      case "sawmill": style = "workstation"; break;
     }
     return "var(--color-banner-" + style + ")";
   }

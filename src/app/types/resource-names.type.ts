@@ -1,1 +1,1 @@
-export type ResourceNames = "water" | "stone" | "wood" | "fiber" | "fabric" | "iron-ore";
+export type ResourceNames = "water" | "stone" | "wood" | "plank" | "stick" | "fiber" | "fabric" | "iron-ore" | "iron";

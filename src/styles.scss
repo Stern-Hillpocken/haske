@@ -72,6 +72,10 @@ p {
     padding: 0.5em;
 }
 
+// Assign after (like in a string)
 .goal-validated {
     color: var(--color-validation);
+}
+.math-sign {
+    font-size: 3em;
 }

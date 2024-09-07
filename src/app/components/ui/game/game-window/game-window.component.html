@@ -32,7 +32,7 @@
     >
         <app-draggable-image *ngFor="let c of windowInfo.content" [name]="c" [windowId]="id"></app-draggable-image>
         <p *ngIf="windowInfo.name === 'help'">{{ helpDisplay() }}</p>
-        <p *ngIf="windowInfo.name === 'recipes-book'" [innerHTML]="recipesBookDisplay()" style="font-size: 3em;"></p>
+        <p *ngIf="windowInfo.name === 'recipes-book'" [innerHTML]="recipesBookDisplay()"></p>
         <p *ngIf="windowInfo.name === 'goal'" [innerHTML]="currentGoal"></p>
     </div>
 
