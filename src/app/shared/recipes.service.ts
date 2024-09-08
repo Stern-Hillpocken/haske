@@ -17,7 +17,7 @@ export class RecipesService {
     new Recipe("fabric", ["fiber"], [3], 8),
 
     new Recipe("storage", ["wood", "plank"], [4, 4], 12),
-    new Recipe("dressing", ["fabric", "wood", "plank"], [1, 1, 2], 12),
+    new Recipe("dressing", ["fabric", "wood", "plank"], [1, 2, 2], 12),
     new Recipe("furnace", ["stone"], [8], 16),
     new Recipe("sawmill", ["iron", "wood", "plank"], [3, 2, 3], 16)
   ];

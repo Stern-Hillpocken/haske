@@ -108,7 +108,8 @@ export class GameWindowComponent {
       // Resources
       case "stone": return "De la pierre pour construire.";
       case "water": return "De l’eau pour survivre et allumer le phare.";
-      case "wood": return "Du bois pour construire.";
+      case "wood": return "Du bois pour construire ou pour être transformé en charbon ou planche.";
+      case "charcoal": return "Du charbon de bois pour le Four.";
       case "plank": return "Une planche de bois utile pour faire des tiges."
       case "stick": return "Tige de bois.";
       case "fiber": return "Une fibre extraite des végétaux, utile pour faire du tissu.";

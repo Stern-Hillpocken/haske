@@ -14,7 +14,8 @@ export class GoalService {
     ["Découverte du monde et de ses ressources", "Envoyer un aikaci en exploration", "Récupérer de la pierre dans une Carrière", "Récupérer du bois dans les Broussailles", "Trouver de la fibre dans les Broussailles"],
     ["Un endroit pour se vêtir", "Tisser un tissu à partir de fibres dans l’Atelier", "Dégrossir du bois en planche dans l’Atelier", "Construire un Vestiaire"],
     ["Retour au début de l’âge de fer", "Fabriquer une pioche dans l’Atelier", "Équiper un aikaci avec la pioche dans le Vestiaire", "Miner du minerai de fer dans une Mine"],
-    ["Une meilleure découpe du bois", "Construire un Four", "Y faire fondre un minerai de fer", "Construire une Scierie", "Construire un Stockage"],
+    ["Si il ne faisait pas assez chaud", "Construire un Four", "Y mettre du combustible (en haut) et du bois (dedans) pour obtenir du charbon", "Faire fondre un minerai de fer"],
+    ["Du bois de qualité", "Construire une Scierie", "Construire un Stockage"],
     
     ["Allumer le Phare !", "Avoir 100 de luminosité dans le Phare"]
   ]
@@ -55,13 +56,16 @@ export class GoalService {
     } else if (this.currentStep === 3) {
       // 3 - Furnace && Sawmill && Storage
       if (trigger === "build-furnace") this.isCurrentSubStepsValidated[1] = true;
-      if (trigger === "melt-iron") this.isCurrentSubStepsValidated[2] = true;
-      if (trigger === "build-sawmill") this.isCurrentSubStepsValidated[3] = true;
-      if (trigger === "build-storage") this.isCurrentSubStepsValidated[4] = true;
+      if (trigger === "melt-charcoal") this.isCurrentSubStepsValidated[2] = true;
+      if (trigger === "melt-iron") this.isCurrentSubStepsValidated[3] = true;
     } else if (this.currentStep === 4) {
-      // 4 - Equip a aikaci to have soldier
+      // 5 - Woody wood
+      if (trigger === "build-sawmill") this.isCurrentSubStepsValidated[1] = true;
+      if (trigger === "build-storage") this.isCurrentSubStepsValidated[2] = true;
     } else if (this.currentStep === 5) {
-      // 5 - Perform your first sacrifice
+      // 5 - Equip a aikaci to have soldier
+    } else if (this.currentStep === 6) {
+      // 6 - Perform your first sacrifice
     } else {
       // Light the lighthouse with 100 fire
     }
