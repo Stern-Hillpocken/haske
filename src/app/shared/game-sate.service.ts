@@ -228,10 +228,13 @@ export class GameStateService {
             window.slot = window.slot.filter((e) => e !== "charcoal");
           }
           // See if it can smelt
-          if (window.power > 0 && (window.content.includes("wood") || window.content.includes("iron-ore"))) {
+          if (window.power > 0 && (window.content[0] === "wood" || window.content[0] === "iron-ore")) {
             window.currentTime ++;
             window.power --;
           }
+
+        } else if (window instanceof GameWindowSawmill) {
+          if (window.content[0] === "wood" || window.content[0] === "plank") window.currentTime += window.content.filter((name) => name === "worker").length;
 
         } else if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(window.content) !== "nothing")) {
           window.currentTime += window.content.filter((name) => this.workerNames.includes(name)).length;
@@ -335,13 +338,32 @@ export class GameStateService {
               this.goalService.launchTrigger("equip-miner");
             }
           } else if (window instanceof GameWindowFurnace) {
-            if (window.content.includes("wood")) {
-              window.content = ["charcoal"];
+            if (window.content[0] === "wood" && this.indexOfFirstOpenedStorage("charcoal") !== -1) {
+              window.content.shift();
+              this._gameState$.value.windows[this.indexOfFirstOpenedStorage("charcoal")].content.push("charcoal");
               this.goalService.launchTrigger("melt-charcoal");
-            }
-            if (window.content.includes("iron-ore")) {
-              window.content = ["iron"];
+            } else if (window.content[0] === "iron-ore" && this.indexOfFirstOpenedStorage("iron") !== -1) {
+              window.content.shift();
+              this._gameState$.value.windows[this.indexOfFirstOpenedStorage("charcoal")].content.push("iron");
               this.goalService.launchTrigger("melt-iron");
+            } else {
+              window.currentTime = window.maxTime;
+              //this.popupService.pushValue("error", "Pas assez de Stockage pour ce qui sort du Four");
+            }
+
+          } else if (window instanceof GameWindowSawmill) {
+            let stuffCuted: ResourceNames[] = []
+            if (window.content[0] === "wood") stuffCuted = ["plank", "plank"];
+            else if (window.content[0] === "plank") stuffCuted = ["stick", "stick"];
+            if (this.indexOfFirstOpenedStorage(stuffCuted[0]) === -1) {
+              window.currentTime = window.maxTime;
+              //this.popupService.pushValue("error", "Pas de Stockage pour ce qui vient de la Scierie");
+            } else {
+              window.content.shift();
+              for (let i = 0; i < stuffCuted.length; i++) {
+                if (this.indexOfFirstOpenedStorage(stuffCuted[i]) !== -1) this._gameState$.value.windows[this.indexOfFirstOpenedStorage(stuffCuted[i])].content.push(stuffCuted[i]);
+                else window.content.push(stuffCuted[i]);
+              }
             }
           }
 

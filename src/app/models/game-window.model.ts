@@ -195,7 +195,7 @@ export class GameWindowFurnace extends GameWindow {
         public override acceptance: DraggableNames[] = ["iron-ore", "charcoal", "wood", "plank", "stick"],
         public override currentTime: number = 0,
         public override maxTime: number = 16,
-        public override maxSpace: number = 1,
+        public override maxSpace: number = 3,
         public override slot: ResourceNames[] = [],
         public override power: number = 0
     ) {
@@ -209,8 +209,8 @@ export class GameWindowSawmill extends GameWindow {
         public override content: DraggableNames[] = [],
         public override acceptance: DraggableNames[] = ["worker", "wood", "plank"],
         public override currentTime: number = 0,
-        public override maxTime: number = 12,
-        public override maxSpace: number = 1
+        public override maxTime: number = 10,
+        public override maxSpace: number = 3
     ) {
         super(name, content, acceptance)
     }
