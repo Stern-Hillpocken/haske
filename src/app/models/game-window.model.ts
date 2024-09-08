@@ -17,7 +17,8 @@ export class GameWindow {
         public maxTime?: number,
         public usageRemaining?: number,
         public maxSpace?: number,
-        public slot?: DraggableNames[]
+        public slot?: DraggableNames[],
+        public power?: number
     ) {}
 }
 
@@ -191,10 +192,12 @@ export class GameWindowFurnace extends GameWindow {
     constructor(
         public override name: WindowNames = "furnace",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["worker", "iron-ore"],
+        public override acceptance: DraggableNames[] = ["iron-ore", "charcoal", "wood", "plank", "stick"],
         public override currentTime: number = 0,
         public override maxTime: number = 16,
-        public override maxSpace: number = 1
+        public override maxSpace: number = 1,
+        public override slot: ResourceNames[] = [],
+        public override power: number = 0
     ) {
         super(name, content, acceptance)
     }

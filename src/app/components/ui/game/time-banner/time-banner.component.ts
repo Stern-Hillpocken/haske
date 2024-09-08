@@ -15,7 +15,7 @@ export class TimeBannerComponent {
   content: string = "";
 
   isTimeEvent(): boolean {
-    if (this.time.day >= 3 && [5, 6, 7, 8, 9].includes(this.time.tick)) {
+    if (this.time.day >= 4 && [5, 6, 7, 8, 9].includes(this.time.tick)) {
       this.title = "Évènement environemental";
       this.content = "Un nouvel évènement vient d’arriver";
       return true;
@@ -23,7 +23,7 @@ export class TimeBannerComponent {
       this.title = "Nouveaux et nouvelles arrivantes";
       this.content = "Des personnes sont arrivées dans le phare";
       return true;
-    } else if (this.time.day >= 4 && [85, 86, 87, 88, 89].includes(this.time.tick)) {
+    } else if (this.time.day >= 5 && [85, 86, 87, 88, 89].includes(this.time.tick)) {
       this.title = "Attaque des créatures";
       this.content = "Si tu ne les gères pas elles éteindront le phare";
       return true;

@@ -19,7 +19,7 @@ import { GoalTriggerNames } from '../types/goal-trigger-names.type';
 })
 export class GameStateService {
 
-  private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 5, new GameTime(), [
+  private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 10, new GameTime(), [
     new GameWindowGoal(),
     new GameWindowStorage(),
     new GameWindowExploration(),
@@ -162,7 +162,10 @@ export class GameStateService {
     this._gameState$.value.time.tick ++;
     if (this._gameState$.value.time.tick === 5) {
       // Morning environment event
-      if (this._gameState$.value.time.day === 3) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-event");
+      if (this._gameState$.value.time.day === 4) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-event");
+
+    } else if(this._gameState$.value.time.day === 1 && this._gameState$.value.time.tick === 11) {
+      this._gameState$.value.windows[this.indexOfWindow("storage")].content.push("bread", "fiber", "fiber", "monster-eye");
 
     } else if (this._gameState$.value.time.day === 1 && this._gameState$.value.time.tick === 40) {
       this._gameState$.value.windows.push(
@@ -184,7 +187,7 @@ export class GameStateService {
     } else if (this._gameState$.value.time.tick === 85) {
       if (this._gameState$.value.time.day === 1) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-time-strip");
       // Attack of the monsters
-      if (this._gameState$.value.time.day === 4) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-fight");
+      if (this._gameState$.value.time.day === 5) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-fight");
 
     } else if (this._gameState$.value.time.tick > 100) {
       // Flame lost and new day
@@ -199,14 +202,41 @@ export class GameStateService {
   performTimedActions(): void {
     for (let window of this._gameState$.value.windows) {
       if (window.currentTime !== undefined && window.maxTime) {
+
         // Add time
         if (window instanceof GameWindowDressing) {
           if (window.content.filter((name) => !this.workerNames.includes(name)).length > 0 && window.content.filter((name) => this.workerNames.includes(name)).length > 0) {
             window.currentTime ++;
           }
+
+        } else if (window instanceof GameWindowFurnace) {
+          // Add fuel
+          if (window.slot.includes("stick")) {
+            window.power += 4 * window.slot.filter((e) => e === "stick").length;
+            window.slot = window.slot.filter((e) => e !== "stick");
+          }
+          if (window.slot.includes("plank")) {
+            window.power += 8 * window.slot.filter((e) => e === "plank").length;
+            window.slot = window.slot.filter((e) => e !== "plank");
+          }
+          if (window.slot.includes("wood")) {
+            window.power += 16 * window.slot.filter((e) => e === "wood").length;
+            window.slot = window.slot.filter((e) => e !== "wood");
+          }
+          if (window.slot.includes("charcoal")) {
+            window.power += 48 * window.slot.filter((e) => e === "charcoal").length;
+            window.slot = window.slot.filter((e) => e !== "charcoal");
+          }
+          // See if it can smelt
+          if (window.power > 0 && (window.content.includes("wood") || window.content.includes("iron-ore"))) {
+            window.currentTime ++;
+            window.power --;
+          }
+
         } else if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(window.content) !== "nothing")) {
           window.currentTime += window.content.filter((name) => this.workerNames.includes(name)).length;
         }
+
         // Max time
         if (window.currentTime >= window.maxTime) {
           window.currentTime = 0;
@@ -304,7 +334,17 @@ export class GameStateService {
               window.content.push("miner");
               this.goalService.launchTrigger("equip-miner");
             }
+          } else if (window instanceof GameWindowFurnace) {
+            if (window.content.includes("wood")) {
+              window.content = ["charcoal"];
+              this.goalService.launchTrigger("melt-charcoal");
+            }
+            if (window.content.includes("iron-ore")) {
+              window.content = ["iron"];
+              this.goalService.launchTrigger("melt-iron");
+            }
           }
+
         }
       }
     }
