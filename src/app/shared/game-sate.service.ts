@@ -66,7 +66,7 @@ export class GameStateService {
       let windowEnd = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
       let dragName = this._gameState$.value.drag.draggableName;
 
-      if (windowEnd instanceof GameWindowStorage && windowEnd.content.filter((name) => name !== "worker").length === windowEnd.maxSpace) {
+      if (windowEnd.maxSpace !== undefined && windowEnd.content.filter((name) => name !== "worker").length >= windowEnd.maxSpace) {
         this.popupService.pushValue("error", "Plus de place");
       } else if (windowStart instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowStart.content) !== "nothing" && windowStart.currentTime !== 0) {
         this.popupService.pushValue("error", "La recette doit être menée à son terme");
