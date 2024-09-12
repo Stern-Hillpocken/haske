@@ -29,6 +29,12 @@ export class GameWindowComponent {
   @Input()
   flame!: number;
 
+  @Input()
+  food!: number;
+
+  @Input()
+  people!: number;
+
   @Output()
   draggableEnterEmitter: EventEmitter<number> = new EventEmitter();
 
@@ -152,8 +158,8 @@ export class GameWindowComponent {
     return this.windowInfo.content.filter((name) => name !== "worker").length
   }
 
-  backgroundColorOfTitle(): string {
-    let style: "basic" | "exploration" | "food" | "storage" | "workstation" = "basic";
+  classOfTitle(): string {
+    let style: "basic" | "exploration" | "food" | "storage" | "workstation" | "warning" = "basic";
     switch (this.windowInfo.name) {
       case "dressing": style = "workstation"; break;
       case "exploration": style = "exploration"; break;
@@ -161,7 +167,9 @@ export class GameWindowComponent {
       case "help": style = "basic"; break;
       case "lighthouse": style = "basic"; break;
       case "mine": style = "exploration"; break;
-      case "pantry": style = "food"; break;
+      case "pantry":
+        if(this.food >= this.people) {style = "food"; break;}
+        else {style = "warning"; break;}
       case "quarry": style = "exploration"; break;
       case "recipes-book": style = "basic"; break;
       case "scrub": style = "exploration"; break;
@@ -172,7 +180,7 @@ export class GameWindowComponent {
       case "furnace": style = "workstation"; break;
       case "sawmill": style = "workstation"; break;
     }
-    return "var(--color-banner-" + style + ")";
+    return style;
   }
 
 }

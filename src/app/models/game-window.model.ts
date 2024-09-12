@@ -1,4 +1,5 @@
 import { DraggableNames } from "../types/draggable-names.type";
+import { FoodNames } from "../types/food-names.type";
 import { MonsterPartNames } from "../types/monster-part-names.type";
 import { NoteNames } from "../types/note-names.type";
 import { ResourceNames } from "../types/resource-names.type";
@@ -37,8 +38,9 @@ export class GameWindowStorage extends GameWindow {
 export class GameWindowPantry extends GameWindow {
     constructor(
         public override name: WindowNames = "pantry",
-        public override content: DraggableNames[] = ["bread", "bread", "bread", "monster-eye"],
-        public override acceptance: DraggableNames[] = ["bread", "monster-eye"]
+        public override content: DraggableNames[] = [],
+        public override acceptance: DraggableNames[] = ["bread", "monster-eye"],
+        public override slot: DraggableNames[] = []
     ) {
         super(name, content, acceptance)
     }

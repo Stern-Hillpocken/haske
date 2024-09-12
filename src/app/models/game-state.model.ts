@@ -6,6 +6,8 @@ export class GameState {
     constructor(
         public drag: GameDrag,
         public flame: number,
+        public people: number,
+        public food: number,
         public time: GameTime,
         public windows: GameWindow[]
     ) {}

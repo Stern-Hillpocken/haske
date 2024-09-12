@@ -3,4 +3,4 @@
     <app-time-banner [time]="gameState.time"></app-time-banner>
 </div>
 
-<app-game-window *ngFor="let w of gameState.windows; let id = index" [currentDragName]="gameState.drag.draggableName" [windowInfo]="w" [id]="id" [allWindows]="gameState.windows" [currentGoal]="currentGoal" [flame]="gameState.flame" (draggableEnterEmitter)="onDraggableEnterReceive($event)"></app-game-window>
+<app-game-window *ngFor="let w of gameState.windows; let id = index" [currentDragName]="gameState.drag.draggableName" [windowInfo]="w" [id]="id" [allWindows]="gameState.windows" [currentGoal]="currentGoal" [flame]="gameState.flame" [food]="gameState.food" [people]="gameState.people" (draggableEnterEmitter)="onDraggableEnterReceive($event)"></app-game-window>

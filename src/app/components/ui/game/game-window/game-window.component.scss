@@ -28,6 +28,31 @@
     filter: brightness(0.4);
 }
 
-.power, .flame {
+.power-text, .flame-text, .pantry-text {
     font-size: 2em;
+}
+
+.basic {
+    background-color: var(--color-banner-basic);
+}
+.exploration {
+    background-color: var(--color-banner-exploration);
+}
+.food {
+    background-color: var(--color-banner-food);
+}
+.storage {
+    background-color: var(--color-banner-storage);
+}
+.warning {
+    animation: warning-triggered 2s infinite;
+}
+.workstation {
+    background-color: var(--color-banner-workstation);
+}
+
+@keyframes warning-triggered {
+    0% {background-color: var(--color-banner-food);}
+    50% {background-color: var(--color-banner-warning);}
+    100% {background-color: var(--color-banner-food);}
 }

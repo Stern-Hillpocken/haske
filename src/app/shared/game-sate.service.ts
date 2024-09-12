@@ -13,15 +13,17 @@ import { GoalService } from './goal.service';
 import { FoodNames } from '../types/food-names.type';
 import { MonsterPartNames } from '../types/monster-part-names.type';
 import { GoalTriggerNames } from '../types/goal-trigger-names.type';
+import { UtilsService } from './utils.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameStateService {
 
-  private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 10, new GameTime(), [
+  private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 10, 0, 0, new GameTime(), [
     new GameWindowGoal(),
     new GameWindowStorage(),
+    new GameWindowPantry(),
     new GameWindowExploration(),
     new GameWindowLighthouse()
   ]
@@ -30,7 +32,7 @@ export class GameStateService {
   windowsWhichCanPause: WindowNames[] = ["exploration", "scrub", "quarry"];
   workerNames: DraggableNames[] = ["worker", "miner"];
 
-  constructor(private popupService: PopupService, private recipesServices: RecipesService, private goalService: GoalService) { }
+  constructor(private popupService: PopupService, private recipesServices: RecipesService, private goalService: GoalService, private utils: UtilsService) { }
 
   _getGameState$(): Observable<GameState> {
     return this._gameState$.asObservable();
@@ -152,10 +154,14 @@ export class GameStateService {
     this._gameState$.next(this._gameState$.value);
   }
 
+  ////////////////////////////////////////////////
+
   tickTime(): void {
     this.timeAdvance();
     this.performTimedActions();
     this.emptyTrash();
+    this.emptyPantrySlot();
+    this.countPeople();
   }
 
   timeAdvance(): void {
@@ -193,6 +199,7 @@ export class GameStateService {
       // Flame lost and new day
       if (this._gameState$.value.time.day === 1) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-end-day");
       this.flameLost();
+      this.lunchTime();
       this._gameState$.value.time.tick = 0;
       this._gameState$.value.time.day ++;
     }
@@ -413,6 +420,29 @@ export class GameStateService {
         break;
       }
     }
+    this._gameState$.next(this._gameState$.value);
+  }
+
+  emptyPantrySlot(): void {
+    const pantryID: number = this.indexOfWindow("pantry");
+    this._gameState$.value.food += this.utils.foodValue(this._gameState$.value.windows[pantryID].slot as DraggableNames[]);
+    this._gameState$.value.windows[pantryID].slot = [];
+    this._gameState$.next(this._gameState$.value);
+  }
+
+  lunchTime(): void {
+    this._gameState$.value.food -= this._gameState$.value.people;
+    this._gameState$.next(this._gameState$.value);
+  }
+
+  countPeople(): void {
+    let people: number = 0;
+    for (const window of this._gameState$.value.windows) {
+      for (const worker of this.workerNames) {
+        if (window.content.includes(worker)) people += window.content.filter((e) => e === worker).length;
+      }
+    }
+    this._gameState$.value.people = people;
     this._gameState$.next(this._gameState$.value);
   }
 
