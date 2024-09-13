@@ -285,18 +285,25 @@ export class GameStateService {
 
           } else if (window instanceof GameWindowQuarry || window instanceof GameWindowScrub || window instanceof GameWindowMine || window instanceof GameWindowRuin) {
             let resourceName: DraggableNames = "nothing";
+            let randomResource: number = this.random(0, 100);
             switch (window.constructor) {
               case GameWindowQuarry:
-                resourceName = "stone";
-                this.goalService.launchTrigger("gather-stone");
+                if (randomResource < 90) {
+                  resourceName = "stone";
+                  this.goalService.launchTrigger("gather-stone");
+                } else {
+                  resourceName = "lizard";
+                }
                 break;
               case GameWindowScrub:
-                if (this.random(0, 100) < 80) {
+                if (randomResource < 75) {
                   resourceName = "wood";
                   this.goalService.launchTrigger("gather-wood");
-                } else {
+                } else if (randomResource < 90) {
                   resourceName = "fiber";
                   this.goalService.launchTrigger("gather-fiber");
+                } else {
+                  //
                 }
                 break;
               case GameWindowMine:
@@ -351,8 +358,11 @@ export class GameStateService {
               this.goalService.launchTrigger("melt-charcoal");
             } else if (window.content[0] === "iron-ore" && this.indexOfFirstOpenedStorage("iron") !== -1) {
               window.content.shift();
-              this._gameState$.value.windows[this.indexOfFirstOpenedStorage("charcoal")].content.push("iron");
+              this._gameState$.value.windows[this.indexOfFirstOpenedStorage("iron")].content.push("iron");
               this.goalService.launchTrigger("melt-iron");
+            } else if (window.content[0] === "raw-meat" && this.indexOfFirstOpenedStorage("meat") !== -1) {
+              window.content.shift();
+              this._gameState$.value.windows[this.indexOfFirstOpenedStorage("meat")].content.push("meat");
             } else {
               window.currentTime = window.maxTime;
               //this.popupService.pushValue("error", "Pas assez de Stockage pour ce qui sort du Four");

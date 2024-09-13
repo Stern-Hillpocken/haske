@@ -121,11 +121,14 @@ export class GameWindowComponent {
       case "fiber": return "Une fibre extraite des végétaux, utile pour faire du tissu.";
       case "fabric": return "Du tissu, très rustique.";
       case "iron-ore": return "Un minerai de fer qu’il va falloir faire fondre dans le Four pour être utilisé.";
+      case "lizard": return "Un lézard des rochers, qui peut être relâché dans le Rebus ou dépecé dans l’Atelier.";
+      case "raw-meat": return "Viande cru, à mettre au Four.";
       case "iron": return "Un lingot de fer.";
       // Monster parts
       case "monster-eye": return "Un œil qui peut être utilisé pour ne plus voir les objectifs.";
       // Food
       case "bread": return "Du pain pour faire manger un aikaci.";
+      case "meat": return "De la viande consommable ou à utiliser en recette.";
       // Notes
       case "note-help-and-trash": return "Ici c’est l’endroit pour avoir des informations sur les différents élèments. Pour l’instant un élement de type \"note\" (représenté par l’enveloppe) est dans l’emplacement mais tu peux l’enlever pour libérer la place pour un autre élèment. Tu peux par exemple détruire cette note en la plaçant dans le Rebut. Chaque note est différente, examine les toutes !";
       case "note-time-strip": return "En haut se trouve la frise du temps avec différents évènements qui y sont associés, et le temps qui passe.";

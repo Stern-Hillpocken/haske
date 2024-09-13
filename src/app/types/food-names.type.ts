@@ -1,1 +1,1 @@
-export type FoodNames = "bread";
+export type FoodNames = "bread" | "meat";
