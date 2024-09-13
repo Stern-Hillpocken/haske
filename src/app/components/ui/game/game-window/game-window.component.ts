@@ -122,7 +122,9 @@ export class GameWindowComponent {
       case "fabric": return "Du tissu, très rustique.";
       case "iron-ore": return "Un minerai de fer qu’il va falloir faire fondre dans le Four pour être utilisé.";
       case "lizard": return "Un lézard des rochers, qui peut être relâché dans le Rebus ou dépecé dans l’Atelier.";
+      case "hare": return "Un lièvre des sables, qui peut être relâché dans le Rebus ou dépecé dans l’Atelier.";
       case "raw-meat": return "Viande cru, à mettre au Four.";
+      case "skin": return "De la peau d’animal.";
       case "iron": return "Un lingot de fer.";
       // Monster parts
       case "monster-eye": return "Un œil qui peut être utilisé pour ne plus voir les objectifs.";
@@ -148,12 +150,22 @@ export class GameWindowComponent {
     return this.recipesService.recipesWith(this.windowInfo.slot[0]);
   }
 
-  workbenchPreparedRecipe(): string {
-    if (this.windowInfo.name === "workbench" && this.exactRecipe() !== "nothing") return "assets/images/draggable/" + this.exactRecipe() + ".png";
-    return "assets/images/window/" + this.windowInfo.name + ".png";
+  workbenchPreparedRecipe(): string[] {
+    let xRecipe = this.exactRecipe();
+    if (this.windowInfo.name === "workbench" && xRecipe[0] !== "nothing") {
+      let ret: string[] = [];
+      if (typeof xRecipe === "string") return ["assets/images/draggable/" + xRecipe + ".png"];
+      for (let res of xRecipe) {
+        ret.push("assets/images/draggable/" + res + ".png");
+      }
+      return ret;
+    } /*else if (this.windowInfo.name === "lighthouse") {
+      return ["assets/images/window/" + this.windowInfo.name + ".png"];
+    }*/
+    return [];
   }
 
-  exactRecipe(): DraggableNames | WindowNames {
+  exactRecipe(): DraggableNames[] | WindowNames {
     return this.recipesService.recipeDoable(this.windowInfo.content);
   }
 

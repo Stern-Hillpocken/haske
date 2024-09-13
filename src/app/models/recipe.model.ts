@@ -4,7 +4,7 @@ import { WindowNames } from "../types/window-names.type";
 
 export class Recipe {
     constructor(
-        public name: DraggableNames | WindowNames,
+        public name: DraggableNames[] | WindowNames,
         public resources: ResourceNames[],
         public quantity: number[],
         public duration: number,

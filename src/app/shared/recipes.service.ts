@@ -10,13 +10,14 @@ import { WindowNames } from '../types/window-names.type';
 export class RecipesService {
 
   allReceipes: Recipe[] = [
-    new Recipe("pickaxe", ["stone", "wood"], [1, 1], 12),
+    new Recipe(["pickaxe"], ["stone", "wood"], [1, 1], 12),
 
-    new Recipe("plank", ["wood"], [1], 8),
-    new Recipe("stick", ["plank"], [1], 8),
-    new Recipe("fabric", ["fiber"], [3], 8),
+    new Recipe(["plank", "plank"], ["wood"], [1], 8),
+    new Recipe(["stick", "stick"], ["plank"], [1], 8),
+    new Recipe(["fabric"], ["fiber"], [3], 8),
 
-    new Recipe("raw-meat", ["lizard"], [1], 6),
+    new Recipe(["raw-meat", "skin"], ["hare"], [1], 6),
+    new Recipe(["raw-meat"], ["lizard"], [1], 6),
 
     new Recipe("storage", ["wood", "plank"], [4, 4], 12),
     new Recipe("dressing", ["fabric", "wood", "plank"], [1, 2, 2], 12),
@@ -30,7 +31,7 @@ export class RecipesService {
     return this.allReceipes;
   }
 
-  recipeDoable(content: DraggableNames[]): DraggableNames | WindowNames {
+  recipeDoable(content: DraggableNames[]): DraggableNames[] | WindowNames {
     for (let r = 0; r < this.allReceipes.length; r++) {
       let valid: number = 0;
       for (let i = 0; i < this.allReceipes[r].resources.length; i++) {
@@ -40,7 +41,7 @@ export class RecipesService {
       let contentWithoutWorker: number = content.filter((e) => !e.includes("worker")).length;
       if (valid === this.allReceipes[r].resources.length && contentWithoutWorker === sumOfQuantity) return this.allReceipes[r].name;
     }
-    return "nothing";
+    return ["nothing"];
   }
 
   recipesWith(resource: ResourceNames): string {
@@ -52,7 +53,12 @@ export class RecipesService {
         let timesNeeded: string = recipe.quantity[i] > 1 ? recipe.quantity[i]+"x" : "";
         sentence += timesNeeded + "<img src='assets/images/draggable/" + recipe.resources[i] + ".png'>";
         if (i < recipe.resources.length-1) sentence += "<span class='math-sign'> + </span>";
-        if (i === recipe.resources.length-1) sentence += "<span class='math-sign'> = </span><img src='assets/images/draggable/" + recipe.name + ".png'><br>";
+        if (i === recipe.resources.length-1) {
+          sentence += "<span class='math-sign'> = </span>";
+          console.log(recipe.name)
+          for (let res of recipe.name) sentence += "<img src='assets/images/draggable/" + res + ".png'>";
+          sentence += "<br>";
+        }
         if (recipe.resources[i] === resource) isIn = true;
       }
       if (isIn) recipes += sentence;

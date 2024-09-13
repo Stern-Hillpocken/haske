@@ -68,11 +68,11 @@ export class GameStateService {
       let windowEnd = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
       let dragName = this._gameState$.value.drag.draggableName;
 
-      if (windowEnd.maxSpace !== undefined && windowEnd.content.filter((name) => name !== "worker").length >= windowEnd.maxSpace) {
+      if (windowEnd.maxSpace !== undefined && windowEnd.content.filter((name) => name !== "worker").length >= windowEnd.maxSpace && dragName !== "worker") {
         this.popupService.pushValue("error", "Plus de place");
-      } else if (windowStart instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowStart.content) !== "nothing" && windowStart.currentTime !== 0) {
+      } else if (windowStart instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowStart.content)[0] !== "nothing" && windowStart.currentTime !== 0) {
         this.popupService.pushValue("error", "La recette doit être menée à son terme");
-      } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content) === "nothing" && dragName === "worker") {
+      } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content)[0] === "nothing" && dragName === "worker") {
         this.popupService.pushValue("error", "La recette doit être correcte avant d’y assigner des ouvriers");
       } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
         windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
@@ -140,7 +140,7 @@ export class GameStateService {
     //
     if (windowEnd instanceof GameWindowStorage && windowEnd.content.length === windowEnd.maxSpace) {
       this.popupService.pushValue("error", "Plus de place");
-    } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content) === "nothing" && windowEnd.content.length > 0) {
+    } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content)[0] === "nothing" && windowEnd.content.length > 0) {
       this.popupService.pushValue("error", "Atelier non prêt");
     } else if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
       windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
@@ -235,7 +235,7 @@ export class GameStateService {
             window.slot = window.slot.filter((e) => e !== "charcoal");
           }
           // See if it can smelt
-          if (window.power > 0 && (window.content[0] === "wood" || window.content[0] === "iron-ore")) {
+          if (window.power > 0 && (window.content[0] === "wood" || window.content[0] === "iron-ore" || window.content[0] === "raw-meat")) {
             window.currentTime ++;
             window.power --;
           }
@@ -243,7 +243,7 @@ export class GameStateService {
         } else if (window instanceof GameWindowSawmill) {
           if (window.content[0] === "wood" || window.content[0] === "plank") window.currentTime += window.content.filter((name) => name === "worker").length;
 
-        } else if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(window.content) !== "nothing")) {
+        } else if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(window.content)[0] !== "nothing")) {
           window.currentTime += window.content.filter((name) => this.workerNames.includes(name)).length;
         }
 
@@ -303,7 +303,7 @@ export class GameStateService {
                   resourceName = "fiber";
                   this.goalService.launchTrigger("gather-fiber");
                 } else {
-                  //
+                  resourceName = "hare";
                 }
                 break;
               case GameWindowMine:
@@ -329,12 +329,12 @@ export class GameStateService {
               window.currentTime = window.maxTime;
             }
           } else if (window instanceof GameWindowWorkbench) {
-            let recipeName: DraggableNames | WindowNames = this.recipesServices.recipeDoable(window.content);
+            let recipeName: DraggableNames[] | WindowNames = this.recipesServices.recipeDoable(window.content);
             this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push(...window.content.filter((name) => name === "worker"));
             window.content = [];
-            if (recipeName === "pickaxe" || recipeName === "plank" || recipeName === "stick" || recipeName === "fabric") {
-              window.content = [recipeName];
-              this.goalService.launchTrigger("make-"+recipeName as GoalTriggerNames);
+            if (recipeName[0] === "pickaxe" || recipeName[0] === "plank" || recipeName[0] === "stick" || recipeName[0] === "fabric" || recipeName[0] === "raw-meat") {
+              for (let res of recipeName) window.content.push(res as DraggableNames);
+              this.goalService.launchTrigger("make-"+recipeName[0] as GoalTriggerNames);
             } else {
               if (recipeName === "storage") this._gameState$.value.windows.push(new GameWindowStorage ());
               else if (recipeName === "dressing") this._gameState$.value.windows.push(new GameWindowDressing());
@@ -370,8 +370,8 @@ export class GameStateService {
 
           } else if (window instanceof GameWindowSawmill) {
             let stuffCuted: ResourceNames[] = []
-            if (window.content[0] === "wood") stuffCuted = ["plank", "plank"];
-            else if (window.content[0] === "plank") stuffCuted = ["stick", "stick"];
+            if (window.content[0] === "wood") stuffCuted = ["plank", "plank", "plank", "plank"];
+            else if (window.content[0] === "plank") stuffCuted = ["stick", "stick", "stick", "stick"];
             if (this.indexOfFirstOpenedStorage(stuffCuted[0]) === -1) {
               window.currentTime = window.maxTime;
               //this.popupService.pushValue("error", "Pas de Stockage pour ce qui vient de la Scierie");

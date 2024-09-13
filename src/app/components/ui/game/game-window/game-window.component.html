@@ -10,7 +10,7 @@
         class="window-title"
         [ngClass]="classOfTitle()"
     >
-        <img *ngIf="windowInfo.name === 'workbench'" [src]="workbenchPreparedRecipe()">
+        <img *ngFor="let recep of workbenchPreparedRecipe()" [src]="recep">
         <p *ngIf="windowInfo.name === 'storage'">#{{ storageId() }}</p>
         <p *ngIf="windowInfo.power !== undefined && windowInfo.name !== 'pantry'"><span class="power-text">{{ windowInfo.power }}</span><img src="assets/images/window/power.png"></p>
         <p *ngIf="windowInfo.name === 'pantry'"><span class="pantry-text">{{ food }}</span><img src="assets/images/window/food.png">/{{ people }}</p>
