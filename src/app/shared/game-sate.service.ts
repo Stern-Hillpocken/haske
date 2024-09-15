@@ -23,8 +23,6 @@ export class GameStateService {
   private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 10, 0, 0, new GameTime(), [
     new GameWindowGoal(),
     new GameWindowStorage(),
-    new GameWindowPantry(),
-    new GameWindowField(),
     new GameWindowExploration(),
     new GameWindowLighthouse()
   ]
@@ -242,7 +240,7 @@ export class GameStateService {
             window.slot = window.slot.filter((e) => e !== "charcoal");
           }
           // See if it can smelt
-          if (window.power > 0 && (window.content[0] === "wood" || window.content[0] === "iron-ore" || window.content[0] === "raw-meat")) {
+          if (window.power > 0 && (window.content[0] === "wood" || window.content[0] === "iron-ore" || window.content[0] === "raw-meat" || window.content[0] === "dough")) {
             window.currentTime ++;
             window.power --;
           }
@@ -348,7 +346,7 @@ export class GameStateService {
             let recipeName: DraggableNames[] | WindowNames = this.recipesServices.recipeDoable(window.content);
             this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push(...window.content.filter((name) => name === "worker"));
             window.content = [];
-            if (recipeName[0] === "pickaxe" || recipeName[0] === "plank" || recipeName[0] === "stick" || recipeName[0] === "fabric" || recipeName[0] === "raw-meat" || recipeName[0] === "millet-seed") {
+            if (recipeName[0].length > 1) { // Not the "f" of "furnace", but the first element of an array ["bread"]
               for (let res of recipeName) window.content.push(res as DraggableNames);
               this.goalService.launchTrigger("make-"+recipeName[0] as GoalTriggerNames);
             } else {
@@ -380,6 +378,9 @@ export class GameStateService {
             } else if (window.content[0] === "raw-meat" && this.indexOfFirstOpenedStorage("meat") !== -1) {
               window.content.shift();
               this._gameState$.value.windows[this.indexOfFirstOpenedStorage("meat")].content.push("meat");
+            } else if (window.content[0] === "dough" && this.indexOfFirstOpenedStorage("bread") !== -1) {
+              window.content.shift();
+              this._gameState$.value.windows[this.indexOfFirstOpenedStorage("bread")].content.push("bread");
             } else {
               window.currentTime = window.maxTime;
               //this.popupService.pushValue("error", "Pas assez de Stockage pour ce qui sort du Four");

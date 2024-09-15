@@ -17,6 +17,14 @@ export class RecipesService {
     new Recipe(["fabric"], ["fiber"], [3], 8),
 
     new Recipe(["millet-seed", "millet-seed"], ["millet"], [1], 4),
+    new Recipe(["flour"], ["millet"], [3], 6),
+    new Recipe(["dough"], ["flour", "water"], [1, 1], 4),
+    new Recipe(["dough", "dough"], ["flour", "water"], [2, 1], 5),
+    new Recipe(["dough", "dough", "dough"], ["flour", "water"], [3, 1], 6),
+    new Recipe(["dough", "dough", "dough", "dough"], ["flour", "water"], [4, 1], 7),
+    new Recipe(["dough", "dough", "dough", "dough", "dough"], ["flour", "water"], [5, 1], 8),
+    new Recipe(["dough", "dough", "dough", "dough", "dough", "dough"], ["flour", "water"], [6, 1], 9),
+    new Recipe(["dough", "dough", "dough", "dough", "dough", "dough", "dough"], ["flour", "water"], [7, 1], 10),
     new Recipe(["raw-meat", "skin"], ["hare"], [1], 6),
     new Recipe(["raw-meat"], ["lizard"], [1], 6),
 

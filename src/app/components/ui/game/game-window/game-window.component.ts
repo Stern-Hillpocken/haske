@@ -129,10 +129,12 @@ export class GameWindowComponent {
       case "iron": return "Un lingot de fer.";
       case "millet-seed": return "Une graine de mil (ou millet) utilisée dans les Champs.";
       case "millet": return "Du mil (ou millet), comme du blé mais pour les zones sèches. Sa farine peut être utilisée pour faire des galettes.";
+      case "flour": return "Farine, utilisée pour faire des galettes, du pain.";
+      case "dough": return "Une pâte prête à être cuite."
       // Monster parts
       case "monster-eye": return "Un œil qui peut être utilisé pour ne plus voir les objectifs.";
       // Food
-      case "bread": return "Du pain pour faire manger un aikaci.";
+      case "bread": return "Du pain à donner à manger à un aikaci.";
       case "meat": return "De la viande consommable ou à utiliser en recette.";
       // Notes
       case "note-help-and-trash": return "Ici c’est l’endroit pour avoir des informations sur les différents élèments. Pour l’instant un élement de type \"note\" (représenté par l’enveloppe) est dans l’emplacement mais tu peux l’enlever pour libérer la place pour un autre élèment. Tu peux par exemple détruire cette note en la plaçant dans le Rebut. Chaque note est différente, examine les toutes !";

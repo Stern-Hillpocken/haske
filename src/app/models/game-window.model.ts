@@ -27,7 +27,7 @@ export class GameWindowStorage extends GameWindow {
     constructor(
         public override name: WindowNames = "storage",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["stone", "water", "charcoal", "wood", "plank", "stick", "fiber", "fabric", "iron-ore", "iron", "lizard", "hare", "skin", "millet-seed", "millet", "bread", "raw-meat", "meat", "monster-eye", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip", "note-exploration-x-time"],
+        public override acceptance: DraggableNames[] = ["stone", "water", "charcoal", "wood", "plank", "stick", "fiber", "fabric", "iron-ore", "iron", "lizard", "hare", "skin", "millet-seed", "millet", "flour", "dough", "bread", "raw-meat", "meat", "monster-eye", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip", "note-exploration-x-time"],
         public override maxSpace: number = 14,
         public override slot: DraggableNames[] = []
     ) {
@@ -61,7 +61,7 @@ export class GameWindowExploration extends GameWindow {
 export class GameWindowLighthouse extends GameWindow {
     constructor(
         public override name: WindowNames = "lighthouse",
-        public override content: DraggableNames[] = ["worker", "worker", "worker", "water", "water", "millet", "millet-seed"],
+        public override content: DraggableNames[] = ["worker", "worker", "worker"],
         public override acceptance: DraggableNames[] = ["worker", "miner", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip"]
     ) {
         super(name, content, acceptance)
@@ -124,7 +124,7 @@ export class GameWindowTrash extends GameWindow {
     constructor(
         public override name: WindowNames = "trash",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["stone", "water", "charcoal", "wood", "plank", "stick", "fiber", "fabric", "iron-ore", "iron", "millet-seed", "millet", "bread", "lizard", "hare", "skin", "raw-meat", "meat", "pickaxe", "monster-eye", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip", "note-exploration-x-time"],
+        public override acceptance: DraggableNames[] = ["stone", "water", "charcoal", "wood", "plank", "stick", "fiber", "fabric", "iron-ore", "iron", "millet-seed", "millet", "flour", "dough", "bread", "lizard", "hare", "skin", "raw-meat", "meat", "pickaxe", "monster-eye", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip", "note-exploration-x-time"],
         public override slot: ResourceNames[] = []
     ) {
         super(name, content, acceptance)
@@ -135,7 +135,7 @@ export class GameWindowHelp extends GameWindow {
     constructor(
         public override name: WindowNames = "help",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["worker", "miner", "stone", "water", "charcoal", "wood", "plank", "stick", "fiber", "fabric", "iron-ore", "iron", "millet-seed", "millet", "bread", "lizard", "hare", "skin", "raw-meat", "meat", "pickaxe", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip", "note-exploration-x-time"],
+        public override acceptance: DraggableNames[] = ["worker", "miner", "stone", "water", "charcoal", "wood", "plank", "stick", "fiber", "fabric", "iron-ore", "iron", "millet-seed", "millet", "flour", "dough", "bread", "lizard", "hare", "skin", "raw-meat", "meat", "pickaxe", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip", "note-exploration-x-time"],
         public override slot: DraggableNames[] = ["note-help-and-trash"]
     ) {
         super(name, content, acceptance)
@@ -146,7 +146,7 @@ export class GameWindowRecipesBook extends GameWindow {
     constructor(
         public override name: WindowNames = "recipes-book",
         public override content: DraggableNames[] = [],
-        public override acceptance: ResourceNames[] = ["stone", "water", "wood", "plank", "stick", "fiber", "fabric", "iron", "lizard", "hare", "skin", "millet"],
+        public override acceptance: ResourceNames[] = ["stone", "water", "wood", "plank", "stick", "fiber", "fabric", "iron", "lizard", "hare", "skin", "millet", "flour"],
         public override slot: ResourceNames[] = []
     ) {
         super(name, content, acceptance)
@@ -168,7 +168,7 @@ export class GameWindowWorkbench extends GameWindow {
     constructor(
         public override name: WindowNames = "workbench",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["worker", "stone", "water", "wood", "plank", "stick", "fiber", "fabric", "iron", "lizard", "hare", "millet"],
+        public override acceptance: DraggableNames[] = ["worker", "stone", "water", "wood", "plank", "stick", "fiber", "fabric", "iron", "lizard", "hare", "millet", "flour"],
         public override currentTime: number = 0,
         public override maxTime: number = 12,
         public override maxSpace: number = 8
@@ -194,7 +194,7 @@ export class GameWindowFurnace extends GameWindow {
     constructor(
         public override name: WindowNames = "furnace",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["iron-ore", "charcoal", "wood", "plank", "stick", "raw-meat"],
+        public override acceptance: DraggableNames[] = ["iron-ore", "charcoal", "wood", "plank", "stick", "raw-meat", "dough"],
         public override currentTime: number = 0,
         public override maxTime: number = 16,
         public override maxSpace: number = 3,
