@@ -39,5 +39,9 @@
         <p *ngIf="windowInfo.name === 'goal'" [innerHTML]="currentGoal"></p>
     </div>
 
-    <div *ngIf="windowInfo.currentTime !== undefined && windowInfo.maxTime && (windowInfo.content.includes('worker') || windowInfo.content.includes('miner') || (windowInfo.name === 'furnace' && windowInfo.currentTime > 0))" class="progress-bar"><div class="bar" [style]="{'width': windowInfo.currentTime*100/windowInfo.maxTime+'%'}"></div></div>
+    <div *ngIf="
+        windowInfo.currentTime !== undefined && windowInfo.maxTime && (windowInfo.content.includes('worker') || windowInfo.content.includes('miner') || (windowInfo.name === 'furnace' && windowInfo.currentTime > 0) || (windowInfo.name === 'field' && windowInfo.currentTime > 0) )"
+        class="progress-bar">
+        <div class="bar" [style]="{'width': windowInfo.currentTime*100/windowInfo.maxTime+'%'}"></div>
+    </div>
 </div>

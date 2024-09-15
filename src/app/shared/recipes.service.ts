@@ -16,13 +16,15 @@ export class RecipesService {
     new Recipe(["stick", "stick"], ["plank"], [1], 8),
     new Recipe(["fabric"], ["fiber"], [3], 8),
 
+    new Recipe(["millet-seed", "millet-seed"], ["millet"], [1], 4),
     new Recipe(["raw-meat", "skin"], ["hare"], [1], 6),
     new Recipe(["raw-meat"], ["lizard"], [1], 6),
 
     new Recipe("storage", ["wood", "plank"], [4, 4], 12),
     new Recipe("dressing", ["fabric", "wood", "plank"], [1, 2, 2], 12),
     new Recipe("furnace", ["stone"], [8], 16),
-    new Recipe("sawmill", ["iron", "wood", "plank"], [3, 2, 3], 16)
+    new Recipe("sawmill", ["iron", "wood", "plank"], [3, 2, 3], 16),
+    new Recipe("field", ["wood", "fiber"], [4, 2], 10)
   ];
 
   constructor() { }
@@ -55,8 +57,11 @@ export class RecipesService {
         if (i < recipe.resources.length-1) sentence += "<span class='math-sign'> + </span>";
         if (i === recipe.resources.length-1) {
           sentence += "<span class='math-sign'> = </span>";
-          console.log(recipe.name)
-          for (let res of recipe.name) sentence += "<img src='assets/images/draggable/" + res + ".png'>";
+          if (typeof recipe.name === "string") {
+            sentence += "<img src='assets/images/draggable/" + recipe.name + ".png'>";
+          } else {
+            for (let res of recipe.name) sentence += "<img src='assets/images/draggable/" + res + ".png'>";
+          }
           sentence += "<br>";
         }
         if (recipe.resources[i] === resource) isIn = true;

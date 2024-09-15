@@ -61,6 +61,7 @@ export class GameWindowComponent {
       case "ruin": return "Ruine";
       case "furnace": return "Four";
       case "sawmill": return "Scierie";
+      case "field": return "Champs";
     }
   }
 
@@ -126,6 +127,8 @@ export class GameWindowComponent {
       case "raw-meat": return "Viande cru, à mettre au Four.";
       case "skin": return "De la peau d’animal.";
       case "iron": return "Un lingot de fer.";
+      case "millet-seed": return "Une graine de mil (ou millet) utilisée dans les Champs.";
+      case "millet": return "Du mil (ou millet), comme du blé mais pour les zones sèches. Sa farine peut être utilisée pour faire des galettes.";
       // Monster parts
       case "monster-eye": return "Un œil qui peut être utilisé pour ne plus voir les objectifs.";
       // Food
@@ -174,7 +177,7 @@ export class GameWindowComponent {
   }
 
   classOfTitle(): string {
-    let style: "basic" | "exploration" | "food" | "storage" | "workstation" | "warning" = "basic";
+    let style!: "basic" | "exploration" | "food" | "storage" | "workstation" | "warning";
     switch (this.windowInfo.name) {
       case "dressing": style = "workstation"; break;
       case "exploration": style = "exploration"; break;
@@ -194,6 +197,7 @@ export class GameWindowComponent {
       case "ruin": style = "exploration"; break;
       case "furnace": style = "workstation"; break;
       case "sawmill": style = "workstation"; break;
+      case "field": style = "food"; break;
     }
     return style;
   }

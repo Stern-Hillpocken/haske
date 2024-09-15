@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
+import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowField, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -24,6 +24,7 @@ export class GameStateService {
     new GameWindowGoal(),
     new GameWindowStorage(),
     new GameWindowPantry(),
+    new GameWindowField(),
     new GameWindowExploration(),
     new GameWindowLighthouse()
   ]
@@ -74,6 +75,8 @@ export class GameStateService {
         this.popupService.pushValue("error", "La recette doit être menée à son terme");
       } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content)[0] === "nothing" && dragName === "worker") {
         this.popupService.pushValue("error", "La recette doit être correcte avant d’y assigner des ouvriers");
+      } else if (windowEnd instanceof GameWindowField && windowEnd.currentTime > 0 && dragName !== "water") {
+        this.popupService.pushValue("error", "Champs déjà utilisé");
       } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
         windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
         windowEnd.content.push(dragName);
@@ -140,8 +143,12 @@ export class GameStateService {
     //
     if (windowEnd instanceof GameWindowStorage && windowEnd.content.length === windowEnd.maxSpace) {
       this.popupService.pushValue("error", "Plus de place");
-    } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content)[0] === "nothing" && windowEnd.content.length > 0) {
+    } /* else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content)[0] === "nothing" && windowEnd.content.length > 0) {
       this.popupService.pushValue("error", "Atelier non prêt");
+    }*/ else if (windowEnd instanceof GameWindowWorkbench && windowEnd.currentTime > 0) {
+      this.popupService.pushValue("error", "Atelier déjà utilisé");
+    } else if (windowEnd instanceof GameWindowField && windowEnd.currentTime > 0 && dragName !== "water") {
+      this.popupService.pushValue("error", "Champs déjà utilisé");
     } else if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
       windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
       windowEnd.content.push(dragName);
@@ -243,6 +250,13 @@ export class GameStateService {
         } else if (window instanceof GameWindowSawmill) {
           if (window.content[0] === "wood" || window.content[0] === "plank") window.currentTime += window.content.filter((name) => name === "worker").length;
 
+        } else if (window instanceof GameWindowField) {
+          if (window.currentTime !== 0) window.currentTime ++;
+          for (let w = 0; w < window.content.filter((e) => e === "water").length; w++) {
+            if (window.currentTime === 0 && window.content.filter((e) => e !== "water").length > 0) window.currentTime = 1;
+            else window.currentTime += 10;
+          }
+          window.content = window.content.filter((e) => e !== "water");
         } else if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(window.content)[0] !== "nothing")) {
           window.currentTime += window.content.filter((name) => this.workerNames.includes(name)).length;
         }
@@ -312,12 +326,14 @@ export class GameStateService {
                 break;
               case GameWindowRuin:
                 let pRuinN: number = 50;
-                let pRuinB: number = 30;
+                let pRuinB: number = 25;
                 let pRuinE: number = 20;
+                let pRuinS: number = 5;
                 let randRuinObj: number = this.random(0, 100);
                 if (randRuinObj < pRuinN) {}
                 else if (randRuinObj < pRuinN+pRuinB) resourceName = "bread";
                 else if (randRuinObj < pRuinN+pRuinB+pRuinE) resourceName = "monster-eye";
+                else if (randRuinObj < pRuinN+pRuinB+pRuinE+pRuinS) resourceName = "millet-seed";
                 break;
             }
             let storageId: number = resourceName === "nothing" ? -1 : this.indexOfFirstOpenedStorage(resourceName);
@@ -332,7 +348,7 @@ export class GameStateService {
             let recipeName: DraggableNames[] | WindowNames = this.recipesServices.recipeDoable(window.content);
             this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push(...window.content.filter((name) => name === "worker"));
             window.content = [];
-            if (recipeName[0] === "pickaxe" || recipeName[0] === "plank" || recipeName[0] === "stick" || recipeName[0] === "fabric" || recipeName[0] === "raw-meat") {
+            if (recipeName[0] === "pickaxe" || recipeName[0] === "plank" || recipeName[0] === "stick" || recipeName[0] === "fabric" || recipeName[0] === "raw-meat" || recipeName[0] === "millet-seed") {
               for (let res of recipeName) window.content.push(res as DraggableNames);
               this.goalService.launchTrigger("make-"+recipeName[0] as GoalTriggerNames);
             } else {
@@ -340,6 +356,7 @@ export class GameStateService {
               else if (recipeName === "dressing") this._gameState$.value.windows.push(new GameWindowDressing());
               else if (recipeName === "furnace") this._gameState$.value.windows.push(new GameWindowFurnace());
               else if (recipeName === "sawmill") this._gameState$.value.windows.push(new GameWindowSawmill());
+              else if (recipeName === "field") this._gameState$.value.windows.push(new GameWindowField());
               this.goalService.launchTrigger("build-"+recipeName as GoalTriggerNames);
             }
 
@@ -382,6 +399,9 @@ export class GameStateService {
                 else window.content.push(stuffCuted[i]);
               }
             }
+          } else if (window instanceof GameWindowField) {
+            window.currentTime = 0;
+            window.content = window.content.map((e) => e === "millet-seed" ? "millet" : e);
           }
 
         }
