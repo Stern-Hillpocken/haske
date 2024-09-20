@@ -16,6 +16,7 @@ export class GoalService {
     ["Retour au début de l’âge de fer", "Fabriquer une pioche dans l’Atelier", "Équiper un aikaci avec la pioche dans le Vestiaire", "Miner du minerai de fer dans une Mine"],
     ["Si il ne faisait pas assez chaud", "Construire un Four", "Y mettre du combustible (en haut) et du bois (dedans) pour obtenir du charbon", "Faire fondre un minerai de fer"],
     ["Du bois de qualité", "Construire une Scierie", "Construire un Stockage"],
+    ["Tournée pour tout le monde", "Trouver une graine dans les Broussailles ou Ruines", "Construire un Champs", "Mettre une ou mieux : plus de 3 graines puis de l’eau dans le Champs", "Avoir de la farine", "Avoir de la pâte", "Cuire du pain"],
     
     ["Allumer le Phare !", "Avoir 100 de luminosité dans le Phare"]
   ]
@@ -63,9 +64,17 @@ export class GoalService {
       if (trigger === "build-sawmill") this.isCurrentSubStepsValidated[1] = true;
       if (trigger === "build-storage") this.isCurrentSubStepsValidated[2] = true;
     } else if (this.currentStep === 5) {
-      // 5 - Equip a aikaci to have soldier
+      // 5 - Food for all
+      if (trigger === "find-seed") this.isCurrentSubStepsValidated[1] = true;
+      if (trigger === "build-field") this.isCurrentSubStepsValidated[2] = true;
+      if (trigger === "gather-millet") this.isCurrentSubStepsValidated[3] = true;
+      if (trigger === "make-flour") this.isCurrentSubStepsValidated[4] = true;
+      if (trigger === "make-dough") this.isCurrentSubStepsValidated[5] = true;
+      if (trigger === "melt-bread") this.isCurrentSubStepsValidated[6] = true;
+    } else if (this.currentStep === 5) {
+      // 6 - Equip a aikaci to have soldier
     } else if (this.currentStep === 6) {
-      // 6 - Perform your first sacrifice
+      // 7 - Perform your first sacrifice
     } else {
       // Light the lighthouse with 100 fire
     }

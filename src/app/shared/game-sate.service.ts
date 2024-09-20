@@ -202,9 +202,12 @@ export class GameStateService {
 
     } else if (this._gameState$.value.time.tick > 100) {
       // Flame lost and new day
-      if (this._gameState$.value.time.day === 1) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-end-day");
+      if (this._gameState$.value.time.day === 5) {
+        this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-end-day");
+        this._gameState$.value.windows.push(new GameWindowPantry());
+      }
       this.flameLost();
-      this.lunchTime();
+      if (this._gameState$.value.time.day >= 5) this.lunchTime();
       this._gameState$.value.time.tick = 0;
       this._gameState$.value.time.day ++;
     }
@@ -308,12 +311,15 @@ export class GameStateService {
                 }
                 break;
               case GameWindowScrub:
-                if (randomResource < 75) {
+                if (randomResource < 70) {
                   resourceName = "wood";
                   this.goalService.launchTrigger("gather-wood");
-                } else if (randomResource < 90) {
+                } else if (randomResource < 85) {
                   resourceName = "fiber";
                   this.goalService.launchTrigger("gather-fiber");
+                } else if (randomResource < 95) {
+                  resourceName = "millet-seed";
+                  this.goalService.launchTrigger("find-seed");
                 } else {
                   resourceName = "hare";
                 }
@@ -331,7 +337,10 @@ export class GameStateService {
                 if (randRuinObj < pRuinN) {}
                 else if (randRuinObj < pRuinN+pRuinB) resourceName = "bread";
                 else if (randRuinObj < pRuinN+pRuinB+pRuinE) resourceName = "monster-eye";
-                else if (randRuinObj < pRuinN+pRuinB+pRuinE+pRuinS) resourceName = "millet-seed";
+                else if (randRuinObj < pRuinN+pRuinB+pRuinE+pRuinS) {
+                  resourceName = "millet-seed";
+                  this.goalService.launchTrigger("find-seed");
+                }
                 break;
             }
             let storageId: number = resourceName === "nothing" ? -1 : this.indexOfFirstOpenedStorage(resourceName);
@@ -354,7 +363,10 @@ export class GameStateService {
               else if (recipeName === "dressing") this._gameState$.value.windows.push(new GameWindowDressing());
               else if (recipeName === "furnace") this._gameState$.value.windows.push(new GameWindowFurnace());
               else if (recipeName === "sawmill") this._gameState$.value.windows.push(new GameWindowSawmill());
-              else if (recipeName === "field") this._gameState$.value.windows.push(new GameWindowField());
+              else if (recipeName === "field") {
+                this._gameState$.value.windows.push(new GameWindowField());
+                this.goalService.launchTrigger("build-field");
+              }
               this.goalService.launchTrigger("build-"+recipeName as GoalTriggerNames);
             }
 
@@ -381,6 +393,7 @@ export class GameStateService {
             } else if (window.content[0] === "dough" && this.indexOfFirstOpenedStorage("bread") !== -1) {
               window.content.shift();
               this._gameState$.value.windows[this.indexOfFirstOpenedStorage("bread")].content.push("bread");
+              this.goalService.launchTrigger("melt-bread");
             } else {
               window.currentTime = window.maxTime;
               //this.popupService.pushValue("error", "Pas assez de Stockage pour ce qui sort du Four");
@@ -403,6 +416,7 @@ export class GameStateService {
           } else if (window instanceof GameWindowField) {
             window.currentTime = 0;
             window.content = window.content.map((e) => e === "millet-seed" ? "millet" : e);
+            this.goalService.launchTrigger("gather-millet");
           }
 
         }
@@ -456,6 +470,7 @@ export class GameStateService {
 
   emptyPantrySlot(): void {
     const pantryID: number = this.indexOfWindow("pantry");
+    if (pantryID === -1) return; // For tuto
     this._gameState$.value.food += this.utils.foodValue(this._gameState$.value.windows[pantryID].slot as DraggableNames[]);
     this._gameState$.value.windows[pantryID].slot = [];
     this._gameState$.next(this._gameState$.value);
