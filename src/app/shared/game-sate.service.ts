@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
+import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowField, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -13,13 +13,14 @@ import { GoalService } from './goal.service';
 import { FoodNames } from '../types/food-names.type';
 import { MonsterPartNames } from '../types/monster-part-names.type';
 import { GoalTriggerNames } from '../types/goal-trigger-names.type';
+import { UtilsService } from './utils.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameStateService {
 
-  private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 10, new GameTime(), [
+  private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 10, 0, 0, new GameTime(), [
     new GameWindowGoal(),
     new GameWindowStorage(),
     new GameWindowExploration(),
@@ -30,7 +31,7 @@ export class GameStateService {
   windowsWhichCanPause: WindowNames[] = ["exploration", "scrub", "quarry"];
   workerNames: DraggableNames[] = ["worker", "miner"];
 
-  constructor(private popupService: PopupService, private recipesServices: RecipesService, private goalService: GoalService) { }
+  constructor(private popupService: PopupService, private recipesServices: RecipesService, private goalService: GoalService, private utils: UtilsService) { }
 
   _getGameState$(): Observable<GameState> {
     return this._gameState$.asObservable();
@@ -66,12 +67,14 @@ export class GameStateService {
       let windowEnd = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
       let dragName = this._gameState$.value.drag.draggableName;
 
-      if (windowEnd.maxSpace !== undefined && windowEnd.content.filter((name) => name !== "worker").length >= windowEnd.maxSpace) {
+      if (windowEnd.maxSpace !== undefined && windowEnd.content.filter((name) => name !== "worker").length >= windowEnd.maxSpace && dragName !== "worker") {
         this.popupService.pushValue("error", "Plus de place");
-      } else if (windowStart instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowStart.content) !== "nothing" && windowStart.currentTime !== 0) {
+      } else if (windowStart instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowStart.content)[0] !== "nothing" && windowStart.currentTime !== 0) {
         this.popupService.pushValue("error", "La recette doit être menée à son terme");
-      } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content) === "nothing" && dragName === "worker") {
+      } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content)[0] === "nothing" && dragName === "worker") {
         this.popupService.pushValue("error", "La recette doit être correcte avant d’y assigner des ouvriers");
+      } else if (windowEnd instanceof GameWindowField && windowEnd.currentTime > 0 && dragName !== "water") {
+        this.popupService.pushValue("error", "Champs déjà utilisé");
       } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
         windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
         windowEnd.content.push(dragName);
@@ -138,8 +141,12 @@ export class GameStateService {
     //
     if (windowEnd instanceof GameWindowStorage && windowEnd.content.length === windowEnd.maxSpace) {
       this.popupService.pushValue("error", "Plus de place");
-    } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content) === "nothing" && windowEnd.content.length > 0) {
+    } /* else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content)[0] === "nothing" && windowEnd.content.length > 0) {
       this.popupService.pushValue("error", "Atelier non prêt");
+    }*/ else if (windowEnd instanceof GameWindowWorkbench && windowEnd.currentTime > 0) {
+      this.popupService.pushValue("error", "Atelier déjà utilisé");
+    } else if (windowEnd instanceof GameWindowField && windowEnd.currentTime > 0 && dragName !== "water") {
+      this.popupService.pushValue("error", "Champs déjà utilisé");
     } else if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
       windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
       windowEnd.content.push(dragName);
@@ -152,10 +159,14 @@ export class GameStateService {
     this._gameState$.next(this._gameState$.value);
   }
 
+  ////////////////////////////////////////////////
+
   tickTime(): void {
     this.timeAdvance();
     this.performTimedActions();
     this.emptyTrash();
+    this.emptyPantrySlot();
+    this.countPeople();
   }
 
   timeAdvance(): void {
@@ -191,8 +202,12 @@ export class GameStateService {
 
     } else if (this._gameState$.value.time.tick > 100) {
       // Flame lost and new day
-      if (this._gameState$.value.time.day === 1) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-end-day");
+      if (this._gameState$.value.time.day === 5) {
+        this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-end-day");
+        this._gameState$.value.windows.push(new GameWindowPantry());
+      }
       this.flameLost();
+      if (this._gameState$.value.time.day >= 5) this.lunchTime();
       this._gameState$.value.time.tick = 0;
       this._gameState$.value.time.day ++;
     }
@@ -228,7 +243,7 @@ export class GameStateService {
             window.slot = window.slot.filter((e) => e !== "charcoal");
           }
           // See if it can smelt
-          if (window.power > 0 && (window.content[0] === "wood" || window.content[0] === "iron-ore")) {
+          if (window.power > 0 && (window.content[0] === "wood" || window.content[0] === "iron-ore" || window.content[0] === "raw-meat" || window.content[0] === "dough")) {
             window.currentTime ++;
             window.power --;
           }
@@ -236,7 +251,14 @@ export class GameStateService {
         } else if (window instanceof GameWindowSawmill) {
           if (window.content[0] === "wood" || window.content[0] === "plank") window.currentTime += window.content.filter((name) => name === "worker").length;
 
-        } else if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(window.content) !== "nothing")) {
+        } else if (window instanceof GameWindowField) {
+          if (window.currentTime !== 0) window.currentTime ++;
+          for (let w = 0; w < window.content.filter((e) => e === "water").length; w++) {
+            if (window.currentTime === 0 && window.content.filter((e) => e !== "water").length > 0) window.currentTime = 1;
+            else window.currentTime += 10;
+          }
+          window.content = window.content.filter((e) => e !== "water");
+        } else if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(window.content)[0] !== "nothing")) {
           window.currentTime += window.content.filter((name) => this.workerNames.includes(name)).length;
         }
 
@@ -278,18 +300,28 @@ export class GameStateService {
 
           } else if (window instanceof GameWindowQuarry || window instanceof GameWindowScrub || window instanceof GameWindowMine || window instanceof GameWindowRuin) {
             let resourceName: DraggableNames = "nothing";
+            let randomResource: number = this.random(0, 100);
             switch (window.constructor) {
               case GameWindowQuarry:
-                resourceName = "stone";
-                this.goalService.launchTrigger("gather-stone");
+                if (randomResource < 90) {
+                  resourceName = "stone";
+                  this.goalService.launchTrigger("gather-stone");
+                } else {
+                  resourceName = "lizard";
+                }
                 break;
               case GameWindowScrub:
-                if (this.random(0, 100) < 80) {
+                if (randomResource < 70) {
                   resourceName = "wood";
                   this.goalService.launchTrigger("gather-wood");
-                } else {
+                } else if (randomResource < 85) {
                   resourceName = "fiber";
                   this.goalService.launchTrigger("gather-fiber");
+                } else if (randomResource < 95) {
+                  resourceName = "millet-seed";
+                  this.goalService.launchTrigger("find-seed");
+                } else {
+                  resourceName = "hare";
                 }
                 break;
               case GameWindowMine:
@@ -298,12 +330,17 @@ export class GameStateService {
                 break;
               case GameWindowRuin:
                 let pRuinN: number = 50;
-                let pRuinB: number = 30;
+                let pRuinB: number = 25;
                 let pRuinE: number = 20;
+                let pRuinS: number = 5;
                 let randRuinObj: number = this.random(0, 100);
                 if (randRuinObj < pRuinN) {}
                 else if (randRuinObj < pRuinN+pRuinB) resourceName = "bread";
                 else if (randRuinObj < pRuinN+pRuinB+pRuinE) resourceName = "monster-eye";
+                else if (randRuinObj < pRuinN+pRuinB+pRuinE+pRuinS) {
+                  resourceName = "millet-seed";
+                  this.goalService.launchTrigger("find-seed");
+                }
                 break;
             }
             let storageId: number = resourceName === "nothing" ? -1 : this.indexOfFirstOpenedStorage(resourceName);
@@ -315,17 +352,21 @@ export class GameStateService {
               window.currentTime = window.maxTime;
             }
           } else if (window instanceof GameWindowWorkbench) {
-            let recipeName: DraggableNames | WindowNames = this.recipesServices.recipeDoable(window.content);
+            let recipeName: DraggableNames[] | WindowNames = this.recipesServices.recipeDoable(window.content);
             this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push(...window.content.filter((name) => name === "worker"));
             window.content = [];
-            if (recipeName === "pickaxe" || recipeName === "plank" || recipeName === "stick" || recipeName === "fabric") {
-              window.content = [recipeName];
-              this.goalService.launchTrigger("make-"+recipeName as GoalTriggerNames);
+            if (recipeName[0].length > 1) { // Not the "f" of "furnace", but the first element of an array ["bread"]
+              for (let res of recipeName) window.content.push(res as DraggableNames);
+              this.goalService.launchTrigger("make-"+recipeName[0] as GoalTriggerNames);
             } else {
               if (recipeName === "storage") this._gameState$.value.windows.push(new GameWindowStorage ());
               else if (recipeName === "dressing") this._gameState$.value.windows.push(new GameWindowDressing());
               else if (recipeName === "furnace") this._gameState$.value.windows.push(new GameWindowFurnace());
               else if (recipeName === "sawmill") this._gameState$.value.windows.push(new GameWindowSawmill());
+              else if (recipeName === "field") {
+                this._gameState$.value.windows.push(new GameWindowField());
+                this.goalService.launchTrigger("build-field");
+              }
               this.goalService.launchTrigger("build-"+recipeName as GoalTriggerNames);
             }
 
@@ -344,8 +385,15 @@ export class GameStateService {
               this.goalService.launchTrigger("melt-charcoal");
             } else if (window.content[0] === "iron-ore" && this.indexOfFirstOpenedStorage("iron") !== -1) {
               window.content.shift();
-              this._gameState$.value.windows[this.indexOfFirstOpenedStorage("charcoal")].content.push("iron");
+              this._gameState$.value.windows[this.indexOfFirstOpenedStorage("iron")].content.push("iron");
               this.goalService.launchTrigger("melt-iron");
+            } else if (window.content[0] === "raw-meat" && this.indexOfFirstOpenedStorage("meat") !== -1) {
+              window.content.shift();
+              this._gameState$.value.windows[this.indexOfFirstOpenedStorage("meat")].content.push("meat");
+            } else if (window.content[0] === "dough" && this.indexOfFirstOpenedStorage("bread") !== -1) {
+              window.content.shift();
+              this._gameState$.value.windows[this.indexOfFirstOpenedStorage("bread")].content.push("bread");
+              this.goalService.launchTrigger("melt-bread");
             } else {
               window.currentTime = window.maxTime;
               //this.popupService.pushValue("error", "Pas assez de Stockage pour ce qui sort du Four");
@@ -353,8 +401,8 @@ export class GameStateService {
 
           } else if (window instanceof GameWindowSawmill) {
             let stuffCuted: ResourceNames[] = []
-            if (window.content[0] === "wood") stuffCuted = ["plank", "plank"];
-            else if (window.content[0] === "plank") stuffCuted = ["stick", "stick"];
+            if (window.content[0] === "wood") stuffCuted = ["plank", "plank", "plank", "plank"];
+            else if (window.content[0] === "plank") stuffCuted = ["stick", "stick", "stick", "stick"];
             if (this.indexOfFirstOpenedStorage(stuffCuted[0]) === -1) {
               window.currentTime = window.maxTime;
               //this.popupService.pushValue("error", "Pas de Stockage pour ce qui vient de la Scierie");
@@ -365,6 +413,10 @@ export class GameStateService {
                 else window.content.push(stuffCuted[i]);
               }
             }
+          } else if (window instanceof GameWindowField) {
+            window.currentTime = 0;
+            window.content = window.content.map((e) => e === "millet-seed" ? "millet" : e);
+            this.goalService.launchTrigger("gather-millet");
           }
 
         }
@@ -413,6 +465,30 @@ export class GameStateService {
         break;
       }
     }
+    this._gameState$.next(this._gameState$.value);
+  }
+
+  emptyPantrySlot(): void {
+    const pantryID: number = this.indexOfWindow("pantry");
+    if (pantryID === -1) return; // For tuto
+    this._gameState$.value.food += this.utils.foodValue(this._gameState$.value.windows[pantryID].slot as DraggableNames[]);
+    this._gameState$.value.windows[pantryID].slot = [];
+    this._gameState$.next(this._gameState$.value);
+  }
+
+  lunchTime(): void {
+    this._gameState$.value.food -= this._gameState$.value.people;
+    this._gameState$.next(this._gameState$.value);
+  }
+
+  countPeople(): void {
+    let people: number = 0;
+    for (const window of this._gameState$.value.windows) {
+      for (const worker of this.workerNames) {
+        if (window.content.includes(worker)) people += window.content.filter((e) => e === worker).length;
+      }
+    }
+    this._gameState$.value.people = people;
     this._gameState$.next(this._gameState$.value);
   }
 

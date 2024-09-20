@@ -29,6 +29,12 @@ export class GameWindowComponent {
   @Input()
   flame!: number;
 
+  @Input()
+  food!: number;
+
+  @Input()
+  people!: number;
+
   @Output()
   draggableEnterEmitter: EventEmitter<number> = new EventEmitter();
 
@@ -55,6 +61,7 @@ export class GameWindowComponent {
       case "ruin": return "Ruine";
       case "furnace": return "Four";
       case "sawmill": return "Scierie";
+      case "field": return "Champs";
     }
   }
 
@@ -115,16 +122,25 @@ export class GameWindowComponent {
       case "fiber": return "Une fibre extraite des végétaux, utile pour faire du tissu.";
       case "fabric": return "Du tissu, très rustique.";
       case "iron-ore": return "Un minerai de fer qu’il va falloir faire fondre dans le Four pour être utilisé.";
+      case "lizard": return "Un lézard des rochers, qui peut être relâché dans le Rebus ou dépecé dans l’Atelier.";
+      case "hare": return "Un lièvre des sables, qui peut être relâché dans le Rebus ou dépecé dans l’Atelier.";
+      case "raw-meat": return "Viande cru, à mettre au Four.";
+      case "skin": return "De la peau d’animal.";
       case "iron": return "Un lingot de fer.";
+      case "millet-seed": return "Une graine de mil (ou millet) utilisée dans les Champs.";
+      case "millet": return "Du mil (ou millet), comme du blé mais pour les zones sèches. Sa farine peut être utilisée pour faire des galettes.";
+      case "flour": return "Farine, utilisée pour faire des galettes, du pain.";
+      case "dough": return "Une pâte prête à être cuite."
       // Monster parts
       case "monster-eye": return "Un œil qui peut être utilisé pour ne plus voir les objectifs.";
       // Food
-      case "bread": return "Du pain pour faire manger un aikaci.";
+      case "bread": return "Du pain à donner à manger à un aikaci.";
+      case "meat": return "De la viande consommable ou à utiliser en recette.";
       // Notes
       case "note-help-and-trash": return "Ici c’est l’endroit pour avoir des informations sur les différents élèments. Pour l’instant un élement de type \"note\" (représenté par l’enveloppe) est dans l’emplacement mais tu peux l’enlever pour libérer la place pour un autre élèment. Tu peux par exemple détruire cette note en la plaçant dans le Rebut. Chaque note est différente, examine les toutes !";
       case "note-time-strip": return "En haut se trouve la frise du temps avec différents évènements qui y sont associés, et le temps qui passe.";
       case "note-storage-filter": return "Tu peux associer un ou plusieurs élèments dans le haut d’un Entrepôt pour que seulement ces élèments puissent être stockés à l’intérieur.";
-      case "note-event-end-day": return "À la fin de la journée il faut nourrir tes aikacis, sans quoi ils et elles mourront. En plus de la nourriture, la flamme du phare diminue d’un cran à chaque fois.";
+      case "note-event-end-day": return "À la fin de la journée il faut nourrir tes aikacis en ayant au préalable mis de la nourriture dans le Garde-Manger, sans quoi ils et elles mourront. Pour avoir de la nourriture tu peux trouver des lézards (à dépecer puis cuire) dans les Carrières, des lièvres dans les Broussailles, ou des graines à mettre dans un Champs (avec de l'eau). En plus de la nourriture, la flamme du phare diminue d’un cran à chaque fin de journée.";
       case "note-event-event": return "Tous les matins tu auras un nouvel évènement à t’occuper.";
       case "note-event-fight": return "Durant la nuit les halittus attaqueront de différents côtés, en fonction de la puissance de la puissance de ton phare. Prépare de défenses et dispose des guerriers.";
       case "note-event-newcomers": return "En fonction de la puissance de feu de ton phare, des gens viendront te rejoindre. Mais cela impact aussi le nombre de personnes à nourrir.";
@@ -139,12 +155,22 @@ export class GameWindowComponent {
     return this.recipesService.recipesWith(this.windowInfo.slot[0]);
   }
 
-  workbenchPreparedRecipe(): string {
-    if (this.windowInfo.name === "workbench" && this.exactRecipe() !== "nothing") return "assets/images/draggable/" + this.exactRecipe() + ".png";
-    return "assets/images/window/" + this.windowInfo.name + ".png";
+  workbenchPreparedRecipe(): string[] {
+    let xRecipe = this.exactRecipe();
+    if (this.windowInfo.name === "workbench" && xRecipe[0] !== "nothing") {
+      let ret: string[] = [];
+      if (typeof xRecipe === "string") return ["assets/images/draggable/" + xRecipe + ".png"];
+      for (let res of xRecipe) {
+        ret.push("assets/images/draggable/" + res + ".png");
+      }
+      return ret;
+    } /*else if (this.windowInfo.name === "lighthouse") {
+      return ["assets/images/window/" + this.windowInfo.name + ".png"];
+    }*/
+    return [];
   }
 
-  exactRecipe(): DraggableNames | WindowNames {
+  exactRecipe(): DraggableNames[] | WindowNames {
     return this.recipesService.recipeDoable(this.windowInfo.content);
   }
 
@@ -152,8 +178,8 @@ export class GameWindowComponent {
     return this.windowInfo.content.filter((name) => name !== "worker").length
   }
 
-  backgroundColorOfTitle(): string {
-    let style: "basic" | "exploration" | "food" | "storage" | "workstation" = "basic";
+  classOfTitle(): string {
+    let style!: "basic" | "exploration" | "food" | "storage" | "workstation" | "warning";
     switch (this.windowInfo.name) {
       case "dressing": style = "workstation"; break;
       case "exploration": style = "exploration"; break;
@@ -161,7 +187,9 @@ export class GameWindowComponent {
       case "help": style = "basic"; break;
       case "lighthouse": style = "basic"; break;
       case "mine": style = "exploration"; break;
-      case "pantry": style = "food"; break;
+      case "pantry":
+        if(this.food >= this.people) {style = "food"; break;}
+        else {style = "warning"; break;}
       case "quarry": style = "exploration"; break;
       case "recipes-book": style = "basic"; break;
       case "scrub": style = "exploration"; break;
@@ -171,8 +199,9 @@ export class GameWindowComponent {
       case "ruin": style = "exploration"; break;
       case "furnace": style = "workstation"; break;
       case "sawmill": style = "workstation"; break;
+      case "field": style = "food"; break;
     }
-    return "var(--color-banner-" + style + ")";
+    return style;
   }
 
 }
