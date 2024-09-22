@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { timeInterval } from 'rxjs';
 import { GameTime } from 'src/app/models/game-time.model';
 
 @Component({
@@ -8,6 +7,9 @@ import { GameTime } from 'src/app/models/game-time.model';
   styleUrls: ['./time-tracker.component.scss']
 })
 export class TimeTrackerComponent {
+
+  @Input()
+  isTuto!: boolean;
 
   @Input()
   time!: GameTime;

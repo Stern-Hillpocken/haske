@@ -17,8 +17,8 @@ export class HomeMenuComponent {
   @Output()
   pawnEndEmitter: EventEmitter<void> = new EventEmitter();
 
-  titles = ["Jouer", "Histoire", "Crédits", "?"];
-  keywords = ["game", "background", "credits", "help"];
+  titles = ["Jouer", "Tutoriel", "Histoire", "Crédits"];
+  keywords = ["game", "tuto", "background", "credits"];
 
   layerX: number = 0;
   layerY: number = 0;

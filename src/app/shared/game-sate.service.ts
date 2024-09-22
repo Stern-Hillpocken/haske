@@ -20,13 +20,7 @@ import { UtilsService } from './utils.service';
 })
 export class GameStateService {
 
-  private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(new GameDrag(), 10, 0, 0, new GameTime(), [
-    new GameWindowGoal(),
-    new GameWindowStorage(),
-    new GameWindowExploration(),
-    new GameWindowLighthouse()
-  ]
-  ));
+  private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(true, new GameDrag(), 0, 0, 0, new GameTime(), []));
 
   windowsWhichCanPause: WindowNames[] = ["exploration", "scrub", "quarry"];
   workerNames: DraggableNames[] = ["worker", "miner"];
@@ -35,6 +29,17 @@ export class GameStateService {
 
   _getGameState$(): Observable<GameState> {
     return this._gameState$.asObservable();
+  }
+
+  init(isTuto: boolean): void {
+    this._gameState$.value.isTuto = isTuto;
+    this._gameState$.value.drag = new GameDrag();
+    this._gameState$.value.flame = 10;
+    this._gameState$.value.people = 0;
+    this._gameState$.value.food = 0;
+    this._gameState$.value.time = new GameTime();
+    this._gameState$.value.windows = [];
+    this._gameState$.next(this._gameState$.value);
   }
 
   onDragStart(altNameImage: DraggableNames, windowId: number): void {
@@ -171,46 +176,81 @@ export class GameStateService {
 
   timeAdvance(): void {
     this._gameState$.value.time.tick ++;
-    if (this._gameState$.value.time.tick === 5) {
-      // Morning environment event
-      if (this._gameState$.value.time.day === 4) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-event");
-
-    } else if(this._gameState$.value.time.day === 1 && this._gameState$.value.time.tick === 11) {
-      this._gameState$.value.windows[this.indexOfWindow("storage")].content.push("bread", "fiber", "fiber", "monster-eye");
-
-    } else if (this._gameState$.value.time.day === 1 && this._gameState$.value.time.tick === 40) {
-      this._gameState$.value.windows.push(
-        new GameWindowHelp(),
-        new GameWindowWorkbench()
-      );
-      this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-exploration-x-time");
-
-    } else if (this._gameState$.value.time.day === 1 && this._gameState$.value.time.tick === 60) {
-      this._gameState$.value.windows.push(
-        new GameWindowTrash(),
-        new GameWindowRecipesBook()
-      );
-
-    } else if (this._gameState$.value.time.tick === 75) {
-      // Newcomers
-      if (this._gameState$.value.time.day === 2) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-newcomers");
-
-    } else if (this._gameState$.value.time.tick === 85) {
-      if (this._gameState$.value.time.day === 1) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-time-strip");
-      // Attack of the monsters
-      if (this._gameState$.value.time.day === 5) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-fight");
-
-    } else if (this._gameState$.value.time.tick > 100) {
-      // Flame lost and new day
-      if (this._gameState$.value.time.day === 5) {
-        this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-end-day");
-        this._gameState$.value.windows.push(new GameWindowPantry());
+    // Setup
+    if (this._gameState$.value.time.day === 1) {
+      if (!this._gameState$.value.isTuto) {
+        if (this._gameState$.value.time.tick === 11) {
+          this._gameState$.value.windows.push(
+            new GameWindowHelp(),
+            new GameWindowTrash(),
+            new GameWindowRecipesBook(),
+            new GameWindowWorkbench(),
+            new GameWindowStorage(),
+            new GameWindowExploration(),
+            new GameWindowLighthouse()
+          );
+          this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content = ["worker", "worker", "water", "water"];
+        }
+      } else {
+        // TUTO
+        switch (this._gameState$.value.time.tick) {
+          case 11:
+            this._gameState$.value.windows.push(new GameWindowGoal()); break;
+          case 15:
+            this._gameState$.value.windows.push(new GameWindowLighthouse());
+            this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content = ["worker", "worker", "worker", "water", "water"];
+            break;
+          case 17:
+            this._gameState$.value.windows.push(new GameWindowExploration()); break;
+          case 27:
+            this._gameState$.value.windows.push(new GameWindowStorage());
+            this._gameState$.value.windows[this.indexOfWindow("storage")].content.push("fiber", "fiber", "monster-eye");
+            break;
+          case 40:
+            this._gameState$.value.windows.push(new GameWindowHelp());
+            this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-exploration-x-time");
+            break;
+          case 50:
+            this._gameState$.value.windows.push(new GameWindowWorkbench()); break;
+          case 54:
+            this._gameState$.value.windows.push(new GameWindowTrash()); break;
+          case 58:
+            this._gameState$.value.windows.push(new GameWindowRecipesBook()); break;
+        }
       }
-      this.flameLost();
-      if (this._gameState$.value.time.day >= 5) this.lunchTime();
-      this._gameState$.value.time.tick = 0;
-      this._gameState$.value.time.day ++;
     }
+    
+    // Time related actions for no tuto
+    if (!this._gameState$.value.isTuto) {
+      if (this._gameState$.value.time.tick === 5) {
+        // Morning environment event
+        if (this._gameState$.value.time.day === 2) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-event");
+  
+      } else if (this._gameState$.value.time.day === 1 && this._gameState$.value.time.tick === 11) {
+        // First trigger
+        this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-time-strip");
+  
+      } else if (this._gameState$.value.time.tick === 75) {
+        // Newcomers
+        if (this._gameState$.value.time.day === 2) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-newcomers");
+  
+      } else if (this._gameState$.value.time.tick === 85) {
+        // Attack of the monsters
+        if (this._gameState$.value.time.day === 5) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-fight");
+  
+      } else if (this._gameState$.value.time.tick > 100) {
+        // Flame lost and new day
+        if (this._gameState$.value.time.day === 5) {
+          this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-end-day");
+          this._gameState$.value.windows.push(new GameWindowPantry());
+        }
+        this.flameLost();
+        if (this._gameState$.value.time.day >= 5) this.lunchTime();
+        this._gameState$.value.time.tick = 0;
+        this._gameState$.value.time.day ++;
+      }
+    }
+
     this._gameState$.next(this._gameState$.value);
   }
 
