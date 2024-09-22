@@ -4,6 +4,7 @@ import { GameWindow } from "./game-window.model";
 
 export class GameState {
     constructor(
+        public isTuto: boolean,
         public drag: GameDrag,
         public flame: number,
         public people: number,

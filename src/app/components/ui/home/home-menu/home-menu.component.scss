@@ -1,10 +1,12 @@
-.window-box:nth-child(2) {
+.window-box:nth-child(1) {
     top: 45vh;
 }
+.window-box:nth-child(2) {
+    top: 55vh;
+}
 .window-box:nth-child(3) {
-    top: 60vh;
+    top: 65vh;
 }
 .window-box:nth-child(4) {
-    top: 1vh;
-    left: 95vw;
+    top: 75vh;
 }
