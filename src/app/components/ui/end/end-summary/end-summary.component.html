@@ -1,0 +1,9 @@
+<div>
+    <h2>{{ gameState.flame <= 0 || gameState.people <= 0 ? "Défaite..." : "Victoire !" }}</h2>
+    <ul>
+        <li>Flamme&nbsp;: {{ gameState.flame }}</li>
+        <li>Aikacin&nbsp;: {{ gameState.people }}</li>
+        <li>Nourriture&nbsp;: {{ gameState.food }}</li>
+        <li>Journée&nbsp;: {{ gameState.time.day }}</li>
+    </ul>
+</div>

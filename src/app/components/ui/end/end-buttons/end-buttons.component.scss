@@ -1,0 +1,21 @@
+.options {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2em;
+}
+
+.window-box {
+    position: inherit;
+    transform: inherit;
+}
+
+.window-title {
+    display: flex;
+    gap: 0.5em;
+}
+
+.window-slot {
+    height: 32px;
+    border: 2px dashed black;
+}
