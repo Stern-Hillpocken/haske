@@ -16,6 +16,10 @@ import { TimeTrackerComponent } from './components/ui/game/time-tracker/time-tra
 import { TimeBannerComponent } from './components/ui/game/time-banner/time-banner.component';
 import { GameWindowComponent } from './components/ui/game/game-window/game-window.component';
 import { PopupComponent } from './shared/popup/popup.component';
+import { EndPageComponent } from './pages/end-page/end-page.component';
+import { EndComponent } from './components/features/end/end.component';
+import { EndSummaryComponent } from './components/ui/end/end-summary/end-summary.component';
+import { EndButtonsComponent } from './components/ui/end/end-buttons/end-buttons.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +37,10 @@ import { PopupComponent } from './shared/popup/popup.component';
     TimeBannerComponent,
     GameWindowComponent,
     PopupComponent,
+    EndPageComponent,
+    EndComponent,
+    EndSummaryComponent,
+    EndButtonsComponent,
   ],
   imports: [
     BrowserModule,

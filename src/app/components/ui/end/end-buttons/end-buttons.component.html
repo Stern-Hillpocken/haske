@@ -1,0 +1,14 @@
+<div class="options">
+
+    <div *ngFor="let name of titles; let i = index" class="window-box">
+        <div class="window-title">
+            <div
+                class="window-slot"
+                [ngStyle]="{'width': 32+'px'}"
+                (dragenter)="onDragEnter(i)"
+            ><img *ngIf="i === 0" src="assets/images/draggable/pawn.png" (dragend)="onDragEnd()"></div>
+            <h3>{{ name }}</h3>
+        </div>
+    </div>
+
+</div>

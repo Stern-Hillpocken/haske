@@ -14,6 +14,7 @@ import { FoodNames } from '../types/food-names.type';
 import { MonsterPartNames } from '../types/monster-part-names.type';
 import { GoalTriggerNames } from '../types/goal-trigger-names.type';
 import { UtilsService } from './utils.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,7 @@ export class GameStateService {
   windowsWhichCanPause: WindowNames[] = ["exploration", "scrub", "quarry"];
   workerNames: DraggableNames[] = ["worker", "miner"];
 
-  constructor(private popupService: PopupService, private recipesServices: RecipesService, private goalService: GoalService, private utils: UtilsService) { }
+  constructor(private router: Router, private popupService: PopupService, private recipesServices: RecipesService, private goalService: GoalService, private utils: UtilsService) { }
 
   _getGameState$(): Observable<GameState> {
     return this._gameState$.asObservable();
@@ -519,6 +520,7 @@ export class GameStateService {
   lunchTime(): void {
     this._gameState$.value.food -= this._gameState$.value.people;
     this._gameState$.next(this._gameState$.value);
+    if (this._gameState$.value.food < 0 && !this._gameState$.value.isTuto) this.router.navigateByUrl("/end");
   }
 
   countPeople(): void {
@@ -535,6 +537,7 @@ export class GameStateService {
   flameLost(): void {
     this._gameState$.value.flame --;
     this._gameState$.next(this._gameState$.value);
+    if (this._gameState$.value.flame <= 0 || this._gameState$.value.flame >= 100) this.router.navigateByUrl("/end");
   }
 
   random(min: number, max: number): number {
