@@ -425,6 +425,8 @@ export class GameStateService {
             if (item === "pickaxe") {
               window.content.push("miner");
               this.goalService.launchTrigger("equip-miner");
+            } else if (item === "weapon-stick") {
+              window.content.push("fighter");
             }
           } else if (window instanceof GameWindowFurnace) {
             if (window.content[0] === "wood" && this.indexOfFirstOpenedStorage("charcoal") !== -1) {

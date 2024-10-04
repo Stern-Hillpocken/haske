@@ -151,6 +151,7 @@ export class GameWindowComponent {
       case "note-exploration-x-time": return "Chaque lieu exploré peut l’être un certain nombre de fois, rappelé à droite par le x1, x2, x3, etc...";
       // Items
       case "pickaxe": return "Un outil qui peut être équipé à un aikaci dans un Vestiaire, permettant d’exploiter les mines.";
+      case "weapon-stick": return "Une arme de mêlée facilement utilisable à une ou deux mains.";
     }
   }
 
