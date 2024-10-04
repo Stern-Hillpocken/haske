@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowField, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
+import { GameWindow, GameWindowBattlefield, GameWindowDressing, GameWindowExploration, GameWindowField, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -236,8 +236,15 @@ export class GameStateService {
         if (this._gameState$.value.time.day === 2) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-newcomers");
   
       } else if (this._gameState$.value.time.tick === 85) {
-        // Attack of the monsters
-        if (this._gameState$.value.time.day === 5) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-fight");
+        // Add new monsters
+        this._gameState$.value.windows = this.addMonsters(this._gameState$.value.windows);
+        // Add new battle-field
+        if (this._gameState$.value.time.day === 5) {
+          this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-fight");
+          this._gameState$.value.windows.push(new GameWindowBattlefield());
+        }
+        if (this._gameState$.value.time.day === 6) this._gameState$.value.windows.push(new GameWindowBattlefield());
+        if (this._gameState$.value.time.day === 7) this._gameState$.value.windows.push(new GameWindowBattlefield());
   
       } else if (this._gameState$.value.time.tick > 100) {
         // Flame lost and new day
@@ -542,5 +549,14 @@ export class GameStateService {
 
   random(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  addMonsters(windows: GameWindow[]): GameWindow[] {
+    for (const w of windows) {
+      if (w.name === "battlefield") {
+        w.content.push("monster-worm");
+      }
+    }
+    return windows;
   }
 }

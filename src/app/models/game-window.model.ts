@@ -229,3 +229,15 @@ export class GameWindowField extends GameWindow {
         super(name, content, acceptance)
     }
 }
+
+export class GameWindowBattlefield extends GameWindow {
+    constructor(
+        public override name: WindowNames = "battlefield",
+        public override content: DraggableNames[] = [],
+        public override acceptance: DraggableNames[] = ["fighter"],
+        public override currentTime: number = 0,
+        public override maxTime: number = 30,
+    ) {
+        super(name, content, acceptance)
+    }
+}

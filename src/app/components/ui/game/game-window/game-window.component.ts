@@ -62,6 +62,7 @@ export class GameWindowComponent {
       case "furnace": return "Four";
       case "sawmill": return "Scierie";
       case "field": return "Champs";
+      case "battlefield": return "Champs de bataille";
     }
   }
 
@@ -112,6 +113,7 @@ export class GameWindowComponent {
       // Workers
       case "worker": return "Une main d’oeuvre pour faire ce que vous désirez.";
       case "miner": return "Un aikaci spécialisé pour aller dans la mine.";
+      case "fighter": return "Un combatant spécialisé dans les arts de la guerre pour défendre le lieu.";
       // Resources
       case "stone": return "De la pierre pour construire.";
       case "water": return "De l’eau pour survivre et allumer le phare.";
@@ -131,6 +133,8 @@ export class GameWindowComponent {
       case "millet": return "Du mil (ou millet), comme du blé mais pour les zones sèches. Sa farine peut être utilisée pour faire des galettes.";
       case "flour": return "Farine, utilisée pour faire des galettes, du pain.";
       case "dough": return "Une pâte prête à être cuite."
+      // Monster
+      case "monster-worm": return "NO";
       // Monster parts
       case "monster-eye": return "Un œil qui peut être utilisé pour ne plus voir les objectifs.";
       // Food
