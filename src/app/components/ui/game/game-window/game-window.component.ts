@@ -138,6 +138,8 @@ export class GameWindowComponent {
       case "dough": return "Une pâte prête à être cuite."
       // Monster
       case "monster-worm": return "NO";
+      case "monster-dogo": return "NO";
+      case "monster-spiter": return "NO";
       // Monster parts
       case "monster-eye": return "Un œil qui peut être utilisé pour ne plus voir les objectifs.";
       // Food

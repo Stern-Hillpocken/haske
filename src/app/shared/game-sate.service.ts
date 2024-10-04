@@ -237,7 +237,7 @@ export class GameStateService {
   
       } else if (this._gameState$.value.time.tick === 85) {
         // Add new monsters
-        this._gameState$.value.windows = this.addMonsters(this._gameState$.value.windows);
+        if (this._gameState$.value.time.day > 5) this._gameState$.value.windows = this.addMonsters(this._gameState$.value.windows, this._gameState$.value.time.day);
         // Add new battle-field
         if (this._gameState$.value.time.day === 5) {
           this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-fight");
@@ -560,10 +560,17 @@ export class GameStateService {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  addMonsters(windows: GameWindow[]): GameWindow[] {
+  addMonsters(windows: GameWindow[], day: number): GameWindow[] {
+    day -= 5;
     for (const w of windows) {
       if (w.name === "battlefield") {
         w.content.push("monster-worm");
+        for (let i = 0; i < day; i++) {
+          let rand: number = this.random(0, 100);
+          if (rand < 30) w.content.push("monster-worm");
+          else if (rand < 80) w.content.push("monster-dogo");
+          else w.content.push("monster-spiter");
+        }
       }
     }
     return windows;

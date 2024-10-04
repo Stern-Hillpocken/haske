@@ -1,1 +1,1 @@
-export type MonsterNames = "monster-worm";
+export type MonsterNames = "monster-worm" | "monster-dogo" | "monster-spiter";
