@@ -1,1 +1,1 @@
-export type ItemNames = "pickaxe" | "weapon-stick";
+export type ItemNames = "pickaxe" | "weapon-contact" | "weapon-distance" | "armor";

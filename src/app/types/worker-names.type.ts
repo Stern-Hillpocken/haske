@@ -1,1 +1,1 @@
-export type WorkerNames = "worker" | "miner" | "fighter";
+export type WorkerNames = "worker" | "miner" | "fighter" | "archer" | "fighter-reinforced" | "archer-reinforced";

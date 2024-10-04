@@ -24,7 +24,7 @@ export class GameStateService {
   private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(true, new GameDrag(), 0, 0, 0, new GameTime(), []));
 
   windowsWhichCanPause: WindowNames[] = ["exploration", "scrub", "quarry"];
-  workerNames: DraggableNames[] = ["worker", "miner"];
+  workerNames: DraggableNames[] = ["worker", "miner", "fighter", "archer", "fighter-reinforced", "archer-reinforced"];
 
   constructor(private router: Router, private popupService: PopupService, private recipesServices: RecipesService, private goalService: GoalService, private utils: UtilsService) { }
 
@@ -421,12 +421,19 @@ export class GameStateService {
           } else if (window instanceof GameWindowDressing) {
             let item: DraggableNames = window.content.filter((name) => !this.workerNames.includes(name))[0];
             window.content = window.content.filter((name) => this.workerNames.includes(name));
+            let worker: DraggableNames = window.content[0];
             window.content.shift();
             if (item === "pickaxe") {
               window.content.push("miner");
               this.goalService.launchTrigger("equip-miner");
-            } else if (item === "weapon-stick") {
+            } else if (item === "weapon-contact") {
               window.content.push("fighter");
+            } else if (item === "weapon-distance") {
+              window.content.push("archer");
+            } else if (item === "armor") {
+              if (worker === "fighter") window.content.push("fighter-reinforced");
+              else if (worker === "archer") window.content.push("archer-reinforced");
+              else window.content.push("armor", "worker");
             }
           } else if (window instanceof GameWindowFurnace) {
             if (window.content[0] === "wood" && this.indexOfFirstOpenedStorage("charcoal") !== -1) {

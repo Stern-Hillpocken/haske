@@ -112,8 +112,11 @@ export class GameWindowComponent {
       case "pawn": return "";
       // Workers
       case "worker": return "Une main d’oeuvre pour faire ce que vous désirez.";
-      case "miner": return "Un aikaci spécialisé pour aller dans la mine.";
-      case "fighter": return "Un combatant spécialisé dans les arts de la guerre pour défendre le lieu.";
+      case "miner": return "Un ou une aikaci spécialisée pour aller dans la mine.";
+      case "fighter": return "Un ou une combattante rôdée à la force de la mêlée, qui offrira sa vie pour défendre le lieu.";
+      case "fighter-reinforced": return "Une personne renforcée qui pourra supporter une attaque.";
+      case "archer": return "Un ou une combatante rôdée à la précision de distance, qui offrira sa vie pour défendre le lieu.";
+      case "archer-reinforced": return "Une personne renforcée qui pourra supporter une attaque.";
       // Resources
       case "stone": return "De la pierre pour construire.";
       case "water": return "De l’eau pour survivre et allumer le phare.";
@@ -151,7 +154,9 @@ export class GameWindowComponent {
       case "note-exploration-x-time": return "Chaque lieu exploré peut l’être un certain nombre de fois, rappelé à droite par le x1, x2, x3, etc...";
       // Items
       case "pickaxe": return "Un outil qui peut être équipé à un aikaci dans un Vestiaire, permettant d’exploiter les mines.";
-      case "weapon-stick": return "Une arme de mêlée facilement utilisable à une ou deux mains.";
+      case "weapon-contact": return "Une arme de mêlée facilement utilisable à une ou deux mains.";
+      case "weapon-distance": return "Une arme à distance pour que vos aikacis ne soient jamais blessés.";
+      case "armor": return "Une armure pour défendre un combatant ou combatante lors des confrontations sur le champs de bataille.";
     }
   }
 

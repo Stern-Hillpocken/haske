@@ -11,7 +11,9 @@ export class RecipesService {
 
   allReceipes: Recipe[] = [
     new Recipe(["pickaxe"], ["stone", "wood"], [1, 1], 12),
-    new Recipe(["weapon-stick"], ["stick", "iron"], [3, 1], 12),
+    new Recipe(["weapon-contact"], ["stick", "iron"], [4, 1], 12),
+    new Recipe(["weapon-distance"], ["stick", "iron", "fiber"], [3, 1, 1], 12),
+    new Recipe(["armor"], ["iron", "fiber"], [3, 2], 12),
 
     new Recipe(["plank", "plank"], ["wood"], [1], 8),
     new Recipe(["stick", "stick"], ["plank"], [1], 8),
