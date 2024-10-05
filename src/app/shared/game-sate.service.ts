@@ -306,6 +306,10 @@ export class GameStateService {
             else window.currentTime += 10;
           }
           window.content = window.content.filter((e) => e !== "water");
+
+        } else if (window instanceof GameWindowBattlefield) {
+          if (window.content.includes("monster-worm") || window.content.includes("monster-dogo") || window.content.includes("monster-spiter")) window.currentTime ++;
+
         } else if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(window.content)[0] !== "nothing")) {
           window.currentTime += window.content.filter((name) => this.workerNames.includes(name)).length;
         }
