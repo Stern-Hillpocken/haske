@@ -433,12 +433,15 @@ export class GameStateService {
               this.goalService.launchTrigger("equip-miner");
             } else if (item === "weapon-contact") {
               window.content.push("fighter");
+              this.goalService.launchTrigger("equip-soldier");
             } else if (item === "weapon-distance") {
               window.content.push("archer");
+              this.goalService.launchTrigger("equip-soldier");
             } else if (item === "armor") {
               if (worker === "fighter") window.content.push("fighter-reinforced");
               else if (worker === "archer") window.content.push("archer-reinforced");
               else window.content.push("armor", "worker");
+              this.goalService.launchTrigger("equip-reinforcement");
             }
 
           } else if (window instanceof GameWindowFurnace) {
