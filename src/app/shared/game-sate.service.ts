@@ -403,6 +403,7 @@ export class GameStateService {
             } else {
               window.currentTime = window.maxTime;
             }
+
           } else if (window instanceof GameWindowWorkbench) {
             let recipeName: DraggableNames[] | WindowNames = this.recipesServices.recipeDoable(window.content);
             this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push(...window.content.filter((name) => name === "worker"));
@@ -439,6 +440,7 @@ export class GameStateService {
               else if (worker === "archer") window.content.push("archer-reinforced");
               else window.content.push("armor", "worker");
             }
+
           } else if (window instanceof GameWindowFurnace) {
             if (window.content[0] === "wood" && this.indexOfFirstOpenedStorage("charcoal") !== -1) {
               window.content.shift();
@@ -474,10 +476,54 @@ export class GameStateService {
                 else window.content.push(stuffCuted[i]);
               }
             }
+
           } else if (window instanceof GameWindowField) {
             window.currentTime = 0;
             window.content = window.content.map((e) => e === "millet-seed" ? "millet" : e);
             this.goalService.launchTrigger("gather-millet");
+
+          } else if (window instanceof GameWindowBattlefield) {
+            // 1: Long distance attack
+            let longDistancePlayerStrength: number = window.content.filter((e) => e === "archer" || "archer-reinforced").length;
+            let longDistanceEnemyStrength: number = window.content.filter((e) => e === "monster-spiter").length;
+            //
+            while (longDistancePlayerStrength !== 0) {
+              if (window.content.includes("monster-spiter")) window.content.splice(window.content.indexOf("monster-spiter"), 1);
+              else if (window.content.includes("monster-worm")) window.content.splice(window.content.indexOf("monster-worm"), 1);
+              longDistancePlayerStrength --;
+            }
+            while (longDistanceEnemyStrength !== 0) {
+              if (window.content.includes("archer")) window.content.splice(window.content.indexOf("archer"), 1);
+              else if (window.content.includes("archer-reinforced")) window.content[window.content.indexOf("archer-reinforced")] = "archer";
+              else this._gameState$.value.flame --;
+              longDistanceEnemyStrength --;
+            }
+            // 2: Speed dogo attack
+            let firstStrikeEnemy: number = window.content.filter((e) => e === "monster-dogo").length;
+            while (firstStrikeEnemy !== 0) {
+              if (window.content.includes("fighter")) window.content.splice(window.content.indexOf("fighter"), 1);
+              else if (window.content.includes("fighter-reinforced")) window.content[window.content.indexOf("fighter-reinforced")] = "fighter";
+              else this._gameState$.value.flame --;
+              firstStrikeEnemy --;
+            }
+            // 3: Regular attack
+            let meleePlayerStrength: number = window.content.filter((e) => e === "fighter" || "fighter-reinforced").length * 2;
+            let meleeEnemyStrength: number = window.content.filter((e) => e === "monster-worm").length;
+            //
+            while (meleePlayerStrength !== 0) {
+              if (window.content.includes("monster-dogo")) window.content.splice(window.content.indexOf("monster-dogo"), 1);
+              else if (window.content.includes("monster-worm")) window.content.splice(window.content.indexOf("monster-worm"), 1);
+              meleePlayerStrength --;
+            }
+            while (meleeEnemyStrength !== 0) {
+              if (window.content.includes("fighter")) window.content.splice(window.content.indexOf("fighter"), 1);
+              else if (window.content.includes("fighter-reinforced")) window.content[window.content.indexOf("fighter-reinforced")] = "fighter";
+              else this._gameState$.value.flame --;
+              meleeEnemyStrength --;
+            }
+            // Check loss
+            if (this._gameState$.value.flame <= 0) this.router.navigateByUrl("/end");
+
           }
 
         }

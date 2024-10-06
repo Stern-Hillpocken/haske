@@ -154,6 +154,7 @@ export class GameWindowComponent {
       case "note-event-fight": return "Durant la nuit les halittus attaqueront de différents côtés, en fonction de la puissance de la puissance de ton phare. Prépare de défenses et dispose des guerriers.";
       case "note-event-newcomers": return "En fonction de la puissance de feu de ton phare, des gens viendront te rejoindre. Mais cela impact aussi le nombre de personnes à nourrir.";
       case "note-exploration-x-time": return "Chaque lieu exploré peut l’être un certain nombre de fois, rappelé à droite par le x1, x2, x3, etc...";
+      case "note-fight": return "Le combat se déroule de manière complexe mais précise. Les attaques à distances de deux camps (allié et ennemi) se déroulent. Le camp allié va attaquer en premier les monstres attaquant à distance, puis ceux au corps-à-corps (mais pas ceux qui sont trop rapide). Le camp ennemi ennemi va attaquer les aikacis attaquant à distance puis la flamme si il n’y a plus personne. Puis les ennemis qui sont rapides attaque les aikacis étant au corps-à-corps ou à défaut la flamme. Puis enfin les corps-à-corps s’attaquent mutuellement.";
       // Items
       case "pickaxe": return "Un outil qui peut être équipé à un aikaci dans un Vestiaire, permettant d’exploiter les mines.";
       case "weapon-contact": return "Une arme de mêlée facilement utilisable à une ou deux mains.";
