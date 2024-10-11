@@ -145,6 +145,8 @@ export class GameWindowComponent {
       // Food
       case "bread": return "Du pain à donner à manger à un aikaci.";
       case "meat": return "De la viande consommable ou à utiliser en recette.";
+      // Misc
+      case "unequip-tool": return "Un objet pour permettre de d’enlever l’équipement de tes aikacis dans le Vestiaire.";
       // Notes
       case "note-help-and-trash": return "Ici c’est l’endroit pour avoir des informations sur les différents élèments. Pour l’instant un élement de type \"note\" (représenté par l’enveloppe) est dans l’emplacement mais tu peux l’enlever pour libérer la place pour un autre élèment. Tu peux par exemple détruire cette note en la plaçant dans le Rebut. Chaque note est différente, examine les toutes !";
       case "note-time-strip": return "En haut se trouve la frise du temps avec différents évènements qui y sont associés, et le temps qui passe.";
@@ -188,7 +190,7 @@ export class GameWindowComponent {
   }
 
   contentLengthWithoutWorker(): number {
-    return this.windowInfo.content.filter((name) => name !== "worker").length
+    return this.windowInfo.content.filter((name) => !["worker", "miner", "fighter", "figther-reinforced", "archer", "archer-reinforced"].includes(name)).length;
   }
 
   classOfTitle(): string {
@@ -215,6 +217,25 @@ export class GameWindowComponent {
       case "field": style = "food"; break;
     }
     return style;
+  }
+
+  displayProgressBar(): boolean {
+    return this.windowInfo.currentTime !== undefined
+      && this.windowInfo.maxTime !== undefined
+      && (this.windowInfo.content.includes('worker')
+        || this.windowInfo.content.includes('miner')
+        || this.windowInfo.content.includes('fighter')
+        || this.windowInfo.content.includes('fighter-reinforced')
+        || this.windowInfo.content.includes('archer')
+        || this.windowInfo.content.includes('archer-reinforced')
+        || (this.windowInfo.name === 'furnace' && this.windowInfo.currentTime > 0)
+        || (this.windowInfo.name === 'field' && this.windowInfo.currentTime > 0)
+      );
+  }
+
+  progressBarWidth(): number {
+    if (!this.windowInfo.currentTime || !this.windowInfo.maxTime) return 0;
+    return this.windowInfo.currentTime*100/this.windowInfo.maxTime;
   }
 
 }

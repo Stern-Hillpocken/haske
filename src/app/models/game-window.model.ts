@@ -27,7 +27,7 @@ export class GameWindowStorage extends GameWindow {
     constructor(
         public override name: WindowNames = "storage",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["stone", "water", "charcoal", "wood", "plank", "stick", "fiber", "fabric", "iron-ore", "iron", "pickaxe", "weapon-contact", "weapon-distance", "armor", "lizard", "hare", "skin", "millet-seed", "millet", "flour", "dough", "bread", "raw-meat", "meat", "monster-eye", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip", "note-exploration-x-time"],
+        public override acceptance: DraggableNames[] = ["stone", "water", "charcoal", "wood", "plank", "stick", "fiber", "fabric", "iron-ore", "iron", "pickaxe", "weapon-contact", "weapon-distance", "armor", "lizard", "hare", "skin", "millet-seed", "millet", "flour", "dough", "bread", "raw-meat", "meat", "monster-eye", "unequip-tool", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip", "note-exploration-x-time"],
         public override maxSpace: number = 14,
         public override slot: DraggableNames[] = []
     ) {
@@ -62,7 +62,7 @@ export class GameWindowLighthouse extends GameWindow {
     constructor(
         public override name: WindowNames = "lighthouse",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["worker", "miner", "fighter", "archer", "fighter-reinforced", "archer-reinforced", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip", "note-fight"]
+        public override acceptance: DraggableNames[] = ["worker", "miner", "fighter", "archer", "fighter-reinforced", "archer-reinforced", "unequip-tool", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip", "note-fight"]
     ) {
         super(name, content, acceptance)
     }
@@ -135,7 +135,7 @@ export class GameWindowHelp extends GameWindow {
     constructor(
         public override name: WindowNames = "help",
         public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["worker", "miner", "fighter", "archer", "fighter-reinforced", "archer-reinforced", "stone", "water", "charcoal", "wood", "plank", "stick", "fiber", "fabric", "iron-ore", "iron", "millet-seed", "millet", "flour", "dough", "bread", "lizard", "hare", "skin", "raw-meat", "meat", "pickaxe", "weapon-contact", "weapon-distance", "armor", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip", "note-exploration-x-time"],
+        public override acceptance: DraggableNames[] = ["worker", "miner", "fighter", "archer", "fighter-reinforced", "archer-reinforced", "stone", "water", "charcoal", "wood", "plank", "stick", "fiber", "fabric", "iron-ore", "iron", "millet-seed", "millet", "flour", "dough", "bread", "lizard", "hare", "skin", "raw-meat", "meat", "pickaxe", "weapon-contact", "weapon-distance", "armor", "unequip-tool", "note-help-and-trash", "note-event-event", "note-event-newcomers", "note-event-fight", "note-event-end-day", "note-storage-filter", "note-time-strip", "note-exploration-x-time"],
         public override slot: DraggableNames[] = ["note-help-and-trash"]
     ) {
         super(name, content, acceptance)
@@ -180,8 +180,8 @@ export class GameWindowWorkbench extends GameWindow {
 export class GameWindowDressing extends GameWindow {
     constructor(
         public override name: WindowNames = "dressing",
-        public override content: DraggableNames[] = [],
-        public override acceptance: DraggableNames[] = ["worker", "pickaxe", "miner", "weapon-contact", "fighter", "weapon-distance", "archer", "armor"],
+        public override content: DraggableNames[] = ["unequip-tool"],
+        public override acceptance: DraggableNames[] = ["unequip-tool", "worker", "pickaxe", "miner", "weapon-contact", "fighter", "weapon-distance", "archer", "armor", "archer-reinforced", "fighter-reinforced"],
         public override currentTime: number = 0,
         public override maxTime: number = 6,
         public override maxSpace: number = 1

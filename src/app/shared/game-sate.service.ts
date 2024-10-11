@@ -73,7 +73,7 @@ export class GameStateService {
       let windowEnd = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
       let dragName = this._gameState$.value.drag.draggableName;
 
-      if (windowEnd.maxSpace !== undefined && windowEnd.content.filter((name) => !this.workerNames.includes(name)).length >= windowEnd.maxSpace && this.workerNames.includes(dragName)) {
+      if (windowEnd.maxSpace !== undefined && windowEnd.content.filter((name) => !this.workerNames.includes(name)).length >= windowEnd.maxSpace && !this.workerNames.includes(dragName)) {
         this.popupService.pushValue("error", "Plus de place");
       } else if (windowStart instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowStart.content)[0] !== "nothing" && windowStart.currentTime !== 0) {
         this.popupService.pushValue("error", "La recette doit être menée à son terme");
@@ -200,6 +200,9 @@ export class GameStateService {
           case 15:
             this._gameState$.value.windows.push(new GameWindowLighthouse());
             this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content = ["worker", "worker", "worker", "water", "water"];
+            // TODO remove:
+            this._gameState$.value.windows.push(new GameWindowDressing());
+            this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push(...["archer" as DraggableNames, "fighter" as DraggableNames, "archer-reinforced" as DraggableNames, "fighter-reinforced" as DraggableNames])
             break;
           case 17:
             this._gameState$.value.windows.push(new GameWindowExploration()); break;
@@ -268,7 +271,7 @@ export class GameStateService {
 
         // Add time
         if (window instanceof GameWindowDressing) {
-          if (window.content.filter((name) => !this.workerNames.includes(name)).length > 0 && window.content.filter((name) => this.workerNames.includes(name)).length > 0) {
+          if (window.content.filter((name) => !this.workerNames.includes(name)).length > 0 && window.content.filter((name) => this.workerNames.includes(name)).length > 0 && !(window.content.includes("unequip-tool") && window.content.filter((name) => "worker".includes(name)).length === 1)) {
             window.currentTime ++;
           }
 
@@ -428,7 +431,17 @@ export class GameStateService {
             window.content = window.content.filter((name) => this.workerNames.includes(name));
             let worker: DraggableNames = window.content[0];
             window.content.shift();
-            if (item === "pickaxe") {
+            if (item === "unequip-tool") {
+              window.content.push("unequip-tool");
+              window.content.push("worker");
+              switch (worker) {
+                case "miner": window.content.push("pickaxe"); break;
+                case "fighter": window.content.push("weapon-contact"); break;
+                case "archer": window.content.push("weapon-distance"); break;
+                case "fighter-reinforced": window.content.push("weapon-contact"); window.content.push("armor"); break;
+                case "archer-reinforced": window.content.push("weapon-distance"); window.content.push("armor"); break;
+              }
+            } else if (item === "pickaxe") {
               window.content.push("miner");
               this.goalService.launchTrigger("equip-miner");
             } else if (item === "weapon-contact") {
