@@ -10,7 +10,7 @@ import { WindowNames } from '../types/window-names.type';
 export class RecipesService {
 
   allReceipes: Recipe[] = [
-    new Recipe(["pickaxe"], ["stone", "wood"], [1, 1], 12),
+    new Recipe(["pickaxe"], ["stone", "stick"], [1, 2], 12),
     new Recipe(["weapon-contact"], ["stick", "iron"], [4, 1], 12),
     new Recipe(["weapon-distance"], ["stick", "iron", "fiber"], [3, 1, 1], 12),
     new Recipe(["armor"], ["iron", "fiber"], [3, 2], 12),

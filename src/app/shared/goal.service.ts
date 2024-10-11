@@ -72,12 +72,12 @@ export class GoalService {
       if (trigger === "make-flour") this.isCurrentSubStepsValidated[4] = true;
       if (trigger === "make-dough") this.isCurrentSubStepsValidated[5] = true;
       if (trigger === "melt-bread") this.isCurrentSubStepsValidated[6] = true;
-    } else if (this.currentStep === 5) {
+    } else if (this.currentStep === 6) {
       // 6 - Equip a aikaci to have soldier
       if (trigger === "make-weapon-contact" || "make-weapon-distance") this.isCurrentSubStepsValidated[1] = true;
       if (trigger === "equip-soldier") this.isCurrentSubStepsValidated[2] = true;
       if (trigger === "equip-reinforcement") this.isCurrentSubStepsValidated[3] = true;
-    } else if (this.currentStep === 6) {
+    } else if (this.currentStep === 7) {
       // 7 - Perform your first sacrifice
     } else {
       // Light the lighthouse with 100 fire
