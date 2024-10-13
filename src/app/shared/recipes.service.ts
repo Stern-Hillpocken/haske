@@ -35,7 +35,8 @@ export class RecipesService {
     new Recipe("dressing", ["fabric", "wood", "plank"], [1, 2, 2], 12),
     new Recipe("furnace", ["stone"], [8], 16),
     new Recipe("sawmill", ["iron", "wood", "plank"], [3, 2, 3], 16),
-    new Recipe("field", ["wood", "fiber"], [4, 2], 10)
+    new Recipe("field", ["wood", "fiber"], [4, 2], 10),
+    new Recipe("siper", ["fiber", "iron"], [4, 2], 16)
   ];
 
   constructor() { }

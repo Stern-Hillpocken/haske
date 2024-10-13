@@ -63,6 +63,7 @@ export class GameWindowComponent {
       case "sawmill": return "Scierie";
       case "field": return "Champs";
       case "battlefield": return "Champs de bataille";
+      case "siper": return "Siropteur";
     }
   }
 
@@ -110,6 +111,7 @@ export class GameWindowComponent {
     switch (this.windowInfo.slot[0]) {
       case "nothing": return "";
       case "pawn": return "";
+      case "mana": return "La mana, une substance vitale utilisée pour augmenter l’éclat du Phare.";
       // Workers
       case "worker": return "Une main d’oeuvre pour faire ce que vous désirez.";
       case "miner": return "Un ou une aikaci spécialisée pour aller dans la mine.";
@@ -231,7 +233,8 @@ export class GameWindowComponent {
         || this.windowInfo.content.includes('archer-reinforced')
         || (this.windowInfo.name === 'furnace' && this.windowInfo.currentTime > 0)
         || (this.windowInfo.name === 'field' && this.windowInfo.currentTime > 0)
-        || (this.windowInfo.name === 'battlefield' && this.windowInfo.content.length !== 0)
+        || (this.windowInfo.name === 'battlefield' && this.windowInfo.content.length > 0)
+        || (this.windowInfo.name === 'siper' && this.windowInfo.content.length > 0)
       );
   }
 

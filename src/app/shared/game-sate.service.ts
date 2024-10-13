@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowBattlefield, GameWindowDressing, GameWindowExploration, GameWindowField, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
+import { GameWindow, GameWindowBattlefield, GameWindowDressing, GameWindowExploration, GameWindowField, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowSiper, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -82,9 +82,14 @@ export class GameStateService {
       } else if (windowEnd instanceof GameWindowField && windowEnd.currentTime > 0 && dragName !== "water") {
         this.popupService.pushValue("error", "Champs déjà utilisé");
       } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
-        windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
-        windowEnd.content.push(dragName);
-        if (windowEnd !instanceof GameWindowFurnace && windowEnd !instanceof GameWindowSawmill) windowEnd.content.sort();
+        if (dragName === "mana" && windowEnd instanceof GameWindowLighthouse) {
+          this._gameState$.value.flame ++;
+          if (this._gameState$.value.isTuto) this.goalService.launchTrigger("end-tuto");
+        } else {
+          windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
+          windowEnd.content.push(dragName);
+          if (windowEnd !instanceof GameWindowFurnace && windowEnd !instanceof GameWindowSawmill) windowEnd.content.sort();
+        }
       } else {
         this.popupService.pushValue("error", "Drop impossible");
       }
@@ -105,12 +110,19 @@ export class GameStateService {
     }
     //
     if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName) && !windowEnd.slot?.includes(dragName)) {
-      windowEnd.slot?.push(dragName);
-      windowEnd.slot?.sort();
       windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
+      if (windowEnd instanceof GameWindowSiper && dragName === "mana") {
+        windowEnd.power ++;
+        if (windowEnd.power >= 1) windowEnd.slot = ["water"];
+      } else {
+        windowEnd.slot?.push(dragName);
+        windowEnd.slot?.sort();
+      }
     } else {
       this.popupService.pushValue("error", "Drop impossible de slot en slot");
     }
+    //
+    if (windowStart instanceof GameWindowSiper && windowStart.power < 1) windowStart.slot = [];
     //
     this._gameState$.value.drag = new GameDrag();
     this._gameState$.next(this._gameState$.value);
@@ -127,9 +139,14 @@ export class GameStateService {
     }
     //
     if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName) && !windowEnd.slot?.includes(dragName) && (windowStart.currentTime === undefined || windowStart.currentTime === 0)) {
-      windowEnd.slot?.push(dragName);
-      windowEnd.slot?.sort();
       windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
+      if (windowEnd instanceof GameWindowSiper) {
+        windowEnd.power ++;
+        if (windowEnd.power >= 1) windowEnd.slot = ["water"];
+      } else {
+        windowEnd.slot?.push(dragName);
+        windowEnd.slot?.sort();
+      }
     } else if (!this.windowsWhichCanPause.includes(windowStart.name) && windowStart.currentTime && windowStart.currentTime > 0) {
       this.popupService.pushValue("error", "Pas possible de sortir alors que l’action est en cours");
     } else {
@@ -160,6 +177,8 @@ export class GameStateService {
     } else {
       this.popupService.pushValue("error", "Drop impossible depuis le slot");
     }
+    //
+    if (windowStart instanceof GameWindowSiper && windowStart.power < 1) windowStart.slot = [];
     //
     this._gameState$.value.drag = new GameDrag();
     this._gameState$.next(this._gameState$.value);
@@ -317,6 +336,8 @@ export class GameStateService {
         } else if (window instanceof GameWindowBattlefield) {
           if (window.content.includes("monster-worm") || window.content.includes("monster-dogo") || window.content.includes("monster-spiter")) window.currentTime ++;
 
+        } else if (window instanceof GameWindowSiper) {
+          if (window.content.length > 0) window.currentTime ++;
         } else if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(window.content)[0] !== "nothing")) {
           window.currentTime += window.content.filter((name) => this.workerNames.includes(name)).length;
         }
@@ -423,10 +444,8 @@ export class GameStateService {
               else if (recipeName === "dressing") this._gameState$.value.windows.push(new GameWindowDressing());
               else if (recipeName === "furnace") this._gameState$.value.windows.push(new GameWindowFurnace());
               else if (recipeName === "sawmill") this._gameState$.value.windows.push(new GameWindowSawmill());
-              else if (recipeName === "field") {
-                this._gameState$.value.windows.push(new GameWindowField());
-                this.goalService.launchTrigger("build-field");
-              }
+              else if (recipeName === "field") this._gameState$.value.windows.push(new GameWindowField());
+              else if (recipeName === "siper") this._gameState$.value.windows.push(new GameWindowSiper());
               this.goalService.launchTrigger("build-"+recipeName as GoalTriggerNames);
             }
 
@@ -543,6 +562,25 @@ export class GameStateService {
             }
             // Check loss
             if (this._gameState$.value.flame <= 0) this.router.navigateByUrl("/end");
+
+          } else if (window instanceof GameWindowSiper) {
+            // Add water
+            if (window.content[0] === "worker") {
+              this.goalService.launchTrigger("use-siper-dirty");
+              window.content.push("mana");
+              window.power += 3;
+            } else {
+              this.goalService.launchTrigger("use-siper-clean");
+              switch (window.content[0]) {
+                case "hare": window.power += 1; break;
+                case "lizard": window.power += 0.75; break;
+                case "fiber": window.power += 0.5; break;
+                case "wood": window.power += 0.5; break;
+              }
+            }
+            if (window.power >= 1) window.slot = ["water"]; 
+            // Remove element
+            window.content.shift();
 
           }
 
