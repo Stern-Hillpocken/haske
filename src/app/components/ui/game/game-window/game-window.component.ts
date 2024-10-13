@@ -62,6 +62,7 @@ export class GameWindowComponent {
       case "furnace": return "Four";
       case "sawmill": return "Scierie";
       case "field": return "Champs";
+      case "battlefield": return "Champs de bataille";
     }
   }
 
@@ -111,7 +112,11 @@ export class GameWindowComponent {
       case "pawn": return "";
       // Workers
       case "worker": return "Une main d’oeuvre pour faire ce que vous désirez.";
-      case "miner": return "Un aikaci spécialisé pour aller dans la mine.";
+      case "miner": return "Un ou une aikaci spécialisée pour aller dans la mine.";
+      case "fighter": return "Un ou une combattante rôdée à la force de la mêlée, qui offrira sa vie pour défendre le lieu.";
+      case "fighter-reinforced": return "Une personne renforcée qui pourra supporter une attaque.";
+      case "archer": return "Un ou une combatante rôdée à la précision de distance, qui offrira sa vie pour défendre le lieu.";
+      case "archer-reinforced": return "Une personne renforcée qui pourra supporter une attaque.";
       // Resources
       case "stone": return "De la pierre pour construire.";
       case "water": return "De l’eau pour survivre et allumer le phare.";
@@ -131,11 +136,17 @@ export class GameWindowComponent {
       case "millet": return "Du mil (ou millet), comme du blé mais pour les zones sèches. Sa farine peut être utilisée pour faire des galettes.";
       case "flour": return "Farine, utilisée pour faire des galettes, du pain.";
       case "dough": return "Une pâte prête à être cuite."
+      // Monster
+      case "monster-worm": return "NO";
+      case "monster-dogo": return "NO";
+      case "monster-spiter": return "NO";
       // Monster parts
       case "monster-eye": return "Un œil qui peut être utilisé pour ne plus voir les objectifs.";
       // Food
       case "bread": return "Du pain à donner à manger à un aikaci.";
       case "meat": return "De la viande consommable ou à utiliser en recette.";
+      // Misc
+      case "unequip-tool": return "Un objet pour permettre de d’enlever l’équipement de tes aikacis dans le Vestiaire.";
       // Notes
       case "note-help-and-trash": return "Ici c’est l’endroit pour avoir des informations sur les différents élèments. Pour l’instant un élement de type \"note\" (représenté par l’enveloppe) est dans l’emplacement mais tu peux l’enlever pour libérer la place pour un autre élèment. Tu peux par exemple détruire cette note en la plaçant dans le Rebut. Chaque note est différente, examine les toutes !";
       case "note-time-strip": return "En haut se trouve la frise du temps avec différents évènements qui y sont associés, et le temps qui passe.";
@@ -145,8 +156,12 @@ export class GameWindowComponent {
       case "note-event-fight": return "Durant la nuit les halittus attaqueront de différents côtés, en fonction de la puissance de la puissance de ton phare. Prépare de défenses et dispose des guerriers.";
       case "note-event-newcomers": return "En fonction de la puissance de feu de ton phare, des gens viendront te rejoindre. Mais cela impact aussi le nombre de personnes à nourrir.";
       case "note-exploration-x-time": return "Chaque lieu exploré peut l’être un certain nombre de fois, rappelé à droite par le x1, x2, x3, etc...";
+      case "note-fight": return "Le combat se déroule de manière complexe mais précise. Les attaques à distances de deux camps (allié et ennemi) se déroulent. Le camp allié va attaquer en premier les monstres attaquant à distance, puis ceux au corps-à-corps (mais pas ceux qui sont trop rapide). Le camp ennemi ennemi va attaquer les aikacis attaquant à distance puis la flamme si il n’y a plus personne. Puis les ennemis qui sont rapides attaque les aikacis étant au corps-à-corps ou à défaut la flamme. Puis enfin les corps-à-corps s’attaquent mutuellement.";
       // Items
       case "pickaxe": return "Un outil qui peut être équipé à un aikaci dans un Vestiaire, permettant d’exploiter les mines.";
+      case "weapon-contact": return "Une arme de mêlée facilement utilisable à une ou deux mains.";
+      case "weapon-distance": return "Une arme à distance pour que vos aikacis ne soient jamais blessés.";
+      case "armor": return "Une armure pour défendre un combatant ou combatante lors des confrontations sur le champs de bataille.";
     }
   }
 
@@ -175,11 +190,11 @@ export class GameWindowComponent {
   }
 
   contentLengthWithoutWorker(): number {
-    return this.windowInfo.content.filter((name) => name !== "worker").length
+    return this.windowInfo.content.filter((name) => !["worker", "miner", "fighter", "figther-reinforced", "archer", "archer-reinforced"].includes(name)).length;
   }
 
   classOfTitle(): string {
-    let style!: "basic" | "exploration" | "food" | "storage" | "workstation" | "warning";
+    let style!: "basic" | "exploration" | "food" | "storage" | "workstation" | "warning" | "battle";
     switch (this.windowInfo.name) {
       case "dressing": style = "workstation"; break;
       case "exploration": style = "exploration"; break;
@@ -200,8 +215,29 @@ export class GameWindowComponent {
       case "furnace": style = "workstation"; break;
       case "sawmill": style = "workstation"; break;
       case "field": style = "food"; break;
+      case "battlefield": style = "battle"; break;
     }
     return style;
+  }
+
+  displayProgressBar(): boolean {
+    return this.windowInfo.currentTime !== undefined
+      && this.windowInfo.maxTime !== undefined
+      && (this.windowInfo.content.includes('worker')
+        || this.windowInfo.content.includes('miner')
+        || this.windowInfo.content.includes('fighter')
+        || this.windowInfo.content.includes('fighter-reinforced')
+        || this.windowInfo.content.includes('archer')
+        || this.windowInfo.content.includes('archer-reinforced')
+        || (this.windowInfo.name === 'furnace' && this.windowInfo.currentTime > 0)
+        || (this.windowInfo.name === 'field' && this.windowInfo.currentTime > 0)
+        || (this.windowInfo.name === 'battlefield' && this.windowInfo.content.length !== 0)
+      );
+  }
+
+  progressBarWidth(): number {
+    if (!this.windowInfo.currentTime || !this.windowInfo.maxTime) return 0;
+    return this.windowInfo.currentTime*100/this.windowInfo.maxTime;
   }
 
 }

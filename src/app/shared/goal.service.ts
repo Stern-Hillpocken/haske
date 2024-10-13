@@ -13,10 +13,11 @@ export class GoalService {
   allSubSteps: string[][] = [
     ["Découverte du monde et de ses ressources", "Envoyer un aikaci en exploration", "Récupérer de la pierre dans une Carrière", "Récupérer du bois dans les Broussailles", "Trouver de la fibre dans les Broussailles"],
     ["Un endroit pour se vêtir", "Tisser un tissu à partir de fibres dans l’Atelier", "Dégrossir du bois en planche dans l’Atelier", "Construire un Vestiaire"],
-    ["Retour au début de l’âge de fer", "Fabriquer une pioche dans l’Atelier", "Équiper un aikaci avec la pioche dans le Vestiaire", "Miner du minerai de fer dans une Mine"],
+    ["Retour au début de l’âge de fer", "Fabriquer une pioche dans l’Atelier", "Équiper un ou une aikaci avec la pioche dans le Vestiaire", "Miner du minerai de fer dans une Mine"],
     ["Si il ne faisait pas assez chaud", "Construire un Four", "Y mettre du combustible (en haut) et du bois (dedans) pour obtenir du charbon", "Faire fondre un minerai de fer"],
     ["Du bois de qualité", "Construire une Scierie", "Construire un Stockage"],
     ["Tournée pour tout le monde", "Trouver une graine dans les Broussailles ou Ruines", "Construire un Champs", "Mettre une ou mieux : plus de 3 graines puis de l’eau dans le Champs", "Avoir de la farine", "Avoir de la pâte", "Cuire du pain"],
+    ["Se défendre", "Fabriquer un arme de corps-à-corps ou de distance", "Équiper un ou une aikaci", "Renforcer la personne pour qu’elle puisse encaisser une blessure de plus"],
     
     ["Allumer le Phare !", "Avoir 100 de luminosité dans le Phare"]
   ]
@@ -71,9 +72,12 @@ export class GoalService {
       if (trigger === "make-flour") this.isCurrentSubStepsValidated[4] = true;
       if (trigger === "make-dough") this.isCurrentSubStepsValidated[5] = true;
       if (trigger === "melt-bread") this.isCurrentSubStepsValidated[6] = true;
-    } else if (this.currentStep === 5) {
-      // 6 - Equip a aikaci to have soldier
     } else if (this.currentStep === 6) {
+      // 6 - Equip a aikaci to have soldier
+      if (trigger === "make-weapon-contact" || "make-weapon-distance") this.isCurrentSubStepsValidated[1] = true;
+      if (trigger === "equip-soldier") this.isCurrentSubStepsValidated[2] = true;
+      if (trigger === "equip-reinforcement") this.isCurrentSubStepsValidated[3] = true;
+    } else if (this.currentStep === 7) {
       // 7 - Perform your first sacrifice
     } else {
       // Light the lighthouse with 100 fire

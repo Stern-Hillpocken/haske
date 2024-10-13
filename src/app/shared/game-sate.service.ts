@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowDressing, GameWindowExploration, GameWindowField, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
+import { GameWindow, GameWindowBattlefield, GameWindowDressing, GameWindowExploration, GameWindowField, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -24,7 +24,7 @@ export class GameStateService {
   private readonly _gameState$: BehaviorSubject<GameState> = new BehaviorSubject(new GameState(true, new GameDrag(), 0, 0, 0, new GameTime(), []));
 
   windowsWhichCanPause: WindowNames[] = ["exploration", "scrub", "quarry"];
-  workerNames: DraggableNames[] = ["worker", "miner"];
+  workerNames: DraggableNames[] = ["worker", "miner", "fighter", "archer", "fighter-reinforced", "archer-reinforced"];
 
   constructor(private router: Router, private popupService: PopupService, private recipesServices: RecipesService, private goalService: GoalService, private utils: UtilsService) { }
 
@@ -73,7 +73,7 @@ export class GameStateService {
       let windowEnd = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
       let dragName = this._gameState$.value.drag.draggableName;
 
-      if (windowEnd.maxSpace !== undefined && windowEnd.content.filter((name) => name !== "worker").length >= windowEnd.maxSpace && dragName !== "worker") {
+      if (windowEnd.maxSpace !== undefined && windowEnd.content.filter((name) => !this.workerNames.includes(name)).length >= windowEnd.maxSpace && !this.workerNames.includes(dragName)) {
         this.popupService.pushValue("error", "Plus de place");
       } else if (windowStart instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowStart.content)[0] !== "nothing" && windowStart.currentTime !== 0) {
         this.popupService.pushValue("error", "La recette doit être menée à son terme");
@@ -84,7 +84,7 @@ export class GameStateService {
       } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
         windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
         windowEnd.content.push(dragName);
-        windowEnd.content.sort();
+        if (windowEnd !instanceof GameWindowFurnace && windowEnd !instanceof GameWindowSawmill) windowEnd.content.sort();
       } else {
         this.popupService.pushValue("error", "Drop impossible");
       }
@@ -156,7 +156,7 @@ export class GameStateService {
     } else if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
       windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
       windowEnd.content.push(dragName);
-      windowEnd.content.sort();
+      if (windowEnd !instanceof GameWindowFurnace && windowEnd !instanceof GameWindowSawmill) windowEnd.content.sort();
     } else {
       this.popupService.pushValue("error", "Drop impossible depuis le slot");
     }
@@ -176,12 +176,14 @@ export class GameStateService {
   }
 
   timeAdvance(): void {
+    if (this._gameState$.value.time.day === 1 && this._gameState$.value.time.tick === 15) this._gameState$.next(this.testChangeSetup(this._gameState$.value));
     this._gameState$.value.time.tick ++;
     // Setup
     if (this._gameState$.value.time.day === 1) {
       if (!this._gameState$.value.isTuto) {
         if (this._gameState$.value.time.tick === 11) {
           this._gameState$.value.windows.push(
+            new GameWindowPantry(),
             new GameWindowHelp(),
             new GameWindowTrash(),
             new GameWindowRecipesBook(),
@@ -217,6 +219,10 @@ export class GameStateService {
             this._gameState$.value.windows.push(new GameWindowTrash()); break;
           case 58:
             this._gameState$.value.windows.push(new GameWindowRecipesBook()); break;
+          case 85:
+            this._gameState$.value.windows.push(new GameWindowPantry());
+            this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-end-day");
+            break;
         }
       }
     }
@@ -236,17 +242,20 @@ export class GameStateService {
         if (this._gameState$.value.time.day === 2) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-newcomers");
   
       } else if (this._gameState$.value.time.tick === 85) {
-        // Attack of the monsters
-        if (this._gameState$.value.time.day === 5) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-fight");
+        // Add new monsters
+        if (this._gameState$.value.time.day > 5) this._gameState$.value.windows = this.addMonsters(this._gameState$.value.windows, this._gameState$.value.time.day);
+        // Add new battle-field
+        if (this._gameState$.value.time.day === 5) {
+          this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-fight");
+          this._gameState$.value.windows.push(new GameWindowBattlefield());
+        }
+        if (this._gameState$.value.time.day === 6) this._gameState$.value.windows.push(new GameWindowBattlefield());
+        if (this._gameState$.value.time.day === 7) this._gameState$.value.windows.push(new GameWindowBattlefield());
   
       } else if (this._gameState$.value.time.tick > 100) {
         // Flame lost and new day
-        if (this._gameState$.value.time.day === 5) {
-          this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-end-day");
-          this._gameState$.value.windows.push(new GameWindowPantry());
-        }
         this.flameLost();
-        if (this._gameState$.value.time.day >= 5) this.lunchTime();
+        this.lunchTime();
         this._gameState$.value.time.tick = 0;
         this._gameState$.value.time.day ++;
       }
@@ -261,7 +270,7 @@ export class GameStateService {
 
         // Add time
         if (window instanceof GameWindowDressing) {
-          if (window.content.filter((name) => !this.workerNames.includes(name)).length > 0 && window.content.filter((name) => this.workerNames.includes(name)).length > 0) {
+          if (window.content.filter((name) => !this.workerNames.includes(name)).length > 0 && window.content.filter((name) => this.workerNames.includes(name)).length > 0 && !(window.content.includes("unequip-tool") && window.content.filter((name) => "worker".includes(name)).length === 1)) {
             window.currentTime ++;
           }
 
@@ -299,6 +308,10 @@ export class GameStateService {
             else window.currentTime += 10;
           }
           window.content = window.content.filter((e) => e !== "water");
+
+        } else if (window instanceof GameWindowBattlefield) {
+          if (window.content.includes("monster-worm") || window.content.includes("monster-dogo") || window.content.includes("monster-spiter")) window.currentTime ++;
+
         } else if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(window.content)[0] !== "nothing")) {
           window.currentTime += window.content.filter((name) => this.workerNames.includes(name)).length;
         }
@@ -392,6 +405,7 @@ export class GameStateService {
             } else {
               window.currentTime = window.maxTime;
             }
+
           } else if (window instanceof GameWindowWorkbench) {
             let recipeName: DraggableNames[] | WindowNames = this.recipesServices.recipeDoable(window.content);
             this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push(...window.content.filter((name) => name === "worker"));
@@ -414,11 +428,34 @@ export class GameStateService {
           } else if (window instanceof GameWindowDressing) {
             let item: DraggableNames = window.content.filter((name) => !this.workerNames.includes(name))[0];
             window.content = window.content.filter((name) => this.workerNames.includes(name));
+            let worker: DraggableNames = window.content[0];
             window.content.shift();
-            if (item === "pickaxe") {
+            if (item === "unequip-tool") {
+              window.content.push("unequip-tool");
+              window.content.push("worker");
+              switch (worker) {
+                case "miner": window.content.push("pickaxe"); break;
+                case "fighter": window.content.push("weapon-contact"); break;
+                case "archer": window.content.push("weapon-distance"); break;
+                case "fighter-reinforced": window.content.push("weapon-contact"); window.content.push("armor"); break;
+                case "archer-reinforced": window.content.push("weapon-distance"); window.content.push("armor"); break;
+              }
+            } else if (item === "pickaxe") {
               window.content.push("miner");
               this.goalService.launchTrigger("equip-miner");
+            } else if (item === "weapon-contact") {
+              window.content.push("fighter");
+              this.goalService.launchTrigger("equip-soldier");
+            } else if (item === "weapon-distance") {
+              window.content.push("archer");
+              this.goalService.launchTrigger("equip-soldier");
+            } else if (item === "armor") {
+              if (worker === "fighter") window.content.push("fighter-reinforced");
+              else if (worker === "archer") window.content.push("archer-reinforced");
+              else window.content.push("armor", "worker");
+              this.goalService.launchTrigger("equip-reinforcement");
             }
+
           } else if (window instanceof GameWindowFurnace) {
             if (window.content[0] === "wood" && this.indexOfFirstOpenedStorage("charcoal") !== -1) {
               window.content.shift();
@@ -454,10 +491,54 @@ export class GameStateService {
                 else window.content.push(stuffCuted[i]);
               }
             }
+
           } else if (window instanceof GameWindowField) {
             window.currentTime = 0;
             window.content = window.content.map((e) => e === "millet-seed" ? "millet" : e);
             this.goalService.launchTrigger("gather-millet");
+
+          } else if (window instanceof GameWindowBattlefield) {
+            // 1: Long distance attack
+            let longDistancePlayerStrength: number = window.content.filter((e) => e === "archer" || e === "archer-reinforced").length;
+            let longDistanceEnemyStrength: number = window.content.filter((e) => e === "monster-spiter").length;
+            //
+            while (longDistancePlayerStrength !== 0) {
+              if (window.content.includes("monster-spiter")) window.content.splice(window.content.indexOf("monster-spiter"), 1);
+              else if (window.content.includes("monster-worm")) window.content.splice(window.content.indexOf("monster-worm"), 1);
+              longDistancePlayerStrength --;
+            }
+            while (longDistanceEnemyStrength !== 0) {
+              if (window.content.includes("archer")) window.content.splice(window.content.indexOf("archer"), 1);
+              else if (window.content.includes("archer-reinforced")) window.content[window.content.indexOf("archer-reinforced")] = "archer";
+              else this._gameState$.value.flame --;
+              longDistanceEnemyStrength --;
+            }
+            // 2: Speed dogo attack
+            let firstStrikeEnemy: number = window.content.filter((e) => e === "monster-dogo").length;
+            while (firstStrikeEnemy !== 0) {
+              if (window.content.includes("fighter")) window.content.splice(window.content.indexOf("fighter"), 1);
+              else if (window.content.includes("fighter-reinforced")) window.content[window.content.indexOf("fighter-reinforced")] = "fighter";
+              else this._gameState$.value.flame --;
+              firstStrikeEnemy --;
+            }
+            // 3: Regular attack
+            let meleePlayerStrength: number = window.content.filter((e) => e === "fighter" || e === "fighter-reinforced").length * 2;
+            let meleeEnemyStrength: number = window.content.filter((e) => e === "monster-worm").length;
+            //
+            while (meleePlayerStrength !== 0) {
+              if (window.content.includes("monster-dogo")) window.content.splice(window.content.indexOf("monster-dogo"), 1);
+              else if (window.content.includes("monster-worm")) window.content.splice(window.content.indexOf("monster-worm"), 1);
+              meleePlayerStrength --;
+            }
+            while (meleeEnemyStrength !== 0) {
+              if (window.content.includes("fighter")) window.content.splice(window.content.indexOf("fighter"), 1);
+              else if (window.content.includes("fighter-reinforced")) window.content[window.content.indexOf("fighter-reinforced")] = "fighter";
+              else this._gameState$.value.flame --;
+              meleeEnemyStrength --;
+            }
+            // Check loss
+            if (this._gameState$.value.flame <= 0) this.router.navigateByUrl("/end");
+
           }
 
         }
@@ -520,7 +601,7 @@ export class GameStateService {
   lunchTime(): void {
     this._gameState$.value.food -= this._gameState$.value.people;
     this._gameState$.next(this._gameState$.value);
-    if (this._gameState$.value.food < 0 && !this._gameState$.value.isTuto) this.router.navigateByUrl("/end");
+    if (!this._gameState$.value.isTuto && this._gameState$.value.food < 0) this.router.navigateByUrl("/end");
   }
 
   countPeople(): void {
@@ -537,10 +618,39 @@ export class GameStateService {
   flameLost(): void {
     this._gameState$.value.flame --;
     this._gameState$.next(this._gameState$.value);
-    if (this._gameState$.value.flame <= 0 || this._gameState$.value.flame >= 100) this.router.navigateByUrl("/end");
+    if (!this._gameState$.value.isTuto && (this._gameState$.value.flame <= 0 || this._gameState$.value.flame >= 100)) this.router.navigateByUrl("/end");
   }
 
   random(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
+
+  addMonsters(windows: GameWindow[], day: number): GameWindow[] {
+    day -= 5;
+    for (const w of windows) {
+      if (w.name === "battlefield") {
+        w.content.push("monster-worm");
+        for (let i = 0; i < day; i++) {
+          let rand: number = this.random(0, 100);
+          if (rand < 30) w.content.push("monster-worm");
+          else if (rand < 80) w.content.push("monster-dogo");
+          else w.content.push("monster-spiter");
+        }
+      }
+    }
+    return windows;
+  }
+
+  testChangeSetup(gsValue: GameState): GameState {
+    if (gsValue.isTuto) return gsValue;
+
+    gsValue.time.speed = 0.5;
+    gsValue.time.day = 5;
+    gsValue.time.tick = 83;
+    gsValue.food = 99;
+    gsValue.flame = 99;
+    gsValue.windows[this.indexOfWindow("lighthouse")].content.push(...["archer" as DraggableNames, "fighter" as DraggableNames, "archer-reinforced" as DraggableNames, "fighter-reinforced" as DraggableNames]);
+    return gsValue;
+  }
+
 }
