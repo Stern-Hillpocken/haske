@@ -239,7 +239,12 @@ export class GameStateService {
   
       } else if (this._gameState$.value.time.tick === 75) {
         // Newcomers
-        if (this._gameState$.value.time.day === 2) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-newcomers");
+        let numberOfNewcomers: number = Math.floor(this._gameState$.value.flame) + 1;
+        let idL: number = this.indexOfWindow("lighthouse");
+        for (let i = 0; i < numberOfNewcomers; i ++) {
+          this._gameState$.value.windows[idL].content.push("worker");
+        }
+        if (this._gameState$.value.time.day === 1) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-newcomers");
   
       } else if (this._gameState$.value.time.tick === 85) {
         // Add new monsters
@@ -644,12 +649,11 @@ export class GameStateService {
   testChangeSetup(gsValue: GameState): GameState {
     if (gsValue.isTuto) return gsValue;
 
-    gsValue.time.speed = 0.5;
-    gsValue.time.day = 5;
-    gsValue.time.tick = 83;
+    //gsValue.time.day = 5;
+    gsValue.time.tick = 70;
     gsValue.food = 99;
     gsValue.flame = 99;
-    gsValue.windows[this.indexOfWindow("lighthouse")].content.push(...["archer" as DraggableNames, "fighter" as DraggableNames, "archer-reinforced" as DraggableNames, "fighter-reinforced" as DraggableNames]);
+    //gsValue.windows[this.indexOfWindow("lighthouse")].content.push();
     return gsValue;
   }
 
