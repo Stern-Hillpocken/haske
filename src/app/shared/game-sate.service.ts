@@ -601,7 +601,7 @@ export class GameStateService {
   lunchTime(): void {
     this._gameState$.value.food -= this._gameState$.value.people;
     this._gameState$.next(this._gameState$.value);
-    if (this._gameState$.value.food < 0 && !this._gameState$.value.isTuto) this.router.navigateByUrl("/end");
+    if (!this._gameState$.value.isTuto && this._gameState$.value.food < 0) this.router.navigateByUrl("/end");
   }
 
   countPeople(): void {
@@ -618,7 +618,7 @@ export class GameStateService {
   flameLost(): void {
     this._gameState$.value.flame --;
     this._gameState$.next(this._gameState$.value);
-    if (this._gameState$.value.flame <= 0 || this._gameState$.value.flame >= 100) this.router.navigateByUrl("/end");
+    if (!this._gameState$.value.isTuto && (this._gameState$.value.flame <= 0 || this._gameState$.value.flame >= 100)) this.router.navigateByUrl("/end");
   }
 
   random(min: number, max: number): number {
