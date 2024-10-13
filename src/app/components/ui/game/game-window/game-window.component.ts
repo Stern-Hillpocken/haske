@@ -194,7 +194,7 @@ export class GameWindowComponent {
   }
 
   classOfTitle(): string {
-    let style!: "basic" | "exploration" | "food" | "storage" | "workstation" | "warning";
+    let style!: "basic" | "exploration" | "food" | "storage" | "workstation" | "warning" | "battle";
     switch (this.windowInfo.name) {
       case "dressing": style = "workstation"; break;
       case "exploration": style = "exploration"; break;
@@ -215,6 +215,7 @@ export class GameWindowComponent {
       case "furnace": style = "workstation"; break;
       case "sawmill": style = "workstation"; break;
       case "field": style = "food"; break;
+      case "battlefield": style = "battle"; break;
     }
     return style;
   }
@@ -230,6 +231,7 @@ export class GameWindowComponent {
         || this.windowInfo.content.includes('archer-reinforced')
         || (this.windowInfo.name === 'furnace' && this.windowInfo.currentTime > 0)
         || (this.windowInfo.name === 'field' && this.windowInfo.currentTime > 0)
+        || (this.windowInfo.name === 'battlefield' && this.windowInfo.content.length !== 0)
       );
   }
 

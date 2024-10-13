@@ -236,7 +236,7 @@ export class GameWindowBattlefield extends GameWindow {
         public override content: DraggableNames[] = [],
         public override acceptance: DraggableNames[] = ["fighter", "archer", "fighter-reinforced", "archer-reinforced"],
         public override currentTime: number = 0,
-        public override maxTime: number = 30,
+        public override maxTime: number = 20,
     ) {
         super(name, content, acceptance)
     }

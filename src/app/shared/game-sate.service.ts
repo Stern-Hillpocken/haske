@@ -176,12 +176,14 @@ export class GameStateService {
   }
 
   timeAdvance(): void {
+    if (this._gameState$.value.time.day === 1 && this._gameState$.value.time.tick === 15) this._gameState$.next(this.testChangeSetup(this._gameState$.value));
     this._gameState$.value.time.tick ++;
     // Setup
     if (this._gameState$.value.time.day === 1) {
       if (!this._gameState$.value.isTuto) {
         if (this._gameState$.value.time.tick === 11) {
           this._gameState$.value.windows.push(
+            new GameWindowPantry(),
             new GameWindowHelp(),
             new GameWindowTrash(),
             new GameWindowRecipesBook(),
@@ -200,9 +202,6 @@ export class GameStateService {
           case 15:
             this._gameState$.value.windows.push(new GameWindowLighthouse());
             this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content = ["worker", "worker", "worker", "water", "water"];
-            // TODO remove:
-            this._gameState$.value.windows.push(new GameWindowDressing());
-            this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push(...["archer" as DraggableNames, "fighter" as DraggableNames, "archer-reinforced" as DraggableNames, "fighter-reinforced" as DraggableNames])
             break;
           case 17:
             this._gameState$.value.windows.push(new GameWindowExploration()); break;
@@ -220,6 +219,10 @@ export class GameStateService {
             this._gameState$.value.windows.push(new GameWindowTrash()); break;
           case 58:
             this._gameState$.value.windows.push(new GameWindowRecipesBook()); break;
+          case 85:
+            this._gameState$.value.windows.push(new GameWindowPantry());
+            this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-end-day");
+            break;
         }
       }
     }
@@ -251,12 +254,8 @@ export class GameStateService {
   
       } else if (this._gameState$.value.time.tick > 100) {
         // Flame lost and new day
-        if (this._gameState$.value.time.day === 5) {
-          this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-end-day");
-          this._gameState$.value.windows.push(new GameWindowPantry());
-        }
         this.flameLost();
-        if (this._gameState$.value.time.day >= 5) this.lunchTime();
+        this.lunchTime();
         this._gameState$.value.time.tick = 0;
         this._gameState$.value.time.day ++;
       }
@@ -500,7 +499,7 @@ export class GameStateService {
 
           } else if (window instanceof GameWindowBattlefield) {
             // 1: Long distance attack
-            let longDistancePlayerStrength: number = window.content.filter((e) => e === "archer" || "archer-reinforced").length;
+            let longDistancePlayerStrength: number = window.content.filter((e) => e === "archer" || e === "archer-reinforced").length;
             let longDistanceEnemyStrength: number = window.content.filter((e) => e === "monster-spiter").length;
             //
             while (longDistancePlayerStrength !== 0) {
@@ -523,7 +522,7 @@ export class GameStateService {
               firstStrikeEnemy --;
             }
             // 3: Regular attack
-            let meleePlayerStrength: number = window.content.filter((e) => e === "fighter" || "fighter-reinforced").length * 2;
+            let meleePlayerStrength: number = window.content.filter((e) => e === "fighter" || e === "fighter-reinforced").length * 2;
             let meleeEnemyStrength: number = window.content.filter((e) => e === "monster-worm").length;
             //
             while (meleePlayerStrength !== 0) {
@@ -641,4 +640,17 @@ export class GameStateService {
     }
     return windows;
   }
+
+  testChangeSetup(gsValue: GameState): GameState {
+    if (gsValue.isTuto) return gsValue;
+
+    gsValue.time.speed = 0.5;
+    gsValue.time.day = 5;
+    gsValue.time.tick = 83;
+    gsValue.food = 99;
+    gsValue.flame = 99;
+    gsValue.windows[this.indexOfWindow("lighthouse")].content.push(...["archer" as DraggableNames, "fighter" as DraggableNames, "archer-reinforced" as DraggableNames, "fighter-reinforced" as DraggableNames]);
+    return gsValue;
+  }
+
 }
