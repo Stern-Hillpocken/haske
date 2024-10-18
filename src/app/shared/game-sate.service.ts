@@ -88,6 +88,7 @@ export class GameStateService {
           windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
           this._gameState$.value.flame ++;
           if (this._gameState$.value.isTuto) this.goalService.launchTrigger("end-tuto");
+          else if (this._gameState$.value.flame === 100) this.flameLost();
         } else {
           windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
           windowEnd.content.push(dragName);
@@ -687,9 +688,12 @@ export class GameStateService {
   }
 
   flameLost(): void {
-    this._gameState$.value.flame --;
-    this._gameState$.next(this._gameState$.value);
-    if (!this._gameState$.value.isTuto && (this._gameState$.value.flame <= 0 || this._gameState$.value.flame >= 100)) this.router.navigateByUrl("/end");
+    if (!this._gameState$.value.isTuto && (this._gameState$.value.flame <= 0 || this._gameState$.value.flame >= 100)) {
+      this.router.navigateByUrl("/end");
+    } else {
+      this._gameState$.value.flame --;
+      this._gameState$.next(this._gameState$.value);
+    }
   }
 
   random(min: number, max: number): number {
@@ -713,16 +717,16 @@ export class GameStateService {
   }
 
   testChangeSetup(gsValue: GameState): GameState {
-    //if (gsValue.isTuto) return gsValue;
+    if (gsValue.isTuto) return gsValue;
 
     //gsValue.time.day = 5;
     //gsValue.time.tick = 70;
     gsValue.food = 99;
     gsValue.flame = 99;
-    gsValue.windows[this.indexOfWindow("lighthouse")].content.push("millet-seed");
+    //gsValue.windows[this.indexOfWindow("lighthouse")].content.push("millet-seed");
     gsValue.windows.push(
       new GameWindowSiper(),
-      new GameWindowField()
+      //new GameWindowField()
     )
     return gsValue;
   }
