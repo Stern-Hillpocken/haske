@@ -83,6 +83,7 @@ export class GameStateService {
         this.popupService.pushValue("error", "Champs déjà utilisé");
       } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
         if (dragName === "mana" && windowEnd instanceof GameWindowLighthouse) {
+          windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
           this._gameState$.value.flame ++;
           if (this._gameState$.value.isTuto) this.goalService.launchTrigger("end-tuto");
         } else {
@@ -122,6 +123,10 @@ export class GameStateService {
         windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
         windowEnd.slot?.push(dragName);
         windowEnd.slot?.sort();
+        if (windowStart instanceof GameWindowSiper) {
+          windowStart.power --;
+          if (windowStart.power >= 1) windowStart.slot = ["water"];
+        }
       }
     } else {
       this.popupService.pushValue("error", "Drop impossible de slot en slot");
@@ -143,7 +148,7 @@ export class GameStateService {
       return;
     }
     //
-    if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName) && !windowEnd.slot?.includes(dragName) && (windowStart.currentTime === undefined || windowStart.currentTime === 0)) {
+    if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName) && (!windowEnd.slot?.includes(dragName) || windowEnd instanceof GameWindowSiper) && (windowStart.currentTime === undefined || windowStart.currentTime === 0)) {
       if (windowEnd instanceof GameWindowSiper) {
         if (dragName === "water") {
           windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
@@ -156,6 +161,10 @@ export class GameStateService {
         windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
         windowEnd.slot?.push(dragName);
         windowEnd.slot?.sort();
+        if (windowStart instanceof GameWindowSiper) {
+          windowStart.power --;
+          if (windowStart.power > 1) windowStart.slot = ["water"];
+        }
       }
     } else if (!this.windowsWhichCanPause.includes(windowStart.name) && windowStart.currentTime && windowStart.currentTime > 0) {
       this.popupService.pushValue("error", "Pas possible de sortir alors que l’action est en cours");
@@ -183,6 +192,10 @@ export class GameStateService {
     } else if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
       windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
       windowEnd.content.push(dragName);
+      if (windowStart instanceof GameWindowSiper) {
+        windowStart.power --;
+        if (windowStart.power >= 1) windowStart.slot = ["water"];
+      }
       if (windowEnd !instanceof GameWindowFurnace && windowEnd !instanceof GameWindowSawmill) windowEnd.content.sort();
     } else {
       this.popupService.pushValue("error", "Drop impossible depuis le slot");
