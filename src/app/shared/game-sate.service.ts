@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowBattlefield, GameWindowDressing, GameWindowExploration, GameWindowField, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
+import { GameWindow, GameWindowBattlefield, GameWindowDressing, GameWindowExploration, GameWindowField, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowSiper, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -53,7 +53,7 @@ export class GameStateService {
   }
 
   onDragEnd(): void {
-    console.log(this._gameState$.value.drag)
+    //console.log(this._gameState$.value.drag)
     if (this._gameState$.value.drag.windowEndId === -1) {
       this.popupService.pushValue("error", "En dehors");
       this._gameState$.value.drag = new GameDrag();
@@ -81,10 +81,19 @@ export class GameStateService {
         this.popupService.pushValue("error", "La recette doit être correcte avant d’y assigner des ouvriers");
       } else if (windowEnd instanceof GameWindowField && windowEnd.currentTime > 0 && dragName !== "water") {
         this.popupService.pushValue("error", "Champs déjà utilisé");
+      } else if (windowEnd instanceof GameWindowField && dragName === "water" && windowEnd.content.filter(e => e === "millet-seed").length === 0) {
+        this.popupService.pushValue("error", "Pas besoin d’eau si il n'y a pas de graine");
       } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
-        windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
-        windowEnd.content.push(dragName);
-        if (windowEnd !instanceof GameWindowFurnace && windowEnd !instanceof GameWindowSawmill) windowEnd.content.sort();
+        if (dragName === "mana" && windowEnd instanceof GameWindowLighthouse) {
+          windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
+          this._gameState$.value.flame ++;
+          if (this._gameState$.value.isTuto) this.goalService.launchTrigger("end-tuto");
+          else if (this._gameState$.value.flame === 100) this.flameLost();
+        } else {
+          windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
+          windowEnd.content.push(dragName);
+          if (windowEnd !instanceof GameWindowFurnace && windowEnd !instanceof GameWindowSawmill) windowEnd.content.sort();
+        }
       } else {
         this.popupService.pushValue("error", "Drop impossible");
       }
@@ -105,12 +114,28 @@ export class GameStateService {
     }
     //
     if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName) && !windowEnd.slot?.includes(dragName)) {
-      windowEnd.slot?.push(dragName);
-      windowEnd.slot?.sort();
-      windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
+      if (windowEnd instanceof GameWindowSiper) {
+        if (dragName === "water") {
+          windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
+          windowEnd.power ++;
+          windowEnd.slot = ["water"];
+        } else {
+          this.popupService.pushValue("error", "Seulement de l’eau ici");
+        }
+      } else {
+        windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
+        windowEnd.slot?.push(dragName);
+        windowEnd.slot?.sort();
+        if (windowStart instanceof GameWindowSiper) {
+          windowStart.power --;
+          if (windowStart.power >= 1) windowStart.slot = ["water"];
+        }
+      }
     } else {
       this.popupService.pushValue("error", "Drop impossible de slot en slot");
     }
+    //
+    if (windowStart instanceof GameWindowSiper && windowStart.power < 1) windowStart.slot = [];
     //
     this._gameState$.value.drag = new GameDrag();
     this._gameState$.next(this._gameState$.value);
@@ -126,10 +151,24 @@ export class GameStateService {
       return;
     }
     //
-    if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName) && !windowEnd.slot?.includes(dragName) && (windowStart.currentTime === undefined || windowStart.currentTime === 0)) {
-      windowEnd.slot?.push(dragName);
-      windowEnd.slot?.sort();
-      windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
+    if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName) && (!windowEnd.slot?.includes(dragName) || windowEnd instanceof GameWindowSiper) && (windowStart.currentTime === undefined || windowStart.currentTime === 0)) {
+      if (windowEnd instanceof GameWindowSiper) {
+        if (dragName === "water") {
+          windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
+          windowEnd.power ++;
+          windowEnd.slot = ["water"];
+        } else {
+          this.popupService.pushValue("error", "Seulement de l’eau ici");
+        }
+      } else {
+        windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
+        windowEnd.slot?.push(dragName);
+        windowEnd.slot?.sort();
+        if (windowStart instanceof GameWindowSiper) {
+          windowStart.power --;
+          if (windowStart.power > 1) windowStart.slot = ["water"];
+        }
+      }
     } else if (!this.windowsWhichCanPause.includes(windowStart.name) && windowStart.currentTime && windowStart.currentTime > 0) {
       this.popupService.pushValue("error", "Pas possible de sortir alors que l’action est en cours");
     } else {
@@ -151,15 +190,23 @@ export class GameStateService {
       this.popupService.pushValue("error", "Atelier non prêt");
     }*/ else if (windowEnd instanceof GameWindowWorkbench && windowEnd.currentTime > 0) {
       this.popupService.pushValue("error", "Atelier déjà utilisé");
-    } else if (windowEnd instanceof GameWindowField && windowEnd.currentTime > 0 && dragName !== "water") {
+    }else if (windowEnd instanceof GameWindowField && windowEnd.currentTime > 0 && dragName !== "water") {
       this.popupService.pushValue("error", "Champs déjà utilisé");
+    } else if (windowEnd instanceof GameWindowField && dragName === "water" && windowEnd.content.filter(e => e === "millet-seed").length === 0) {
+      this.popupService.pushValue("error", "Pas besoin d’eau si il n'y a pas de graine");
     } else if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
       windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
       windowEnd.content.push(dragName);
+      if (windowStart instanceof GameWindowSiper) {
+        windowStart.power --;
+        if (windowStart.power >= 1) windowStart.slot = ["water"];
+      }
       if (windowEnd !instanceof GameWindowFurnace && windowEnd !instanceof GameWindowSawmill) windowEnd.content.sort();
     } else {
       this.popupService.pushValue("error", "Drop impossible depuis le slot");
     }
+    //
+    if (windowStart instanceof GameWindowSiper && windowStart.power < 1) windowStart.slot = [];
     //
     this._gameState$.value.drag = new GameDrag();
     this._gameState$.next(this._gameState$.value);
@@ -239,7 +286,7 @@ export class GameStateService {
   
       } else if (this._gameState$.value.time.tick === 75) {
         // Newcomers
-        let numberOfNewcomers: number = Math.floor(this._gameState$.value.flame) + 1;
+        let numberOfNewcomers: number = Math.floor(this._gameState$.value.flame/10) + 1;
         let idL: number = this.indexOfWindow("lighthouse");
         for (let i = 0; i < numberOfNewcomers; i ++) {
           this._gameState$.value.windows[idL].content.push("worker");
@@ -317,6 +364,9 @@ export class GameStateService {
         } else if (window instanceof GameWindowBattlefield) {
           if (window.content.includes("monster-worm") || window.content.includes("monster-dogo") || window.content.includes("monster-spiter")) window.currentTime ++;
 
+        } else if (window instanceof GameWindowSiper) {
+          if (window.content.filter(e => (e !== "water" && e !== "mana")).length > 0 && window.content[0] !== "mana" && window.content[0] !== "water") window.currentTime ++;
+          
         } else if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(window.content)[0] !== "nothing")) {
           window.currentTime += window.content.filter((name) => this.workerNames.includes(name)).length;
         }
@@ -423,10 +473,8 @@ export class GameStateService {
               else if (recipeName === "dressing") this._gameState$.value.windows.push(new GameWindowDressing());
               else if (recipeName === "furnace") this._gameState$.value.windows.push(new GameWindowFurnace());
               else if (recipeName === "sawmill") this._gameState$.value.windows.push(new GameWindowSawmill());
-              else if (recipeName === "field") {
-                this._gameState$.value.windows.push(new GameWindowField());
-                this.goalService.launchTrigger("build-field");
-              }
+              else if (recipeName === "field") this._gameState$.value.windows.push(new GameWindowField());
+              else if (recipeName === "siper") this._gameState$.value.windows.push(new GameWindowSiper());
               this.goalService.launchTrigger("build-"+recipeName as GoalTriggerNames);
             }
 
@@ -544,6 +592,25 @@ export class GameStateService {
             // Check loss
             if (this._gameState$.value.flame <= 0) this.router.navigateByUrl("/end");
 
+          } else if (window instanceof GameWindowSiper) {
+            // Add water
+            if (window.content[0] === "worker") {
+              this.goalService.launchTrigger("use-siper-dirty");
+              window.content.push("mana");
+              window.power += 3;
+            } else {
+              this.goalService.launchTrigger("use-siper-clean");
+              switch (window.content[0]) {
+                case "hare": window.power += 1; break;
+                case "lizard": window.power += 0.75; break;
+                case "fiber": window.power += 0.5; break;
+                case "wood": window.power += 0.5; break;
+              }
+            }
+            if (window.power >= 1) window.slot = ["water"]; 
+            // Remove element
+            window.content.shift();
+
           }
 
         }
@@ -621,9 +688,12 @@ export class GameStateService {
   }
 
   flameLost(): void {
-    this._gameState$.value.flame --;
-    this._gameState$.next(this._gameState$.value);
-    if (!this._gameState$.value.isTuto && (this._gameState$.value.flame <= 0 || this._gameState$.value.flame >= 100)) this.router.navigateByUrl("/end");
+    if (!this._gameState$.value.isTuto && (this._gameState$.value.flame <= 0 || this._gameState$.value.flame >= 100)) {
+      this.router.navigateByUrl("/end");
+    } else {
+      this._gameState$.value.flame --;
+      this._gameState$.next(this._gameState$.value);
+    }
   }
 
   random(min: number, max: number): number {
@@ -650,10 +720,14 @@ export class GameStateService {
     if (gsValue.isTuto) return gsValue;
 
     //gsValue.time.day = 5;
-    gsValue.time.tick = 70;
+    //gsValue.time.tick = 70;
     gsValue.food = 99;
     gsValue.flame = 99;
-    //gsValue.windows[this.indexOfWindow("lighthouse")].content.push();
+    //gsValue.windows[this.indexOfWindow("lighthouse")].content.push("millet-seed");
+    gsValue.windows.push(
+      new GameWindowSiper(),
+      //new GameWindowField()
+    )
     return gsValue;
   }
 

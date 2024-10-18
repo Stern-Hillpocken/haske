@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GoalTriggerNames } from '../types/goal-trigger-names.type';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -18,11 +19,11 @@ export class GoalService {
     ["Du bois de qualité", "Construire une Scierie", "Construire un Stockage"],
     ["Tournée pour tout le monde", "Trouver une graine dans les Broussailles ou Ruines", "Construire un Champs", "Mettre une ou mieux : plus de 3 graines puis de l’eau dans le Champs", "Avoir de la farine", "Avoir de la pâte", "Cuire du pain"],
     ["Se défendre", "Fabriquer un arme de corps-à-corps ou de distance", "Équiper un ou une aikaci", "Renforcer la personne pour qu’elle puisse encaisser une blessure de plus"],
-    
-    ["Allumer le Phare !", "Avoir 100 de luminosité dans le Phare"]
+    ["De l’eau et de la mana", "Construire un Siropteur", "Y mettre quelque chose qui contient de l’eau (animal ou végétal)", "Y installer un akaci permet en plus d’avoir plus d’eau, d’avoir une substance : la mana pour illuminer le phare"],
+    ["Allumer le Phare !", "Déposer une mana dans le phare pour augmenter sa luminosité et mettre fin au tuto"]
   ]
 
-  constructor() {
+  constructor(private router: Router) {
     this.addStep();
     this._goal$.next(this.formattingDisplay());
   }
@@ -74,15 +75,20 @@ export class GoalService {
       if (trigger === "melt-bread") this.isCurrentSubStepsValidated[6] = true;
     } else if (this.currentStep === 6) {
       // 6 - Equip a aikaci to have soldier
-      if (trigger === "make-weapon-contact" || "make-weapon-distance") this.isCurrentSubStepsValidated[1] = true;
+      if (trigger === "make-weapon-contact" || trigger === "make-weapon-distance") this.isCurrentSubStepsValidated[1] = true;
       if (trigger === "equip-soldier") this.isCurrentSubStepsValidated[2] = true;
       if (trigger === "equip-reinforcement") this.isCurrentSubStepsValidated[3] = true;
     } else if (this.currentStep === 7) {
-      // 7 - Perform your first sacrifice
-    } else {
-      // Light the lighthouse with 100 fire
+      // 7 - Gather water
+      if (trigger === "build-siper") this.isCurrentSubStepsValidated[1] = true;
+      if (trigger === "use-siper-clean") this.isCurrentSubStepsValidated[2] = true;
+      if (trigger === "use-siper-dirty") this.isCurrentSubStepsValidated[3] = true;
+    } else if (this.currentStep === 8) {
+      // 8 - End tuto
+      if (trigger === "end-tuto") this.isCurrentSubStepsValidated[1] = true;
     }
     if (this.isCurrentSubStepsValidated.filter(val => val === true).length === this.isCurrentSubStepsValidated.length) this.addStep();
+    if (this.currentStep === 9) this.router.navigateByUrl("/end");
     this._goal$.next(this.formattingDisplay());
   }
 
