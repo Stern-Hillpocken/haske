@@ -110,11 +110,16 @@ export class GameStateService {
     }
     //
     if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName) && !windowEnd.slot?.includes(dragName)) {
-      windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
-      if (windowEnd instanceof GameWindowSiper && dragName === "mana") {
-        windowEnd.power ++;
-        if (windowEnd.power >= 1) windowEnd.slot = ["water"];
+      if (windowEnd instanceof GameWindowSiper) {
+        if (dragName === "water") {
+          windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
+          windowEnd.power ++;
+          windowEnd.slot = ["water"];
+        } else {
+          this.popupService.pushValue("error", "Seulement de l’eau ici");
+        }
       } else {
+        windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
         windowEnd.slot?.push(dragName);
         windowEnd.slot?.sort();
       }
@@ -139,11 +144,16 @@ export class GameStateService {
     }
     //
     if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName) && !windowEnd.slot?.includes(dragName) && (windowStart.currentTime === undefined || windowStart.currentTime === 0)) {
-      windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
       if (windowEnd instanceof GameWindowSiper) {
-        windowEnd.power ++;
-        if (windowEnd.power >= 1) windowEnd.slot = ["water"];
+        if (dragName === "water") {
+          windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
+          windowEnd.power ++;
+          windowEnd.slot = ["water"];
+        } else {
+          this.popupService.pushValue("error", "Seulement de l’eau ici");
+        }
       } else {
+        windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
         windowEnd.slot?.push(dragName);
         windowEnd.slot?.sort();
       }
@@ -337,7 +347,8 @@ export class GameStateService {
           if (window.content.includes("monster-worm") || window.content.includes("monster-dogo") || window.content.includes("monster-spiter")) window.currentTime ++;
 
         } else if (window instanceof GameWindowSiper) {
-          if (window.content.length > 0) window.currentTime ++;
+          if (window.content.filter(e => (e !== "water" && e !== "mana")).length > 0 && window.content[0] !== "mana" && window.content[0] !== "water") window.currentTime ++;
+          
         } else if (!(window instanceof GameWindowWorkbench) || (window instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(window.content)[0] !== "nothing")) {
           window.currentTime += window.content.filter((name) => this.workerNames.includes(name)).length;
         }
@@ -685,13 +696,16 @@ export class GameStateService {
   }
 
   testChangeSetup(gsValue: GameState): GameState {
-    if (gsValue.isTuto) return gsValue;
+    //if (gsValue.isTuto) return gsValue;
 
     //gsValue.time.day = 5;
-    gsValue.time.tick = 70;
+    //gsValue.time.tick = 70;
     gsValue.food = 99;
     gsValue.flame = 99;
     //gsValue.windows[this.indexOfWindow("lighthouse")].content.push();
+    gsValue.windows.push(
+      new GameWindowSiper()
+    )
     return gsValue;
   }
 
