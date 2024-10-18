@@ -53,7 +53,7 @@ export class GameStateService {
   }
 
   onDragEnd(): void {
-    console.log(this._gameState$.value.drag)
+    //console.log(this._gameState$.value.drag)
     if (this._gameState$.value.drag.windowEndId === -1) {
       this.popupService.pushValue("error", "En dehors");
       this._gameState$.value.drag = new GameDrag();
@@ -81,6 +81,8 @@ export class GameStateService {
         this.popupService.pushValue("error", "La recette doit être correcte avant d’y assigner des ouvriers");
       } else if (windowEnd instanceof GameWindowField && windowEnd.currentTime > 0 && dragName !== "water") {
         this.popupService.pushValue("error", "Champs déjà utilisé");
+      } else if (windowEnd instanceof GameWindowField && dragName === "water" && windowEnd.content.filter(e => e === "millet-seed").length === 0) {
+        this.popupService.pushValue("error", "Pas besoin d’eau si il n'y a pas de graine");
       } else if (windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
         if (dragName === "mana" && windowEnd instanceof GameWindowLighthouse) {
           windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
@@ -187,8 +189,10 @@ export class GameStateService {
       this.popupService.pushValue("error", "Atelier non prêt");
     }*/ else if (windowEnd instanceof GameWindowWorkbench && windowEnd.currentTime > 0) {
       this.popupService.pushValue("error", "Atelier déjà utilisé");
-    } else if (windowEnd instanceof GameWindowField && windowEnd.currentTime > 0 && dragName !== "water") {
+    }else if (windowEnd instanceof GameWindowField && windowEnd.currentTime > 0 && dragName !== "water") {
       this.popupService.pushValue("error", "Champs déjà utilisé");
+    } else if (windowEnd instanceof GameWindowField && dragName === "water" && windowEnd.content.filter(e => e === "millet-seed").length === 0) {
+      this.popupService.pushValue("error", "Pas besoin d’eau si il n'y a pas de graine");
     } else if (windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
       windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
       windowEnd.content.push(dragName);
@@ -715,9 +719,10 @@ export class GameStateService {
     //gsValue.time.tick = 70;
     gsValue.food = 99;
     gsValue.flame = 99;
-    //gsValue.windows[this.indexOfWindow("lighthouse")].content.push();
+    gsValue.windows[this.indexOfWindow("lighthouse")].content.push("millet-seed");
     gsValue.windows.push(
-      new GameWindowSiper()
+      new GameWindowSiper(),
+      new GameWindowField()
     )
     return gsValue;
   }
