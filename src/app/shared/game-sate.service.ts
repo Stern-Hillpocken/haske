@@ -258,7 +258,7 @@ export class GameStateService {
   
       } else if (this._gameState$.value.time.tick === 75) {
         // Newcomers
-        let numberOfNewcomers: number = Math.floor(this._gameState$.value.flame) + 1;
+        let numberOfNewcomers: number = Math.floor(this._gameState$.value.flame/10) + 1;
         let idL: number = this.indexOfWindow("lighthouse");
         for (let i = 0; i < numberOfNewcomers; i ++) {
           this._gameState$.value.windows[idL].content.push("worker");

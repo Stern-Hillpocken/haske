@@ -75,17 +75,17 @@ export class GoalService {
       if (trigger === "melt-bread") this.isCurrentSubStepsValidated[6] = true;
     } else if (this.currentStep === 6) {
       // 6 - Equip a aikaci to have soldier
-      if (trigger === "make-weapon-contact" || "make-weapon-distance") this.isCurrentSubStepsValidated[1] = true;
+      if (trigger === "make-weapon-contact" || trigger === "make-weapon-distance") this.isCurrentSubStepsValidated[1] = true;
       if (trigger === "equip-soldier") this.isCurrentSubStepsValidated[2] = true;
       if (trigger === "equip-reinforcement") this.isCurrentSubStepsValidated[3] = true;
     } else if (this.currentStep === 7) {
       // 7 - Gather water
-      if (trigger === "build-siper") this.isCurrentSubStepsValidated[2] = true;
-      if (trigger === "use-siper-clean") this.isCurrentSubStepsValidated[3] = true;
-      if (trigger === "use-siper-dirty") this.isCurrentSubStepsValidated[4] = true;
+      if (trigger === "build-siper") this.isCurrentSubStepsValidated[1] = true;
+      if (trigger === "use-siper-clean") this.isCurrentSubStepsValidated[2] = true;
+      if (trigger === "use-siper-dirty") this.isCurrentSubStepsValidated[3] = true;
     } else if (this.currentStep === 8) {
       // 8 - End tuto
-      if (trigger === "end-tuto") this.isCurrentSubStepsValidated[2] = true;
+      if (trigger === "end-tuto") this.isCurrentSubStepsValidated[1] = true;
     }
     if (this.isCurrentSubStepsValidated.filter(val => val === true).length === this.isCurrentSubStepsValidated.length) this.addStep();
     if (this.currentStep === 9) this.router.navigateByUrl("/end");
