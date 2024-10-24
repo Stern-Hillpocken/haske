@@ -255,3 +255,14 @@ export class GameWindowSiper extends GameWindow {
         super(name, content, acceptance)
     }
 }
+
+export class GameWindowTrader extends GameWindow {
+    constructor(
+        public override name: WindowNames = "trader",
+        public override content: DraggableNames[] = [],
+        public override acceptance: DraggableNames[] = ["wood", "stone", "hare", "bread", "charcoal", "iron", "skin"],
+        public override slot: DraggableNames[] = [],
+    ) {
+        super(name, content, acceptance)
+    }
+}
