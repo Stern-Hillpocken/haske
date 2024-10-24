@@ -73,10 +73,13 @@ export class GameStateService {
       let windowStart = this._gameState$.value.windows[this._gameState$.value.drag.windowStartId];
       let windowEnd = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
       let dragName = this._gameState$.value.drag.draggableName;
+      console.log("in")
 
       if (windowEnd.maxSpace !== undefined && windowEnd.content.filter((name) => !this.workerNames.includes(name)).length >= windowEnd.maxSpace && !this.workerNames.includes(dragName)) {
         this.popupService.pushValue("error", "Plus de place");
       } else if (windowStart instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowStart.content)[0] !== "nothing" && windowStart.currentTime !== 0) {
+        this.popupService.pushValue("error", "La recette doit être menée à son terme");
+      } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content)[0] !== "nothing" && windowEnd.currentTime !== 0 && !this.workerNames.includes(dragName)) {
         this.popupService.pushValue("error", "La recette doit être menée à son terme");
       } else if (windowEnd instanceof GameWindowWorkbench && this.recipesServices.recipeDoable(windowEnd.content)[0] === "nothing" && dragName === "worker") {
         this.popupService.pushValue("error", "La recette doit être correcte avant d’y assigner des ouvriers");
@@ -197,7 +200,7 @@ export class GameStateService {
       this.popupService.pushValue("error", "Atelier non prêt");
     }*/ else if (windowEnd instanceof GameWindowWorkbench && windowEnd.currentTime > 0) {
       this.popupService.pushValue("error", "Atelier déjà utilisé");
-    }else if (windowEnd instanceof GameWindowField && windowEnd.currentTime > 0 && dragName !== "water") {
+    } else if (windowEnd instanceof GameWindowField && windowEnd.currentTime > 0 && dragName !== "water") {
       this.popupService.pushValue("error", "Champs déjà utilisé");
     } else if (windowEnd instanceof GameWindowField && dragName === "water" && windowEnd.content.filter(e => e === "millet-seed").length === 0) {
       this.popupService.pushValue("error", "Pas besoin d’eau si il n'y a pas de graine");
