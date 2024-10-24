@@ -37,6 +37,7 @@
         <p *ngIf="windowInfo.name === 'help'">{{ helpDisplay() }}</p>
         <p *ngIf="windowInfo.name === 'recipes-book'" [innerHTML]="recipesBookDisplay()"></p>
         <p *ngIf="windowInfo.name === 'goal'" [innerHTML]="currentGoal"></p>
+        <p *ngIf="windowInfo.name === 'trader'" [innerHTML]="tradesDisplay()"></p>
     </div>
 
     <div *ngIf="displayProgressBar()"

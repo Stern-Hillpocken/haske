@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { GameWindow, GameWindowHelp, GameWindowRecipesBook } from 'src/app/models/game-window.model';
+import { Trade } from 'src/app/models/trade.model';
 import { RecipesService } from 'src/app/shared/recipes.service';
 import { DraggableNames } from 'src/app/types/draggable-names.type';
 import { WindowNames } from 'src/app/types/window-names.type';
@@ -35,6 +36,9 @@ export class GameWindowComponent {
   @Input()
   people!: number;
 
+  @Input()
+  trades!: Trade[];
+
   @Output()
   draggableEnterEmitter: EventEmitter<number> = new EventEmitter();
 
@@ -64,6 +68,7 @@ export class GameWindowComponent {
       case "field": return "Champs";
       case "battlefield": return "Champs de bataille";
       case "siper": return "Siropteur";
+      case "trader": return "Marchand";
     }
   }
 
@@ -159,6 +164,7 @@ export class GameWindowComponent {
       case "note-event-newcomers": return "En fonction de la puissance de feu (palier de 10 + 1) de ton phare, des gens viendront te rejoindre. Mais cela impact aussi le nombre de personnes à nourrir.";
       case "note-exploration-x-time": return "Chaque lieu exploré peut l’être un certain nombre de fois, rappelé à droite par le x1, x2, x3, etc...";
       case "note-fight": return "Le combat se déroule de manière complexe mais précise. Les attaques à distances de deux camps (allié et ennemi) se déroulent. Le camp allié va attaquer en premier les monstres attaquant à distance, puis ceux au corps-à-corps (mais pas ceux qui sont trop rapide). Le camp ennemi ennemi va attaquer les aikacis attaquant à distance puis la flamme si il n’y a plus personne. Puis les ennemis qui sont rapides attaque les aikacis étant au corps-à-corps ou à défaut la flamme. Puis enfin les corps-à-corps s’attaquent mutuellement.";
+      case "note-trader": return "En début de journée un Marchand apparaît. Tu as jusqu’en début de soirée pour commercer.";
       // Items
       case "pickaxe": return "Un outil qui peut être équipé à un aikaci dans un Vestiaire, permettant d’exploiter les mines.";
       case "weapon-contact": return "Une arme de mêlée facilement utilisable à une ou deux mains.";
@@ -241,6 +247,17 @@ export class GameWindowComponent {
   progressBarWidth(): number {
     if (!this.windowInfo.currentTime || !this.windowInfo.maxTime) return 0;
     return this.windowInfo.currentTime*100/this.windowInfo.maxTime;
+  }
+
+  tradesDisplay(): string {
+    let dispay: string = "";
+    for (const trade of this.trades) {
+      trade.wantQuantity > 1 ? dispay += trade.wantQuantity + "x " : "";
+      dispay += "<img src='assets/images/draggable/" + trade.wantName + ".png'> <span class='math-sign'>--></span> ";
+      trade.giveQuantity > 1 ? dispay += trade.giveQuantity + "x ": "";
+      dispay += "<img src='assets/images/draggable/" + trade.giveName + ".png'><br>";
+    }
+    return dispay;
   }
 
 }

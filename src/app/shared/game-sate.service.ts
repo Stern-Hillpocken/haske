@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GameState } from '../models/game-state.model';
 import { GameTime } from '../models/game-time.model';
-import { GameWindow, GameWindowBattlefield, GameWindowDressing, GameWindowExploration, GameWindowField, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowSiper, GameWindowStorage, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
+import { GameWindow, GameWindowBattlefield, GameWindowDressing, GameWindowExploration, GameWindowField, GameWindowFurnace, GameWindowGoal, GameWindowHelp, GameWindowLighthouse, GameWindowMine, GameWindowPantry, GameWindowQuarry, GameWindowRecipesBook, GameWindowRuin, GameWindowSawmill, GameWindowScrub, GameWindowSiper, GameWindowStorage, GameWindowTrader, GameWindowTrash, GameWindowWorkbench } from '../models/game-window.model';
 import { GameDrag } from '../models/game-drag.model';
 import { DraggableNames } from '../types/draggable-names.type';
 import { ResourceNames } from '../types/resource-names.type';
@@ -15,6 +15,7 @@ import { MonsterPartNames } from '../types/monster-part-names.type';
 import { GoalTriggerNames } from '../types/goal-trigger-names.type';
 import { UtilsService } from './utils.service';
 import { Router } from '@angular/router';
+import { TradesService } from './trades.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +27,7 @@ export class GameStateService {
   windowsWhichCanPause: WindowNames[] = ["exploration", "scrub", "quarry"];
   workerNames: DraggableNames[] = ["worker", "miner", "fighter", "archer", "fighter-reinforced", "archer-reinforced"];
 
-  constructor(private router: Router, private popupService: PopupService, private recipesServices: RecipesService, private goalService: GoalService, private utils: UtilsService) { }
+  constructor(private router: Router, private popupService: PopupService, private recipesServices: RecipesService, private goalService: GoalService, private tradesService: TradesService, private utils: UtilsService) { }
 
   _getGameState$(): Observable<GameState> {
     return this._gameState$.asObservable();
@@ -58,7 +59,7 @@ export class GameStateService {
       this.popupService.pushValue("error", "En dehors");
       this._gameState$.value.drag = new GameDrag();
       this._gameState$.next(this._gameState$.value);
-    } else if (this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowHelp || this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowRecipesBook || this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowGoal) {
+    } else if (this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowHelp || this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowRecipesBook || this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowGoal || this._gameState$.value.windows[this._gameState$.value.drag.windowEndId] instanceof GameWindowTrader) {
       this.popupService.pushValue("error", "Impossible de stocker dans du texte");
       this._gameState$.value.drag = new GameDrag();
       this._gameState$.next(this._gameState$.value);
@@ -131,6 +132,9 @@ export class GameStateService {
           if (windowStart.power >= 1) windowStart.slot = ["water"];
         }
       }
+    } else if (windowEnd instanceof GameWindowTrader && windowStart.slot?.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
+      windowStart.slot.splice(windowStart.slot.indexOf(dragName), 1);
+      windowEnd.slot?.push(dragName);
     } else {
       this.popupService.pushValue("error", "Drop impossible de slot en slot");
     }
@@ -171,6 +175,9 @@ export class GameStateService {
       }
     } else if (!this.windowsWhichCanPause.includes(windowStart.name) && windowStart.currentTime && windowStart.currentTime > 0) {
       this.popupService.pushValue("error", "Pas possible de sortir alors que l’action est en cours");
+    } else if (windowEnd instanceof GameWindowTrader && windowStart.content.includes(dragName) && windowEnd.acceptance.includes(dragName)) {
+      windowStart.content.splice(windowStart.content.indexOf(dragName), 1);
+      windowEnd.slot.push(dragName);
     } else {
       this.popupService.pushValue("error", "Drop impossible dans le slot");
     }
@@ -219,6 +226,7 @@ export class GameStateService {
     this.performTimedActions();
     this.emptyTrash();
     this.emptyPantrySlot();
+    this.performTrade();
     this.countPeople();
   }
 
@@ -279,6 +287,9 @@ export class GameStateService {
       if (this._gameState$.value.time.tick === 5) {
         // Morning environment event
         if (this._gameState$.value.time.day === 2) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-event");
+        this._gameState$.value.windows.push(new GameWindowTrader());
+        this.tradesService.newTrader();
+        if (this._gameState$.value.time.day === 1) this._gameState$.value.windows[this.indexOfWindow('lighthouse')].content.push('note-trader');
   
       } else if (this._gameState$.value.time.day === 1 && this._gameState$.value.time.tick === 11) {
         // First trigger
@@ -294,6 +305,10 @@ export class GameStateService {
         if (this._gameState$.value.time.day === 1) this._gameState$.value.windows[this.indexOfWindow("lighthouse")].content.push("note-event-newcomers");
   
       } else if (this._gameState$.value.time.tick === 85) {
+        // Remove trader
+        if (this.indexOfWindow("trader") != -1) {
+          this._gameState$.value.windows.splice(this.indexOfWindow("trader"), 1);
+        }
         // Add new monsters
         if (this._gameState$.value.time.day > 5) this._gameState$.value.windows = this.addMonsters(this._gameState$.value.windows, this._gameState$.value.time.day);
         // Add new battle-field
@@ -667,6 +682,15 @@ export class GameStateService {
     if (pantryID === -1) return; // For tuto
     this._gameState$.value.food += this.utils.foodValue(this._gameState$.value.windows[pantryID].slot as DraggableNames[]);
     this._gameState$.value.windows[pantryID].slot = [];
+    this._gameState$.next(this._gameState$.value);
+  }
+
+  performTrade(): void {
+    let indexOfTrader: number = this.indexOfWindow('trader');
+    if (indexOfTrader === -1) return;
+    if (!(this._gameState$.value.windows[indexOfTrader] instanceof GameWindowTrader)) return;
+
+    this._gameState$.value.windows[indexOfTrader].slot = this.tradesService.tradeCheckAndPerform(this._gameState$.value.windows[indexOfTrader].slot as DraggableNames[]);
     this._gameState$.next(this._gameState$.value);
   }
 
