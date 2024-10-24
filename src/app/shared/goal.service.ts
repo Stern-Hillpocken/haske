@@ -93,6 +93,10 @@ export class GoalService {
   }
 
   formattingDisplay(): string {
+    if (this.currentStep === 9) {
+      this.router.navigateByUrl("/end");
+      return "";
+    }
     let concatedString: string = "<h4>" + this.allSubSteps[this.currentStep][0] + "</h4><ul>";
     for (let i = 1; i < this.isCurrentSubStepsValidated.length; i++) {
       if (this.isCurrentSubStepsValidated[i] === true) concatedString += "<li class='goal-validated'>";
