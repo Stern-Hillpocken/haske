@@ -73,7 +73,6 @@ export class GameStateService {
       let windowStart = this._gameState$.value.windows[this._gameState$.value.drag.windowStartId];
       let windowEnd = this._gameState$.value.windows[this._gameState$.value.drag.windowEndId];
       let dragName = this._gameState$.value.drag.draggableName;
-      console.log("in")
 
       if (windowEnd.maxSpace !== undefined && windowEnd.content.filter((name) => !this.workerNames.includes(name)).length >= windowEnd.maxSpace && !this.workerNames.includes(dragName)) {
         this.popupService.pushValue("error", "Plus de place");
